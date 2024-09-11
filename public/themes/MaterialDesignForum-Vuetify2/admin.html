@@ -1,0 +1,32 @@
+<!doctype html><html lang="{lang}"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5"><title>{title}</title><meta name="keywords" content="{keywords}"><meta name="description" content="{description}"><link rel="icon" href="/public/themes/MaterialDesignForum-Vuetify2/favicon.png"><script defer="defer" src="/public/themes/MaterialDesignForum-Vuetify2/js/chunk-vendors.0ad27a1f.js"></script><script defer="defer" src="/public/themes/MaterialDesignForum-Vuetify2/js/chunk-common.e1087dbc.js"></script><script defer="defer" src="/public/themes/MaterialDesignForum-Vuetify2/js/admin.5589670c.js"></script><link href="/public/themes/MaterialDesignForum-Vuetify2/css/chunk-vendors.3b8cc7dc.css" rel="stylesheet"><link href="/public/themes/MaterialDesignForum-Vuetify2/css/chunk-common.d413a90e.css" rel="stylesheet"><link href="/public/themes/MaterialDesignForum-Vuetify2/css/admin.0f90e43e.css" rel="stylesheet"></head><style>.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: black;
+    /* background-color: {loading-screen-background-color}; */
+    z-index: 9999;
+  }
+
+  .loading-text {
+    font-size: 5em;
+    /* font-size: 10em; */
+    font-weight: bold;
+    color: white;
+    /* color: {loading-text-color}; */
+    text-align: center;
+  }</style><body><div id="client"><div id="app"><div class="loading-screen"><div class="loading-text">{upcoming}</div></div>{content}</div></div><script>// window.onload = function () {
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches ||
+      new Date().getHours() >= 20 || new Date().getHours() <= 8
+    ) {
+      document.querySelector('.loading-screen').style.backgroundColor = 'black';
+      document.querySelector('.loading-text').style.color = 'white';
+    } else {
+      document.querySelector('.loading-screen').style.backgroundColor = 'white';
+      document.querySelector('.loading-text').style.color = 'black';
+    }
+    // }</script><script id="seo"></script></body></html>

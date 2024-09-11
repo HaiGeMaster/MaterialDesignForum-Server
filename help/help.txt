@@ -1,0 +1,38 @@
+1.先把demo_table.sql导入你的MySQL
+
+2.在\public\src\Config\Config.php中修改为你的数据库信息：如下所示
+    //以下是可以修改的配置↓
+    $config['mysql_hostname'] = 'localhost'; //数据库地址
+    $config['mysql_username'] = 'root'; //数据库用户名
+    $config['mysql_password'] = 'root'; //数据库密码
+    $config['mysql_database'] = 'demo'; //'root';//数据库名
+    $config['mysql_prefix'] = ''; //数据库表前缀
+    //以上是可以修改的配置↑
+其他内容不要更改。
+
+3.配置nginx规则。宝塔路径为：点击 你的域名->配置文件->将以下内容添加进去
+
+location / {
+  try_files $uri $uri/ /index.html;
+}
+
+其他服务器配置规则请去看：https://router.vuejs.org/zh/guide/essentials/history-mode.html。
+
+4.QQ群891100027提供售后服务和帮助。
+
+5.爱发电主页：https://afdian.com/a/HaiGeMaster。
+可以购买续期产品序列号（https://afdian.com/item/1822ba0a55a111ef873b52540025c377）。
+
+6.默认安装完毕会有3天试用期。
+
+7.默认用户为2个，Admin和User账户名，密码均是1234。
+
+8.群主的免费帮助服务看情况执行。
+
+9.demo演示站点：https://demo.xbedrock.com/info。别问为什么很慢因为没有放CDN而且套了CF。
+
+10.图标资产默认用的CDN。有需要的找群主单独打包带图标资产的。
+
+11.需要exe打包定制和apk打包定制请单独咨询群主。谢谢
+
+12.没有了

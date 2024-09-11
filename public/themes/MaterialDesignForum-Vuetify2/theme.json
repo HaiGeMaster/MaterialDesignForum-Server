@@ -1,0 +1,8 @@
+{
+    "name": "MaterialDesignVuetify2",
+    "version": "1.0.0",
+    "description": "Material Design for Vuetify2",
+    "disabled": false,
+    "language_routes": true,
+    "support_ie":false
+}

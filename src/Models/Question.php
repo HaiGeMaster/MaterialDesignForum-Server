@@ -1,0 +1,160 @@
+<?php
+/**
+ * author HaiGeMaster
+ * @package MaterialDesignForum
+ * @link https://demo.xbedorck.com
+ */
+
+namespace MaterialDesignForum\Models;
+
+use Illuminate\Database\Eloquent\Model as Eloquent;
+
+class Question extends Eloquent
+{
+  protected $table = 'question';
+  public $timestamps = false;
+  protected $primaryKey = 'question_id';
+  protected $fillable = [
+    'question_id', // 这个字段不需要
+    'user_id',
+    'title',
+    'content_markdown', //纯文本
+    'content_rendered', //渲染后的HTML
+    'comment_count',
+    'answer_count',
+    'follower_count',
+    'vote_count', //投票数 vote_up_count-vote_down_count
+    'vote_up_count',
+    'vote_down_count',
+    'last_answer_time',
+    'create_time',
+    'update_time',
+    'delete_time'
+  ];
+  // 搜索字段
+  public static $search_field = ['title','content_markdown'];
+  /**
+   * 添加评论数
+   * @param int $question_id 问题ID
+   * @param int $count 数量
+   * @return bool
+   */
+  public static function AddCommentCount($question_id, $count = 1): bool
+  {
+    $question = self::find($question_id);
+    $question->comment_count += $count;
+    return $question->save();
+  }
+  /**
+   * 添加回答数
+   * @param int $question_id 问题ID
+   * @param int $count 数量
+   * @return bool
+   */
+  public static function AddAnswerCount($question_id, $count = 1): bool
+  {
+    $question = self::find($question_id);
+    $question->answer_count += $count;
+    return $question->save();
+  }
+  /**
+   * 添加关注数
+   * @param int $question_id 问题ID
+   * @param int $count 数量
+   * @return bool
+   */
+  public static function AddFollowerCount($question_id, $count = 1): bool
+  {
+    $question = self::find($question_id);
+    $question->follower_count += $count;
+    return $question->save();
+  }
+  /**
+   * 添加赞成投票数
+   * @param int $question_id 问题ID
+   * @param int $count 数量
+   * @return bool
+   */
+  public static function AddVoteUpCount($question_id, $count = 1): bool
+  {
+    $question = self::find($question_id);
+    $question->vote_up_count += $count;
+    $question->vote_count += $count;
+    return $question->save();
+  }
+  /**
+   * 添加反对投票数
+   * @param int $question_id 问题ID
+   * @param int $count 数量
+   * @return bool
+   */
+  public static function AddVoteDownCount($question_id, $count = 1): bool
+  {
+    $question = self::find($question_id);
+    $question->vote_down_count += $count;
+    $question->vote_count -= $count;
+    return $question->save();
+  }
+  /**
+   * 减少评论数
+   * @param int $question_id 问题ID
+   * @param int $count 数量
+   * @return bool
+   */
+  public static function SubCommentCount($question_id, $count = 1): bool
+  {
+    $question = self::find($question_id);
+    $question->comment_count -= $count;
+    return $question->save();
+  }
+  /**
+   * 减少回答数
+   * @param int $question_id 问题ID
+   * @param int $count 数量
+   * @return bool
+   */
+  public static function SubAnswerCount($question_id, $count = 1): bool
+  {
+    $question = self::find($question_id);
+    $question->answer_count -= $count;
+    return $question->save();
+  }
+  /**
+   * 减少关注数
+   * @param int $question_id 问题ID
+   * @param int $count 数量
+   * @return bool
+   */
+  public static function SubFollowerCount($question_id, $count = 1): bool
+  {
+    $question = self::find($question_id);
+    $question->follower_count -= $count;
+    return $question->save();
+  }
+  /**
+   * 减少赞成投票数
+   * @param int $question_id 问题ID
+   * @param int $count 数量
+   * @return bool
+   */
+  public static function SubVoteUpCount($question_id, $count = 1): bool
+  {
+    $question = self::find($question_id);
+    $question->vote_up_count -= $count;
+    $question->vote_count -= $count;
+    return $question->save();
+  }
+  /**
+   * 减少反对投票数
+   * @param int $question_id 问题ID
+   * @param int $count 数量
+   * @return bool
+   */
+  public static function SubVoteDownCount($question_id, $count = 1): bool
+  {
+    $question = self::find($question_id);
+    $question->vote_down_count -= $count;
+    $question->vote_count += $count;
+    return $question->save();
+  }
+}

@@ -1,0 +1,913 @@
+<?php
+/**
+ * author HaiGeMaster
+ * @package MaterialDesignForum
+ * @link https://demo.xbedorck.com
+ */
+
+namespace MaterialDesignForum\Controllers;
+
+use itbdw\Ip\IpLocation;
+use MaterialDesignForum\Models\MailCaptcha as MailCaptchaModel;
+use MaterialDesignForum\Models\ImageCaptcha as ImageCaptchaModel;
+use MaterialDesignForum\Models\User as UserModel;
+use MaterialDesignForum\Controllers\Cache as CacheController;
+use MaterialDesignForum\Controllers\Image as ImageController;
+use MaterialDesignForum\Controllers\UserGroup as UserGroupController;
+use MaterialDesignForum\Controllers\Token as TokenController;
+use MaterialDesignForum\Controllers\Follow as FollowController;
+use MaterialDesignForum\Config\Config;
+use MaterialDesignForum\Plugins\i18n;
+use MaterialDesignForum\Plugins\Share;
+use MaterialDesignForum\Controllers\Question as QuestionController;
+use MaterialDesignForum\Controllers\Article as ArticleController;
+use MaterialDesignForum\Controllers\Answer as AnswerController;
+
+class User extends UserModel
+{
+  /**
+   * 请求注册用户
+   * @param string $email 邮箱
+   * @param string $password 密码
+   * @param string $email_captcha 邮箱验证码
+   * @param string $username 用户名
+   * @return json {is_register:是否注册成功}
+   */
+  public static function AddUser($email, $password, $email_captcha, $username = "")
+  {
+    $v = false;
+    $client_email = base64_decode($email);
+    $client_password = self::HandlePassword(base64_decode($password)); //base64_decode($password);
+    $client_email_captcha = md5(base64_decode($email_captcha));
+    //$client_username = base64_decode($username);
+    $client_username = $username == "" ? "User" . Share::ServerTime() : $username;
+    if ($client_username == "") {
+      $client_username = $client_email;
+    }
+    $client_user = self::where('email', '=', $client_email)->first() == null;
+    if ($client_user) {
+      $client_user = self::where('username', '=', $client_username)->first() == null;
+      if ($client_user) {
+        if (CacheController::IsVaildCaptcha($client_email_captcha)) {
+          $user = new self();
+          if (self::count() == 0) {
+            $user->user_group_id = 1;
+          } else {
+            $user->user_group_id = 2;
+          }
+          $user->email = $client_email;
+          $user->password = $client_password;
+          $user->username = $client_username;
+          $user->create_ip = self::GetClientIP();
+          $user->create_location =  self::GetClientLocation();
+          $user->location = self::GetClientLocation();
+          $user->create_time = Share::ServerTime();
+          $user->update_time = Share::ServerTime();
+          //获取网络时间
+
+          $user->avatar = self::CreateDefaultAvatar($client_username); //可能会导致注册失败 vue开发时
+          $user->cover = self::CreateDefaultCover();
+          $v = $user->save();
+          if ($v) {
+            $add = UserGroupController::AddUserGroupUserCount($user->user_group_id);
+            while (!$add) {
+              $add = UserGroupController::AddUserGroupUserCount($user->user_group_id);
+            }
+            CacheController::DeleteCaptcha($client_email_captcha);
+          }
+        }
+      }
+    }
+    $data = array(
+      'is_add' => $v,
+      // 'user' => $v ? $user : null,//安全问题不得返回用户信息
+    );
+    return $data;
+  }
+  /**
+   * 修改用户信息
+   * @param string $email 邮箱
+   * @param string $username 用户名
+   * @param string $user_group_id 用户组id
+   * @param string $headline 个人简介
+   * @param string $blog 个人主页
+   * @param string $company 所属学校或企业
+   * @param string $location 所在地
+   * @param string $bio 个人介绍
+   * @param string $user_token token 修改者用户token字符串
+   * @param string $edit_target_user_id 要编辑的用户id
+   * @return json {is_edit:是否更新成功,user:新的用户信息}
+   */
+  public static function EditInfo($email,$username, $user_group_id, $headline, $blog, $company, $location, $bio, $user_token, $edit_target_user_id)
+  {
+    $is_edit = false;
+    $user = null;
+
+    $user_id = TokenController::GetUserId($user_token);
+    $user_data = UserModel::find($edit_target_user_id);
+    if ($user_data != null) {
+      if ($user_data->user_id == $user_id && UserGroupController::Ability($user_token, 'ability_edit_own_info') || UserGroupController::IsAdmin($user_token)) {
+        $user_data->username = $username;
+        $user_data->email = $email;
+        if (UserGroupController::IsAdmin($user_token)) {
+          if (UserGroupController::SubUserGroupUserCount($user_data->user_group_id)) {
+            if (UserGroupController::AddUserGroupUserCount($user_group_id)) {
+              $user_data->user_group_id = $user_group_id;
+            }
+          } else {
+            UserGroupController::AddUserGroupUserCount($user_data->user_group_id);
+            return [
+              'is_edit' => false,
+              // 'user' => $user,
+              'user' => self::GetUser($edit_target_user_id, $user_token)['user'],
+            ];
+          }
+        }
+        $user_data->headline = $headline;
+        $user_data->blog = $blog;
+        $user_data->company = $company;
+        $user_data->location = $location;
+        $user_data->bio = $bio;
+        $user_data->update_time = Share::ServerTime();
+        $is_edit = $user_data->save();
+        $user = $user_data;
+      }
+    }
+    return [
+      'is_edit' => $is_edit,
+      //'user' => $user,
+      'user' => self::GetUser($edit_target_user_id, $user_token)['user'],
+    ];
+  }
+  public static function CreateDefaultAvatar($name, $user_id = 'cache')
+  {
+    return ImageController::CreateUserDefaultAvatar($name, $user_id);
+  }
+  public static function CreateDefaultCover()
+  {
+    return ImageController::CreateUserDefaultCover();
+  }
+  /**
+   * 获取客户端IP地址
+   */
+  public static function GetClientIP()
+  {
+    $client_ip = '0.0.0.0';
+    if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+      $client_ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+    } elseif (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+      $client_ip = $_SERVER['HTTP_CLIENT_IP'];
+    } else {
+      $client_ip = $_SERVER['REMOTE_ADDR'];
+    }
+    return $client_ip;
+  }
+  /**
+   * 获取客户端IP地址的地理位置
+   * // 返回结果
+   *  array (size=4)
+   *    0 => string '中国' (length=6)
+   *    1 => string '河南' (length=6)
+   *    2 => string '郑州' (length=6)
+   *    3 => string '' (length=0)
+   *    4 => string '410100' (length=6)
+   */
+  public static function GetClientLocation()
+  {
+    $ip = self::GetClientIP();
+    $Location = IpLocation::getLocation($ip);
+    return $Location['country'] . ' ' . $Location['province'] . ' ' . $Location['city'] . ' ' . $Location['county'] . ' ' . $Location['isp'];
+  }
+  /**
+   * 请求发送邮件验证码
+   * @param string $email 邮箱
+   * @param string $lang 语言 如zh_CN 必须来自客户端界面支持的语言 可选的 i18n将会自动检测并设置。
+   * @return json {send_mail:发送的邮箱,is_send:是否发送成功,email_code:邮箱验证码,locale:语言}
+   */
+  public static function GetEmailCaptcha($email, $lang = "")
+  {
+    $client_email = base64_decode($email);
+    $client_lang = base64_decode($lang);
+    $v = false;
+    $config = Config::getConfig();
+    $MailCaptcha = new MailCaptchaModel();
+    $Captcha = $MailCaptcha->CreateMailCode();
+    if ($client_lang != '') {
+      i18n::i18n()->setLocale($client_lang);
+    }
+    $v = $MailCaptcha->SendMail(
+      $client_email,
+      $config['smtp_send_name'] . ':' . i18n::t('Message.Components.Account.Code'),
+      $Captcha['code']
+    );
+    CacheController::create([
+      'name' => $Captcha['md5code'],
+      'value' => $Captcha['code'],
+      'create_time' => Share::ServerTime(),
+      'life_time' => Share::ServerTime() + (60 * 5)
+    ]);
+    $data = array(
+      'is_send' => $v,
+    );
+    // if (Config::Dev()) {
+    //   $data['dev_client_send_mail'] = $client_email;
+    //   $data['dev_client_email_code'] = $Captcha['md5code'];
+    //   $data['dev_client_locale'] = $client_lang;
+    // }
+    return $data;
+  }
+  /**
+   * 请求图片验证码
+   * @return img 图片验证码
+   */
+  public static function GetImageCaptcha($time = 0)
+  {
+    $ImageCaptcha = new ImageCaptchaModel();
+    $Captcha = $ImageCaptcha->CreateImgAndCode();
+    CacheController::create([
+      'name' => $Captcha['md5code'],
+      'value' => $Captcha['code'],
+      'create_time' => Share::ServerTime(),
+      'life_time' => Share::ServerTime() + (60 * 5)
+    ]);
+    return $ImageCaptcha->OutputImg();
+  }
+  /**
+   * 请求登录验证
+   * @param string $email 邮箱
+   * @param string $password 密码
+   * @param string $image_capthca 验证码
+   * @return json {is_login:是否登录成功,token:token字符串}
+   */
+  public static function Login($username_or_email, $password, $image_capthca = "")
+  {
+    try {
+      $username_or_email = base64_decode($username_or_email);
+      $password = self::HandlePassword(base64_decode($password));
+      $image_capthca = $image_capthca ? md5(base64_decode($image_capthca)) : '';
+
+      $user = self::where('email', '=', $username_or_email)->first();
+      if ($user == null) {
+        $user = self::where('username', '=', $username_or_email)->first();
+      }
+      $token = '';
+      $is_login = false;
+      if ($user != null) {
+        if (
+          ($user->email == $username_or_email || $user->username == $username_or_email) &&
+          $user->password == $password &&
+          ($image_capthca == '' || CacheController::IsVaildCaptcha($image_capthca))
+        ) {
+          $local_user = $user;
+          $token = TokenController::SpawnUserToken($local_user);
+          $update_user = self::where('user_id', '=', $user->user_id)->update([
+            'last_login_ip' => self::GetClientIP(),
+            'last_login_location' => self::GetClientLocation(),
+            'last_login_time' => Share::ServerTime(),
+          ]);
+          if ($token != '' && $update_user) {
+            if ($image_capthca != '') {
+              CacheController::DeleteCaptcha($image_capthca);
+            } //删除验证码
+            $is_login = true;
+          }
+        }
+      }
+      return [
+        'is_login' => $is_login,
+        //'token' => $is_login ? $token : '',
+        'token' => $token,
+      ];
+    } catch (\Exception $e) {
+      return [
+        'message' => $e->getMessage(),
+      ];
+    }
+  }
+  /**
+   * 请求修改用户密码
+   * @param string $email 邮箱
+   * @param string $email_captcha 邮箱验证码
+   * @param string $password 密码
+   * @return json {is_reset:是否重置成功}
+   */
+  public static function Reset($email, $password, $email_captcha)
+  {
+    $client_email = base64_decode($email);
+    $client_password = self::HandlePassword(base64_decode($password)); //base64_decode($password);
+    $client_email_captcha = md5(base64_decode($email_captcha));
+    $v = false;
+    $client_cache = CacheController::IsVaildCaptcha($client_email_captcha);
+    //然后检查邮箱是否存在
+    $Update_user = self::where('email', '=', $client_email)->update([
+      'password' => $client_password,
+    ]);
+    if ($client_cache && $Update_user == 1) {
+      $v = true;
+    }
+    $data = array(
+      'is_reset' => $v,
+    );
+    // if (Config::Dev()) {
+    //   $data['dev_client_email'] = $client_email;
+    //   $data['dev_client_password'] = $client_password;
+    //   $data['dev_client_email_captcha'] = $client_email_captcha;
+    // }
+    return $data;
+  }
+  /**
+   * 请求用户信息
+   * @param string $token token字符串
+   * @return json {is_login:是否登录成功,user:用户信息}
+   */
+  public static function Auto_Login($token)
+  {
+    $is_login = false;
+    $user_id = TokenController::GetUserId($token);
+    $user = null;
+    if ($user_id) {
+      $user = self::where('user_id', '=', $user_id)->first();
+      if ($user) {
+        $user->last_login_ip = self::GetClientIP();
+        $user->last_login_location = self::GetClientLocation();
+        $user->last_login_time = Share::ServerTime();
+        if ($user->save()) {
+          $user->password = null;
+          $user->user_group = UserGroupController::find($user->user_group_id);
+          $is_login = true;
+        }
+      }
+    }
+
+    return [
+      'is_login' => $is_login,
+      'user' => $user,
+    ];
+  }
+  /**
+   * 根据user_id请求用户信息
+   * @param string $user_id 用户id
+   * @param string $user_token token字符串 可选
+   * @param string $is_admin 是否是管理员 可选
+   * @return json {is_get:是否获取成功,user:用户信息含is_follow、user_group}
+   */
+  public static function GetUser($user_id, $user_token = '', $is_admin = false)
+  {
+    $user = self::find($user_id);
+    $_user_id = '';
+    if($user_token!=''&&$user!=null){
+      $_user_id = TokenController::GetUserId($user_token);
+    }
+
+    
+    if($user->cover==null){
+      $user->cover = self::CreateDefaultCover();
+      // $user->save();
+    }
+
+    if($user_id == $_user_id){//用户自己查看自己的信息 必须安全的访问用户信息
+      if ($user) {
+        $user->is_follow = false;//用户不可能关注自己//FollowController::IsFollow($user_token, 'user', $user_id, true);
+        $user->user_group = UserGroupController::find($user->user_group_id);
+      }
+      if (!$is_admin && $user != null) {
+        // $user->email = null;
+        $user->password = null;
+      }
+    }else{//其他用户查看用户信息
+      $user = self::GetUserInfo($user_id, $user_token)['user'];
+    }
+    
+    $data = [
+      'is_get' => $user != null,
+      'user' => $user != null ? $user : null,
+    ];
+    return $data;
+  }
+  /**
+   * 根据user_id请求用户简介信息
+   * @param string $user_id 用户id
+   * @param string $user_token token字符串 可选
+   * @return json {is_get:是否获取成功,user:用户信息含is_follow、user_group}
+   */
+  public static function GetUserInfo($user_id, $user_token = '')
+  {
+    $user = self::find($user_id);
+    $return_user = null;
+
+    if ($user) {
+      $user->is_follow = FollowController::IsFollow($user_token, 'user', $user_id, true);
+      $user->user_group = UserGroupController::GetUserGroupInfo($user->user_group_id);
+      if($user->cover==null){
+        $user->cover = self::CreateDefaultCover();
+        // $user->save();
+      }
+      $return_user = [
+        'user_id' => $user->user_id,
+        'username' => $user->username,
+        'avatar' => $user->avatar,
+        'cover' => $user->cover,
+        'headline' => $user->headline,
+        'blog' => $user->blog,
+        'company' => $user->company,
+        'location' => $user->location,
+        'bio' => $user->bio,
+        'question_count' => $user->question_count,
+        'article_count' => $user->article_count,
+        'answer_count' => $user->answer_count,
+        'follower_count' => $user->follower_count,
+        'followee_count' => $user->followee_count,
+        'user_group' => $user->user_group,
+        'is_follow' => $user->is_follow,
+        'create_time' => $user->create_time,
+        'update_time' => $user->update_time,
+      ];
+    }
+
+    $data = [
+      'is_get' => $user != null,
+      'user' => $return_user,
+    ];
+    return $data;
+  }
+  /**
+   * 请求用户列表信息
+   * @param string $order 排序
+   * @param string $page 页码
+   * @param string $type 类型 recommended,followees,followers
+   * @param string $user_token token字符串
+   * @param string $per_page 每页显示的数量
+   * @param string $search_keywords 搜索关键词
+   * @param array $search_field 搜索字段
+   * @param string $is_admin 是否是管理员
+   * @return json {分页用户信息}
+   */
+  public static function GetUsers(
+    $order,
+    $page = 1,
+    $type = 'recommended',
+    $user_token = '',
+    $per_page = 20,
+    $search_keywords = '',
+    $search_field = [],
+    $is_admin = false
+  ) {
+    if($search_field == []){
+      $search_field = self::$search_field;
+    }
+    $data = Share::HandleDataAndPagination(null);
+    $order = Share::HandleArrayField($order);
+    $field = $order['field'];
+    $order = $order['sort'];
+    if ($type == 'recommended') {
+      if ($search_keywords != '') {
+        $data = self::where('disable_time', '=', 0)
+          //->where($search_field, 'like', '%' . $search_keywords . '%')
+          ->where(function ($query) use ($search_field, $search_keywords) {
+            foreach ($search_field as $key => $value) {
+              $query->orWhere($value, 'like', '%' . $search_keywords . '%');
+            }
+          })
+          ->orderBy($field, $order)
+          ->paginate($per_page, ['*'], 'page', $page);
+      } else {
+        $data = self::where('disable_time', '=', 0)
+          ->orderBy($field, $order)
+          ->paginate($per_page, ['*'], 'page', $page);
+      }
+
+      $data = Share::HandleDataAndPagination($data);
+    } else if ($type == 'followees') {
+      $followees_id = FollowController::where('user_id', '=', TokenController::GetUserId($user_token))
+        ->where('followable_type', '=', 'user')
+        ->orderBy($field, $order)
+        ->pluck('followable_id');
+
+      if ($search_keywords != '') {
+        $data = self::where('disable_time', '=', 0)
+          ->whereIn('user_id', $followees_id)
+          //->where($search_field, 'like', '%' . $search_keywords . '%')
+          ->where(function ($query) use ($search_field, $search_keywords) {
+            foreach ($search_field as $key => $value) {
+              $query->orWhere($value, 'like', '%' . $search_keywords . '%');
+            }
+          })
+          ->orderBy($field, $order)
+          ->paginate($per_page, ['*'], 'page', $page);
+      } else {
+        $data = self::where('disable_time', '=', 0)
+          ->whereIn('user_id', $followees_id)
+          ->orderBy($field, $order)
+          ->paginate($per_page, ['*'], 'page', $page);
+      }
+
+      $data = Share::HandleDataAndPagination($data);
+    } else if ($type == 'followers') {
+      $followers_id = FollowController::where('followable_id', '=', TokenController::GetUserId($user_token))
+        ->where('followable_type', '=', 'user')
+        ->orderBy($field, $order)
+        ->pluck('user_id');
+
+      if ($search_keywords != '') {
+        $data = self::where('disable_time', '=', 0)
+          ->whereIn('user_id', $followers_id)
+          //->where($search_field, 'like', '%' . $search_keywords . '%')
+          ->where(function ($query) use ($search_field, $search_keywords) {
+            foreach ($search_field as $key => $value) {
+              $query->orWhere($value, 'like', '%' . $search_keywords . '%');
+            }
+          })
+          ->orderBy($field, $order)
+          ->paginate($per_page, ['*'], 'page', $page);
+      } else {
+        $data = self::where('disable_time', '=', 0)
+          ->whereIn('user_id', $followers_id)
+          ->orderBy($field, $order)
+          ->paginate($per_page, ['*'], 'page', $page);
+      }
+
+      $data = Share::HandleDataAndPagination($data);
+    } else {
+      // $data = self::where('disable_time', '=', 0)
+      //   ->orderBy($field, $order)
+      //   ->paginate($per_page, ['*'], 'page', $page);
+      // $data = Share::HandleDataAndPagination($data);
+
+      if ($search_keywords != '') {
+        $data = self::where('disable_time', '=', 0)
+          //->where($search_field, 'like', '%' . $search_keywords . '%')
+          ->where(function ($query) use ($search_field, $search_keywords) {
+            foreach ($search_field as $key => $value) {
+              $query->orWhere($value, 'like', '%' . $search_keywords . '%');
+            }
+          })
+          ->orderBy($field, $order)
+          ->paginate($per_page, ['*'], 'page', $page);
+      } else {
+        $data = self::where('disable_time', '=', 0)
+          ->orderBy($field, $order)
+          ->paginate($per_page, ['*'], 'page', $page);
+      }
+
+      $data = Share::HandleDataAndPagination($data);
+    }
+
+    // if($user->cover==null){
+    //   $user->cover = self::CreateDefaultCover();
+    //   // $user->save();
+    // }
+
+    if ($data['data'] != null && !$is_admin) {
+      foreach ($data['data'] as $key => $value) {
+        $data['data'][$key] = self::GetUserInfo($value['user_id'], $user_token)['user'];
+      }
+    }
+
+    //循环检查有人的背景图是否为空
+    if ($data['data'] != null){
+      foreach ($data['data'] as $key => $value) {
+        if($value['cover']==null){
+          $value['cover'] = self::CreateDefaultCover();
+        }
+      }
+    }
+
+    return $data;
+  }
+  /**
+   * 重置所有人的头像 仅限开发者使用
+   * @return json {is_reset:是否重置成功}
+   */
+  public static function DEV_AllUserAvatarReset()
+  {
+    if (!Config::Dev()) {
+      return array(
+        'is_reset' => false,
+      );
+    }
+    $users = self::all();
+    foreach ($users as $key => $value) {
+      $avatar = self::CreateDefaultAvatar($value->username, $value->user_id);
+      self::find($value->user_id)->update([
+        'avatar' => $avatar,
+      ]);
+    }
+    return array(
+      'is_reset' => true,
+    );
+  }
+  /**
+   * 重置所有人的封面 仅限开发者使用
+   * @return json {is_reset:是否重置成功}
+   */
+  public static function DEV_AllUserCoverReset()
+  {
+    if (!Config::Dev()) {
+      return array(
+        'is_reset' => false,
+      );
+    }
+    // $users = self::all();
+    // foreach ($users as $key => $value) {
+    //   $cover = self::CreateDefaultCover();
+    //   self::find($value->user_id)->update([
+    //     'cover' => $cover,
+    //   ]);
+    // }
+    $users = self::where('cover', '=', null)->get();
+    foreach ($users as $key => $value) {
+      $cover = self::CreateDefaultCover();
+      self::find($value->user_id)->update([
+        'cover' => $cover,
+      ]);
+    }
+    return array(
+      'is_reset' => true,
+    );
+  }
+  /**
+   * 重置用户头像
+   * @param string $user_id 用户id
+   * @param string $user_token token字符串
+   * @return json {is_reset:是否重置成功}
+   */
+  public static function ResetAvatar($user_id, $user_token)
+  {
+    $is_reset = false;
+    $user = self::find($user_id);
+    try {
+      if ($user != null) {
+        if (UserGroupController::IsAdmin($user_token) || TokenController::IsUserSelf($user_token, $user_id)) {
+          if ($user->avatar != null) {
+            $avatar = $user->avatar;
+            if (is_array($avatar)) {
+              if (array_search('default', $avatar) === false) {
+                ImageController::DeleteUploadImage($user->avatar);
+              }
+            } else {
+              if (strpos($user->avatar, 'default') === false) {
+                ImageController::DeleteUploadImage($user->avatar);
+              }
+            }
+          }
+          $avatar = self::CreateDefaultAvatar($user->username, $user_id);
+          $is_reset = self::find($user_id)->update([
+            'avatar' => $avatar,
+          ]);
+        }
+      }
+    } catch (\Exception $e) {
+      return [
+        'is_reset' => $is_reset,
+        'message' => $e->getMessage(),
+      ];
+    }
+    return [
+      'is_reset' => $is_reset,
+    ];
+  }
+  /**
+   * 重置用户封面
+   * @param string $user_id 用户id
+   * @param string $user_token token字符串
+   * @return json {is_reset:是否重置成功}
+   */
+  public static function ResetCover($user_id, $user_token)
+  {
+    $is_reset = false;
+    $user = self::find($user_id);
+    try {
+      if ($user != null) {
+        if (UserGroupController::IsAdmin($user_token) || TokenController::IsUserSelf($user_token, $user_id)) {
+          if ($user->cover != null) {
+            $cover = $user->cover;
+            if (is_array($cover)) {
+              if (array_search('default', $cover) === false) {
+                ImageController::DeleteUploadImage($user->cover);
+              }
+            } else {
+              if (strpos($user->cover, 'default') === false) {
+                ImageController::DeleteUploadImage($user->cover);
+              }
+            }
+          }
+          $cover = self::CreateDefaultCover();
+          $is_reset = self::find($user_id)->update([
+            'cover' => $cover,
+          ]);
+        }
+      }
+    } catch (\Exception $e) {
+      return [
+        'is_reset' => $is_reset,
+        'message' => $e->getMessage(),
+      ];
+    }
+    return [
+      'is_reset' => $is_reset,
+    ];
+  }
+  /**
+   * 上传头像
+   * @param string $user_token token字符串
+   * @param string $avatar 头像base64
+   * @return json {is_upload:是否上传成功,user:用户信息}
+   */
+  public static function UploadAvatar($user_token, $avatar)
+  {
+    $v = false;
+    $server_user = null;
+    $server_avatar = null;
+    $server_user_id = TokenController::GetUserId($user_token);
+    $server_user = self::find($server_user_id);
+    if ($server_user != null) {
+      if (ImageController::DeleteUploadImage($server_user->avatar)) {
+        $server_avatar = ImageController::SaveUploadImage('user_avatar', $avatar, $server_user_id);
+      }
+      if ($server_avatar != null) {
+        $v = self::find($server_user_id)->update([
+          'avatar' => $server_avatar,
+        ]);
+      }
+    }
+    $data = array(
+      'is_upload' => $v,
+      'user' => User::GetUser($server_user_id, $user_token)['user'],
+      //'avatar' => $avatar,
+    );
+    $v ? $data['user']['password'] = '' : ''; //不返回密码
+    $v ? $data['user']['user_group'] = UserGroupController::find($server_user->user_group_id) : '';
+    return $data;
+  }
+  /**
+   * 上传封面
+   * @param string $user_token token字符串
+   * @param string $cover 封面base64
+   * @return json {is_upload:是否上传成功,user:用户信息}
+   */
+  public static function UploadCover($user_token, $cover)
+  {
+    $v = false;
+    $server_user = null;
+    $server_cover = null;
+    $server_user_id = TokenController::GetUserId($user_token);
+    $server_user = self::find($server_user_id);
+    if ($server_user != null) {
+      if (ImageController::DeleteUploadImage($server_user->cover)) {
+        $server_cover = ImageController::SaveUploadImage('user_cover', $cover, $server_user_id);
+      }
+      if ($server_cover != null) {
+        $v = self::find($server_user_id)->update([
+          'cover' => $server_cover,
+        ]);
+      }
+    }
+    $data = array(
+      'is_upload' => $v,
+      'user' => User::GetUser($server_user_id, $user_token)['user'],
+      //'avatar' => $avatar,
+    );
+    $v ? $data['user']['password'] = '' : ''; //不返回密码
+    $v ? $data['user']['user_group'] = UserGroupController::find($server_user->user_group_id) : '';
+    return $data;
+  }
+  /**
+   * 获取用户的提问
+   * @param string $user_id 用户id
+   * @param string $order 排序
+   * @param string $page 页码
+   * @param string $user_token token字符串
+   * @param string $per_page 每页显示的数量
+   * @return json {分页提问信息}
+   */
+  public static function GetUserQuestions(
+    $user_id,
+    $order,
+    $page,
+    $user_token,
+    $per_page = 20
+  ) {
+    $data = Share::HandleDataAndPagination(null);
+    $orders = Share::HandleArrayField($order);
+    $field = $orders['field'];
+    $sort = $orders['sort'];
+    $data = QuestionController::where('user_id', '=', $user_id)
+      ->where('delete_time', '=', 0)
+      ->orderBy($field, $sort)
+      ->paginate($per_page, ['*'], 'page', $page);
+    $data = Share::HandleDataAndPagination($data);
+    if ($data['data'] != null) {
+      foreach ($data['data'] as $key => $value) {
+        $data['data'][$key]->user = self::GetUserInfo($value->user_id, $user_token)['user'];
+      }
+    }
+    return $data;
+  }
+  /**
+   * 获取用户的回答
+   * @param string $user_id 用户id
+   * @param string $order 排序
+   * @param string $page 页码
+   * @param string $user_token token字符串
+   * @param string $per_page 每页显示的数量
+   * @return json {分页回答信息}
+   */
+  public static function GetUserArticles(
+    $user_id,
+    $order,
+    $page,
+    $user_token,
+    $per_page = 20
+  ) {
+    $data = Share::HandleDataAndPagination(null);
+    $orders = Share::HandleArrayField($order);
+    $field = $orders['field'];
+    $sort = $orders['sort'];
+    $data = ArticleController::where('user_id', '=', $user_id)
+      ->where('delete_time', '=', 0)
+      ->orderBy($field, $sort)
+      ->paginate($per_page, ['*'], 'page', $page);
+    $data = Share::HandleDataAndPagination($data);
+    if ($data['data'] != null) {
+      foreach ($data['data'] as $key => $value) {
+        $data['data'][$key]->user = self::GetUserInfo($value->user_id, $user_token)['user'];
+      }
+    }
+    return $data;
+  }
+  /**
+   * 获取用户的回答
+   * @param string $user_id 用户id
+   * @param string $order 排序
+   * @param string $page 页码
+   * @param string $user_token token字符串
+   * @param string $per_page 每页显示的数量
+   * @return json {分页回答信息}
+   */
+  public static function GetUserAnswers(
+    $user_id,
+    $order,
+    $page,
+    $user_token,
+    $per_page = 20
+  ) {
+    $data = Share::HandleDataAndPagination(null);
+    $orders = Share::HandleArrayField($order);
+    $field = $orders['field'];
+    $sort = $orders['sort'];
+    $data = AnswerController::where('user_id', '=', $user_id)
+      ->where('delete_time', '=', 0)
+      ->orderBy($field, $sort)
+      ->paginate($per_page, ['*'], 'page', $page);
+    $data = Share::HandleDataAndPagination($data);
+    if ($data['data'] != null) {
+      // if (isset($data['data']) && is_array($data['data'])) {
+      foreach ($data['data'] as $key => $value) {
+        $data['data'][$key]->user = self::GetUserInfo($value->user_id, $user_token)['user'];
+        //根据question_id获取问题的标题。问题可能被删除。将不再有效
+        // $data['data'][$key]->question_title = QuestionController::GetQuestion($value->question_id, $user_token)['question']['title'];
+
+        $question = QuestionController::find($value->question_id);
+        //如果$question->delete_time不为0则说明问题已经被删除
+        if ($question->delete_time != 0) {
+          $data['data'][$key]->question_title = null;
+
+          //同时从数组中删除这个回答
+          unset($data['data'][$key]);
+        } else {
+          $data['data'][$key]->question_title = $question->title;
+        }
+      }
+    }
+    return $data;
+  }
+  /**
+   * 用户添加提问、文章、回答图片
+   * @param string $user_token token字符串
+   * @param string $type 类型 question、article、answer
+   * @param string $file 图片base64
+   * @return json {is_upload:是否上传成功,upload_url:上传的图片url}
+   */
+  public static function UploadImage($user_token, $type, $file){
+    $data = [
+      'is_upload' => false,
+      'upload_url' => null,
+    ];
+    $user_id = TokenController::GetUserId($user_token);
+    if($user_id!=null){
+      //确保type是正确的
+      if($type!='question'&&$type!='article'&&$type!='answer'){
+        return $data;
+      }
+      $upload_url = ImageController::SaveUploadImage($type, $file, $user_id);
+      //上传成功,保存一份记录到数据库
+      if($upload_url!=null){
+        ImageController::AddImageRecord($type,0,$user_id,$upload_url['original']);
+      }
+      $is_upload = $upload_url != null;
+      $data['is_upload'] = $is_upload;
+      $data['upload_url'] = $upload_url['original'];
+    }
+    return $data;
+  }
+}

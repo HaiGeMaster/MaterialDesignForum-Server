@@ -1,0 +1,18 @@
+{
+  "prefer-stable": true,
+  "minimum-stability": "stable",
+  "require": {
+    "phroute/phroute": "^2.2",
+    "phpmailer/phpmailer": "^6.8",
+    "illuminate/database": "^8.83",
+    "itbdw/ip-database": "^3.0",
+    "lincanbin/material-design-avatars": "^1.4",
+    "illuminate/pagination": "^8.83",
+    "nesbot/carbon": "^2.72"
+  },
+  "autoload": {
+    "psr-4": {
+      "MaterialDesignForum\\": "src/"
+    }
+  }
+}
