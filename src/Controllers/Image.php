@@ -128,40 +128,100 @@ class Image extends ImageModel
     try{
 
       if ($r) {
+        // foreach ($sizeArray as $key => $size) {
+        //   //读取图片，并生成不同分辨率的图片，不使用MDAvatars
+        //   // 屏蔽警告
+        //   error_reporting(E_ERROR | E_PARSE);
+        //   $image = imagecreatefrompng($locale_img);
+        //   // 恢复默认错误报告级别
+        //   error_reporting(E_ALL);
+        //   if ($size == null) {
+        //     //直接保存
+        //     $paths = $path . '/' . $key;
+        //     if (!file_exists($paths)) {
+        //       mkdir($paths, 0777, true);
+        //     }
+        //     $png = $path . '/' . $key . '/' . $file_name . '.png'; //public/static/upload/user/avatars/user_id/key/xxx.png
+        //     imagepng($image, $png);
+        //     //$AvatarData[$key] = $png;
+        //     $AvatarData[$key] = '/' . $png;
+        //   } else {
+        //     $new_image = imagecreatetruecolor($size[0], $size[1]);
+        //     $source_width = imagesx($image); // 获取原始图像的宽度
+        //     $source_height = imagesy($image); // 获取原始图像的高度
+        //     imagecopyresampled($new_image, $image, 0, 0, 0, 0, $size[0], $size[1], $source_width, $source_height);
+        //     $paths = $path . '/' . $key;
+        //     if (!file_exists($paths)) {
+        //       mkdir($paths, 0777, true);
+        //     }
+        //     $png = $path . '/' . $key . '/' . $file_name . '.png'; //public/static/upload/user/avatars/user_id/key/xxx.png
+        //     imagepng($new_image, $png);
+        //     //$AvatarData[$key] = $png;
+        //     $AvatarData[$key] = '/' . $png;
+        //   }
+        //   if($type=='question'||$type=='article'||$type=='answer'){
+
+        //   }
+        // }
         foreach ($sizeArray as $key => $size) {
-          //读取图片，并生成不同分辨率的图片，不使用MDAvatars
+          // 读取图片，并生成不同分辨率的图片，不使用MDAvatars
           // 屏蔽警告
           error_reporting(E_ERROR | E_PARSE);
           $image = imagecreatefrompng($locale_img);
           // 恢复默认错误报告级别
           error_reporting(E_ALL);
+      
           if ($size == null) {
-            //直接保存
-            $paths = $path . '/' . $key;
-            if (!file_exists($paths)) {
-              mkdir($paths, 0777, true);
-            }
-            $png = $path . '/' . $key . '/' . $file_name . '.png'; //public/static/upload/user/avatars/user_id/key/xxx.png
-            imagepng($image, $png);
-            //$AvatarData[$key] = $png;
-            $AvatarData[$key] = '/' . $png;
+              // 直接保存
+              $paths = $path . '/' . $key;
+              if (!file_exists($paths)) {
+                  mkdir($paths, 0777, true);
+              }
+              $png = $path . '/' . $key . '/' . $file_name . '.png'; // public/static/upload/user/avatars/user_id/key/xxx.png
+              imagepng($image, $png);
+              $AvatarData[$key] = '/' . $png;
           } else {
-            $new_image = imagecreatetruecolor($size[0], $size[1]);
-            $source_width = imagesx($image); // 获取原始图像的宽度
-            $source_height = imagesy($image); // 获取原始图像的高度
-            imagecopyresampled($new_image, $image, 0, 0, 0, 0, $size[0], $size[1], $source_width, $source_height);
-            $paths = $path . '/' . $key;
-            if (!file_exists($paths)) {
-              mkdir($paths, 0777, true);
-            }
-            $png = $path . '/' . $key . '/' . $file_name . '.png'; //public/static/upload/user/avatars/user_id/key/xxx.png
-            imagepng($new_image, $png);
-            //$AvatarData[$key] = $png;
-            $AvatarData[$key] = '/' . $png;
-          }
-          if($type=='question'||$type=='article'||$type=='answer'){
+              $new_image = imagecreatetruecolor($size[0], $size[1]);//创建一个真彩色图像
+      
+              // 确保新图像的背景透明
+              imagealphablending($new_image, false);//关闭混色模式
+              imagesavealpha($new_image, true);//设置保存PNG时保留透明通道信息
+              $transparent = imagecolorallocatealpha($new_image, 0, 0, 0, 127);//为一幅图像分配颜色
+              imagefill($new_image, 0, 0, $transparent);//填充
+      
+              $source_width = imagesx($image); // 获取原始图像的宽度
+              $source_height = imagesy($image); // 获取原始图像的高度
+              imagecopyresampled($new_image, $image, 0, 0, 0, 0, $size[0], $size[1], $source_width-4, $source_height);//重采样拷贝部分图像并调整大小
 
+              //如果原始大小和目标大小一样，那么直接拷贝
+              // if($source_width==$size[0]&&$source_height==$size[1]){
+              //   imagecopy($new_image, $image, 0, 0, 0, 0, $size[0], $size[1]);
+              // }else{
+              //   imagecopyresampled($new_image, $image, 0, 0, 0, 0, $size[0], $size[1], $source_width-2, $source_height-2);//重采样拷贝部分图像并调整大小
+              // }
+
+              // //检查是否存在透明色
+              // $color = imagecolorat($new_image, 0, 0);
+              // $colors = imagecolorsforindex($new_image, $color);
+              // if ($colors['alpha'] == 127) {
+              //     //如果存在透明色，那么将透明色设置为白色
+              //     $white = imagecolorallocate($new_image, 255, 255, 255);
+              //     imagecolortransparent($new_image, $white);
+              // }
+              
+              $paths = $path . '/' . $key;
+              if (!file_exists($paths)) {
+                  mkdir($paths, 0777, true);
+              }
+              $png = $path . '/' . $key . '/' . $file_name . '.png'; // public/static/upload/user/avatars/user_id/key/xxx.png
+              imagepng($new_image, $png);
+              $AvatarData[$key] = '/' . $png;
+      
+              // 释放内存
+              imagedestroy($new_image);
           }
+          // 释放内存
+          imagedestroy($image);
         }
       }
     }catch(\Exception $e){
