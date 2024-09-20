@@ -51,7 +51,7 @@ class Config
     
     $config['mysql_max_query'] = 20; //最大每次查询数据库的数量（条） 过大可能导致服务器缓慢查询
     $config['seo'] = true; //是否开启SEO
-    $config['php_default_theme'] = 'MaterialDesign-Vuetify2'; //默认主题
+    $config['php_default_theme'] = 'MaterialDesignForum-Vuetify2'; //默认主题
     return $config;
   }
   public static function Dev(): bool
@@ -148,6 +148,6 @@ class Config
   }
   public static function GetDefaultTheme(): string
   {
-    return self::getConfig()['php_default_theme'];
+    return Option::Get('theme')||self::getConfig()['php_default_theme'];
   }
 }

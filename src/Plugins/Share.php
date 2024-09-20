@@ -91,11 +91,12 @@ class Share
    * @param string $script 脚本
    * @return string
    */
-  public static function HandleAdminPage($lang, $theme)
+  public static function HandleAdminPage($lang, $theme='MaterialDesignForum-Vuetify2')
   {
     if ($theme == '') {
       //$theme = self::GetClientThemeName();
-      $theme = Config::GetDefaultTheme();
+      // $theme = Config::GetDefaultTheme();
+      $theme = 'MaterialDesignForum-Vuetify2';
     }
     $index_html = file_get_contents(Config::GetWebThemePath() . $theme . '/admin.html');
     $upcoming = i18n::t('Message.App.UpComing', $lang);
