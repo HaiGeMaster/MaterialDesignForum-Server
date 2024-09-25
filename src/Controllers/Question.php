@@ -56,6 +56,8 @@ class Question extends QuestionModel
         UserGroupController::IsAdmin($user_token)
       )
     ) {
+      $content_markdown = preg_replace('/\s+/', '', $content_markdown);//去除回车和空格
+      
       $question = new QuestionModel;
       $question->user_id = $user_id;
       $question->title = $title;
@@ -261,6 +263,8 @@ class Question extends QuestionModel
         ||
         UserGroupController::IsAdmin($user_token)
       ) {
+        $content_markdown = preg_replace('/\s+/', '', $content_markdown);//去除回车和空格
+        
         $question->title = $title;
         $question->content_markdown = $content_markdown;
         $question->content_rendered = $content_rendered;

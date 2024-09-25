@@ -49,6 +49,8 @@ class Answer extends AnswerModel
         UserGroupController::IsAdmin($user_token)
       )
     ) {
+      $content_markdown = preg_replace('/\s+/', '', $content_markdown);//去除回车和空格
+
       $answer = new AnswerModel;
       $answer->question_id = $question_id;
       $answer->user_id = $user_id;
@@ -200,6 +202,8 @@ class Answer extends AnswerModel
         ||
         UserGroupController::IsAdmin($user_token)
       ) {
+        $content_markdown = preg_replace('/\s+/', '', $content_markdown);//去除回车和空格
+        
         $answer->content_markdown = $content_markdown;
         $answer->content_rendered = $content_rendered;
         $answer->update_time = Share::ServerTime();

@@ -32,7 +32,7 @@ class Page
         i18n::t('Message.Client.Info.ProductIntroduction'),
         i18n::t('Message.Client.Info.ProductIntroduction'),
         '',
-        'MaterialDesignVuetify2'
+        'MaterialDesignForum-Vuetify2'
       );
     });
     $collector->get('/{lang:[a-z]{2}_[A-Z]{2}}/info', function ($lang) {
@@ -43,7 +43,7 @@ class Page
         i18n::t('Message.Client.Info.ProductIntroduction'),
         i18n::t('Message.Client.Info.ProductIntroduction'),
         '',
-        'MaterialDesignVuetify2'
+        'MaterialDesignForum-Vuetify2'
       );
     });
     $collector->get('/', function () {

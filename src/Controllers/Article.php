@@ -56,6 +56,8 @@ class Article extends ArticleModel
         UserGroupController::IsAdmin($user_token)
       )
     ) {
+      $content_markdown = preg_replace('/\s+/', '', $content_markdown);//去除回车和空格
+      
       $article = new ArticleModel;
       $article->user_id = $user_id;
       $article->title = $title;
@@ -257,6 +259,8 @@ class Article extends ArticleModel
         ||
         UserGroupController::IsAdmin($user_token)
       ) {
+        $content_markdown = preg_replace('/\s+/', '', $content_markdown);//去除回车和空格
+        
         $article->title = $title;
         $article->content_markdown = $content_markdown;
         $article->content_rendered = $content_rendered;
