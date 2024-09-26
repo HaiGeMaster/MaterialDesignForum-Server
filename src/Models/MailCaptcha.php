@@ -1,4 +1,5 @@
 <?php
+
 /**
  * author HaiGeMaster
  * @package MaterialDesignForum
@@ -96,7 +97,7 @@ class MailCaptcha
   //   }
   // }
   /**
-   * @param string $to 收件人
+   * @param string||array $to 收件人
    * @param string $subject 主题
    * @param string $content 内容
    * @return bool 发送邮件
@@ -111,38 +112,120 @@ class MailCaptcha
     $smtp_host = $config['smtp_host'];
     $smtp_port = $config['smtp_port'];
     $smtp_secure = $config['smtp_secure'];
+
+    // 记录发送状态
+    $sendResults = [];
+
+    // 创建新的 PHPMailer 实例
     $mail = new PHPMailer(true);
+
+    // 配置 SMTP
     try {
       $mail->isSMTP();
       $mail->SMTPAuth = true;
       $mail->Host = $smtp_host;
       $mail->Username = $smtp_username;
       $mail->Password = $smtp_password;
-      $mail->SMTPSecure = $smtp_secure;//ssl
+      $mail->SMTPSecure = $smtp_secure; // ssl
       $mail->Port = $smtp_port;
       $mail->CharSet = 'UTF-8';
       $mail->setFrom($smtp_username, $smtp_send_name);
-      $mail->addReplyTo($smtp_username, ['Information']);
+      $mail->addReplyTo($smtp_username, 'Information');
+
+      // 检查收件人是否为数组
       if (is_array($to)) {
         foreach ($to as $v) {
+          // 为每个收件人发送一封邮件
           $mail->addAddress($v);
+
+          // 设置邮件主题和内容
+          $mail->isHTML(true);
+          $mail->Subject = $subject;
+          if (is_array($content)) {
+            $allcontent = implode('<br>', $content);
+            $mail->Body = $allcontent;
+          } else {
+            $mail->Body = $content;
+          }
+
+          // 发送邮件
+          if ($mail->send()) {
+            $sendResults[$v] = true; // 记录成功
+          } else {
+            $sendResults[$v] = false; // 记录失败
+          }
+
+          // 清除收件人以便下次发送
+          $mail->clearAddresses();
         }
       } else {
+        // 如果是单个收件人
         $mail->addAddress($to);
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        if (is_array($content)) {
+          $allcontent = implode('<br>', $content);
+          $mail->Body = $allcontent;
+        } else {
+          $mail->Body = $content;
+        }
+
+        // 发送邮件
+        if ($mail->send()) {
+          $sendResults[$to] = true; // 记录成功
+        } else {
+          $sendResults[$to] = false; // 记录失败
+        }
       }
-      $mail->isHTML(true);
-      $mail->Subject = $subject;
-      if (is_array($content)) {
-        $allcontent = implode('<br>', $content);
-        $mail->Body = $allcontent;
-      } else {
-        $mail->Body = $content;
-      }
-      $mail->send();
-      return true;
+
+      return $sendResults; // 返回发送结果
     } catch (Exception $e) {
-      //return $e;
+      // 处理异常
       return false;
     }
   }
+  // public function SendMail($to = "", $subject = '', $content = '<h1>Hello World Test</h1>')
+  // {
+  //   //include_once __DIR__ . '/../../plugins/share.php';
+  //   $config = Config::getConfig();
+  //   $smtp_username = $config['smtp_username'];
+  //   $smtp_password = $config['smtp_password'];
+  //   $smtp_send_name = $config['smtp_send_name'];
+  //   $smtp_host = $config['smtp_host'];
+  //   $smtp_port = $config['smtp_port'];
+  //   $smtp_secure = $config['smtp_secure'];
+  //   $mail = new PHPMailer(true);
+  //   try {
+  //     $mail->isSMTP();
+  //     $mail->SMTPAuth = true;
+  //     $mail->Host = $smtp_host;
+  //     $mail->Username = $smtp_username;
+  //     $mail->Password = $smtp_password;
+  //     $mail->SMTPSecure = $smtp_secure;//ssl
+  //     $mail->Port = $smtp_port;
+  //     $mail->CharSet = 'UTF-8';
+  //     $mail->setFrom($smtp_username, $smtp_send_name);
+  //     $mail->addReplyTo($smtp_username, ['Information']);
+  //     if (is_array($to)) {
+  //       foreach ($to as $v) {
+  //         $mail->addAddress($v);
+  //       }
+  //     } else {
+  //       $mail->addAddress($to);
+  //     }
+  //     $mail->isHTML(true);
+  //     $mail->Subject = $subject;
+  //     if (is_array($content)) {
+  //       $allcontent = implode('<br>', $content);
+  //       $mail->Body = $allcontent;
+  //     } else {
+  //       $mail->Body = $content;
+  //     }
+  //     $mail->send();
+  //     return true;
+  //   } catch (Exception $e) {
+  //     //return $e;
+  //     return false;
+  //   }
+  // }
 }
