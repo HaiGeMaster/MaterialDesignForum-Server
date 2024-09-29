@@ -1,4 +1,5 @@
 <?php
+
 /**
  * author HaiGeMaster
  * @package MaterialDesignForum
@@ -211,7 +212,7 @@ class UserGroup extends UserGroupModel
         if ($user_group->$name == 0) {
           return true;
         } else {
-          if ($ObjectCreationTimeStamp != null&&$ObjectCreationTimeStamp != '') {
+          if ($ObjectCreationTimeStamp != null && $ObjectCreationTimeStamp != '') {
             $time = $user_group->$name; //$time等于多少分钟
             $time = $time * 60; //$time等于$time * 60秒 得到 共 秒
             $time1 = Share::ServerTime() - $ObjectCreationTimeStamp; //$time1 等于当前时间 - $ObjectCreationTimeStamp 得到 共 秒
@@ -235,40 +236,42 @@ class UserGroup extends UserGroupModel
    * @return array
    */
   public static function GetUserGroups(
-    $order, 
-    $page, 
-    $user_token, 
-    $per_page = 20, 
-    $search_keywords = '', 
+    $order,
+    $page,
+    $user_token,
+    $per_page = 20,
+    $search_keywords = '',
     $search_field = []
-    )
-  {
+  ) {
     $orders = Share::HandleArrayField($order);
     $field = $orders['field'];
     $sort = $orders['sort'];
-    if($search_field == []){
+    if ($search_field == []) {
       $search_field = self::$search_field;
     }
     $data = Share::HandleDataAndPagination(null);
-    if ($search_keywords != '') {
-      // $data = self::where($search_field, 'like', '%' . $search_keywords . '%')
-      //   ->where('delete_time', '=', 0)
-      //   ->orderBy($field, $sort)
-      //   ->paginate($per_page, ['*'], 'page', $page);
-      $data = self::where('delete_time', '=', 0)
-        ->where(function ($query) use ($search_field, $search_keywords) {
-          foreach ($search_field as $key => $value) {
-            $query->orWhere($value, 'like', '%' . $search_keywords . '%');
-          }
-        })
-        ->orderBy($field, $sort)
-        ->paginate($per_page, ['*'], 'page', $page);
-    } else {
-      $data = self::orderBy($field, $sort)
-        ->where('delete_time', '=', 0)
-        ->paginate($per_page, ['*'], 'page', $page);
+    $is_admin = self::IsAdmin($user_token);
+    if ($is_admin) {
+      if ($search_keywords != '') {
+        // $data = self::where($search_field, 'like', '%' . $search_keywords . '%')
+        //   ->where('delete_time', '=', 0)
+        //   ->orderBy($field, $sort)
+        //   ->paginate($per_page, ['*'], 'page', $page);
+        $data = self::where('delete_time', '=', 0)
+          ->where(function ($query) use ($search_field, $search_keywords) {
+            foreach ($search_field as $key => $value) {
+              $query->orWhere($value, 'like', '%' . $search_keywords . '%');
+            }
+          })
+          ->orderBy($field, $sort)
+          ->paginate($per_page, ['*'], 'page', $page);
+      } else {
+        $data = self::orderBy($field, $sort)
+          ->where('delete_time', '=', 0)
+          ->paginate($per_page, ['*'], 'page', $page);
+      }
+      $data = Share::HandleDataAndPagination($data);
     }
-    $data = Share::HandleDataAndPagination($data);
     return $data;
   }
   /**

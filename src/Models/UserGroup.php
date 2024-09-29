@@ -147,6 +147,7 @@ class UserGroup extends Eloquent
   ];
   // 搜索字段
   public static $search_field = [
+    'user_group_id',
     'user_group_name',
     'user_group_description'
   ];

@@ -101,37 +101,50 @@ class User extends UserModel
   public static function EditInfo($email,$username, $user_group_id, $headline, $blog, $company, $location, $bio, $user_token, $edit_target_user_id)
   {
     $is_edit = false;
-    $user = null;
+    // $user = null;
 
     $user_id = TokenController::GetUserId($user_token);
     $user_data = UserModel::find($edit_target_user_id);
-    if ($user_data != null) {
-      if ($user_data->user_id == $user_id && UserGroupController::Ability($user_token, 'ability_edit_own_info') || UserGroupController::IsAdmin($user_token)) {
-        $user_data->username = $username;
-        $user_data->email = $email;
-        if (UserGroupController::IsAdmin($user_token)) {
-          if (UserGroupController::SubUserGroupUserCount($user_data->user_group_id)) {
-            if (UserGroupController::AddUserGroupUserCount($user_group_id)) {
-              $user_data->user_group_id = $user_group_id;
+    try{
+      if ($user_data != null) {
+        if ($user_data->user_id == $user_id && 
+        UserGroupController::Ability($user_token, 'ability_edit_own_info') || UserGroupController::IsAdmin($user_token)
+        ) {
+          $user_data->username = $username;
+          $user_data->email = $email;
+
+          if (UserGroupController::IsAdmin($user_token)) {//确定是否是管理员再修改用户组
+            if (UserGroupController::SubUserGroupUserCount($user_data->user_group_id)) {//减少原来的用户组人数
+              if (UserGroupController::AddUserGroupUserCount($user_group_id)) {//增加新的用户组人数
+                $user_data->user_group_id = $user_group_id;//修改用户组
+              }
+            } else {
+              // UserGroupController::AddUserGroupUserCount($user_data->user_group_id);//如果减少失败则恢复
+              UserGroupController::AddUserGroupUserCount($user_group_id);//直接增加新的用户组人数，因为减少失败说明原来的用户组人数为0或不存在
+              // return [
+              //   'is_edit' => false,
+              //   // 'user' => $user,
+              //   'user' => self::GetUser($edit_target_user_id, $user_token)['user'],
+              // ];
             }
-          } else {
-            UserGroupController::AddUserGroupUserCount($user_data->user_group_id);
-            return [
-              'is_edit' => false,
-              // 'user' => $user,
-              'user' => self::GetUser($edit_target_user_id, $user_token)['user'],
-            ];
           }
+          
+          $user_data->headline = $headline;
+          $user_data->blog = $blog;
+          $user_data->company = $company;
+          $user_data->location = $location;
+          $user_data->bio = $bio;
+          $user_data->update_time = Share::ServerTime();
+          $is_edit = $user_data->save();
+          // $user = $user_data;
         }
-        $user_data->headline = $headline;
-        $user_data->blog = $blog;
-        $user_data->company = $company;
-        $user_data->location = $location;
-        $user_data->bio = $bio;
-        $user_data->update_time = Share::ServerTime();
-        $is_edit = $user_data->save();
-        $user = $user_data;
       }
+    }catch(\Exception $e){
+      return [
+        'is_edit' => $is_edit,
+        'user' => self::GetUser($edit_target_user_id, $user_token)['user'],
+        'message' => $e->getMessage(),
+      ];
     }
     return [
       'is_edit' => $is_edit,
