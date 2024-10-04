@@ -293,6 +293,7 @@ class Article extends ArticleModel
     $is_delete = false;
     $user_id = TokenController::GetUserId($user_token);
     $delete_ids = [];
+    $articles = [];
     if (
       $user_id != null &&
       $is_valid_content
@@ -320,24 +321,28 @@ class Article extends ArticleModel
           $comments = CommentController::where('commentable_id', '=', $article->article_id)
             ->where('commentable_type', '=', 'article')
             ->get();
-          foreach ($comments as $key => $comment) {
-
-            //将评论下的所有回复删除
-            $replys = ReplyController::where('replyable_comment_id', '=', $comment->comment_id)
-            ->get();
-            foreach ($replys as $key => $reply) {
-              $reply->delete_time = Share::ServerTime();
-              $reply->save();
-
-              //从用户的回复数中减去1
-              UserController::SubReplyCount($reply->user_id);
+          if($comments!=null){
+            foreach ($comments as $key => $comment) {
+  
+              //将评论下的所有回复删除
+              $replys = ReplyController::where('replyable_comment_id', '=', $comment->comment_id)
+              ->get();
+              if($replys!=null){
+                foreach ($replys as $key => $reply) {
+                  $reply->delete_time = Share::ServerTime();
+                  $reply->save();
+    
+                  //从用户的回复数中减去1
+                  UserController::SubReplyCount($reply->user_id);
+                }
+              }
+  
+              $comment->delete_time = Share::ServerTime();
+              $comment->save();
+  
+              //从用户的评论数中减去1
+              UserController::SubCommentCount($comment->user_id);
             }
-
-            $comment->delete_time = Share::ServerTime();
-            $comment->save();
-
-            //从用户的评论数中减去1
-            UserController::SubCommentCount($comment->user_id);
           }
 
           $is_delete = $article->save();
@@ -348,6 +353,7 @@ class Article extends ArticleModel
     return [
       'is_delete' => $is_delete,
       'delete_ids' => $delete_ids,
+      'data' => $articles,
     ];
     // if (
     //   $user_id != null

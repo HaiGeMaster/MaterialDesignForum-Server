@@ -273,6 +273,7 @@ class Topic extends TopicModel
     $is_delete = false;
     $user_id = TokenController::GetUserId($user_token);
     $delete_ids = [];
+    $topics=[];
     if (
       $user_id != null &&
       $is_valid_content
@@ -304,6 +305,7 @@ class Topic extends TopicModel
     return [
       'is_delete' => $is_delete,
       'delete_ids' => $delete_ids,
+      'data' => $topics
     ];
   }
 }

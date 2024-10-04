@@ -430,6 +430,7 @@ class UserGroup extends UserGroupModel
   {
     $is_valid_content = $user_group_ids != null && $user_token != '' && $user_group_ids != '' && $user_token != '';
     $is_delete = false;
+    $user_groups = [];
     if ($is_valid_content) {
       if (self::Ability($user_token, 'ability_admin_manage_user_group') || self::IsAdmin($user_token)) {
         $is_delete = self::whereIn('user_group_id', $user_group_ids)
@@ -437,10 +438,21 @@ class UserGroup extends UserGroupModel
           ->update([
             'delete_time' => Share::ServerTime(),
           ]);
+
+        $user_groups = self::whereIn('user_group_id', $user_group_ids)
+          ->where('delete_time', '=', 0)
+          ->get();
+
+        // foreach ($user_groups as $user_group) {
+        //   $user_group->delete_time = Share::ServerTime();
+        //   $user_group->save();
+        // }
       }
     }
     return [
       'is_delete' => $is_delete,
+      'delete_ids' => $user_group_ids,
+      'data' => $user_groups,
     ];
   }
 }

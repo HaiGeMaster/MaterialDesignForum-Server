@@ -196,16 +196,20 @@ class Inbox extends InboxModel
           UserController::AddNotificationUnread($receiver_id);
           switch ($sender_type) {
             case 'user_to_user':
-              UserController::AddInboxPrivateMessage($receiver_id);
+              // UserController::AddInboxPrivateMessage($receiver_id);
+              UserController::AddNotificationUnread($receiver_id);
               break;
             case 'user_to_chat_group':
               // UserController::AddInboxUserGroup($receiver_id);
+              UserController::AddNotificationUnread($receiver_id);
               break;
             case 'system_to_user':
-              UserController::AddInboxSystem($receiver_id);
+              // UserController::AddInboxSystem($receiver_id);
+              UserController::AddNotificationUnread($receiver_id);
               break;
             case 'system_to_user_group':
               // UserController::AddInboxSystem($receiver_id);
+              UserController::AddNotificationUnread($receiver_id);
               break;
           }
         }

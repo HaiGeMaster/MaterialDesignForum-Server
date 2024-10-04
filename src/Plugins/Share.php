@@ -165,7 +165,7 @@ class Share
   /**
    * 处理数据和分页
    * @param $data 查询的分页数据数据
-   * @return
+   * @return array ['is_get' => bool, 'data' => array, 'pagination' => array]
    */
   public static function HandleDataAndPagination($data = null)
   {
@@ -210,7 +210,7 @@ class Share
    * 处理合并数据和分页 适用于不同表的数据和分页
    * @param $data 查询的数据->items()
    * @param $pagination 分页数据
-   * @return
+   * @return array ['is_get' => bool, 'data' => array, 'pagination' => array]
    */
   public static function HandleMergeDataAndPagination($data, $pagination)
   {
@@ -271,6 +271,23 @@ class Share
     $paramsArray = array();
     parse_str($decodedParams, $paramsArray);
     return $paramsArray;
+  }
+  /**
+   * 从原始请求中获取JSON数据 仅限POST且Content-Type为application/x-www-form-urlencoded
+   * @return array||null
+   */
+  public static function GetRequestJSONData()
+  {
+    $rawPostData = file_get_contents('php://input');
+    $postData = json_decode($rawPostData, true);
+    //检查postData是否是数组
+    if (is_array($postData)) {
+      return $postData;
+    } else {
+      return null;
+    }
+
+    //json_encode($postData, JSON_PRETTY_PRINT)) //转换为正常的json
   }
   public static function GetLanguage($lang)
   {

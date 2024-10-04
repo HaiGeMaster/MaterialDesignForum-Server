@@ -319,6 +319,7 @@ class Comment extends CommentModel
     $is_delete = false;
     $user_id = TokenController::GetUserId($user_token);
     $delete_ids = [];
+    $comments = [];
     if (
       $user_id != null &&
       $is_valid_content
@@ -355,11 +356,13 @@ class Comment extends CommentModel
           //删除此评论下的所有回复 ->where('delete_time', '=', 0)//看情况决定是否加上这个条件
           $replys = ReplyController::where('replyable_comment_id', '=', $comment->comment_id)
             ->get();
-          foreach ($replys as $key => $reply) {
-            $reply->delete_time = Share::ServerTime();
-            $reply->save();
-
-            UserController::SubReplyCount($reply->user_id);
+          if($replys != null){
+            foreach ($replys as $key => $reply) {
+              $reply->delete_time = Share::ServerTime();
+              $reply->save();
+  
+              UserController::SubReplyCount($reply->user_id);
+            }
           }
 
           $is_delete = $comment->save();
@@ -370,6 +373,7 @@ class Comment extends CommentModel
     return [
       'is_delete' => $is_delete,
       'delete_ids' => $delete_ids,
+      'data' => $comments,
     ];
     // if (
     //   $user_id != null

@@ -329,6 +329,7 @@ class Reply extends ReplyModel
     $is_delete = false;
     $user_id = TokenController::GetUserId($user_token);
     $delete_ids = [];
+    $replys = [];
     if (
       $user_id != null &&
       $is_valid_content
@@ -364,11 +365,14 @@ class Reply extends ReplyModel
           $reply_replys = self::where('replyable_id', '=', $reply->reply_id)
             ->where('replyable_type', '=', 'reply')
             ->get();
-          foreach ($reply_replys as $key => $reply) {
-            $reply->delete_time = Share::ServerTime();
-            $reply->save();
+          if($reply_replys!=null){
+            foreach ($reply_replys as $key => $reply_reply) {
+              $reply_reply->delete_time = Share::ServerTime();
+              $reply_reply->save();
 
-            UserController::SubReplyCount($reply->user_id);
+              UserController::SubReplyCount($reply_reply->user_id);
+              self::SubReplyCount($reply_reply->replyable_id);
+            }
           }
 
           $is_delete = $reply->save();
@@ -379,6 +383,7 @@ class Reply extends ReplyModel
     return [
       'is_delete' => $is_delete,
       'delete_ids' => $delete_ids,
+      'data' => $replys,
     ];
     // if ($is_valid_content) {
     //   $user_id = TokenController::GetUserId($user_token);

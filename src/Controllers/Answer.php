@@ -231,6 +231,7 @@ class Answer extends AnswerModel
     $is_delete = false;
     $user_id = TokenController::GetUserId($user_token);
     $delete_ids = [];
+    $answers = [];
     if (
       $user_id != null &&
       $is_valid_content
@@ -258,23 +259,27 @@ class Answer extends AnswerModel
           $comments = CommentController::where('commentable_id', '=', $answer->answer_id)
             ->where('commentable_type', '=', 'answer')
             ->get();
-          foreach ($comments as $key => $comment) {
-            //删除此评论下的回复
-            $replys = ReplyController::where('replyable_comment_id', '=', $comment->comment_id)
-              ->get();
-            foreach($replys as $key => $reply){
-              $reply->delete_time = Share::ServerTime();
-              $reply->save();
-
-              //从用户回复数中减去
-              UserController::SubReplyCount($reply->user_id);
+          if($comments != null){
+            foreach ($comments as $key => $comment) {
+              //删除此评论下的回复
+              $replys = ReplyController::where('replyable_comment_id', '=', $comment->comment_id)
+                ->get();
+              if($replys != null){
+                foreach($replys as $key => $reply){
+                  $reply->delete_time = Share::ServerTime();
+                  $reply->save();
+    
+                  //从用户回复数中减去
+                  UserController::SubReplyCount($reply->user_id);
+                }
+              }
+  
+              $comment->delete_time = Share::ServerTime();
+              $comment->save();
+  
+              //从用户评论数中减去
+              UserController::SubCommentCount($comment->user_id);
             }
-
-            $comment->delete_time = Share::ServerTime();
-            $comment->save();
-
-            //从用户评论数中减去
-            UserController::SubCommentCount($comment->user_id);
           }
 
           $is_delete = $answer->save();
@@ -285,6 +290,7 @@ class Answer extends AnswerModel
     return [
       'is_delete' => $is_delete,
       'delete_ids' => $delete_ids,
+      'data' => $answers,
     ];
     // if (
     //   $user_id != null

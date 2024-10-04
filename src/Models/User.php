@@ -43,9 +43,9 @@ class User extends Eloquent
     'comment_count', // 评论数
     'reply_count', // 回复数
     'notification_unread', // 未读通知数
-    'inbox_system', // 系统消息数
-    'inbox_user_group', // 用户组消息数
-    'inbox_private_message', // 私信数
+    // 'inbox_system', // 系统消息数
+    // 'inbox_user_group', // 用户组消息数
+    // 'inbox_private_message', // 私信数
     'headline', // 个人简介
     'bio', // 个人介绍
     'blog', // 博客链接
@@ -204,42 +204,42 @@ class User extends Eloquent
     $user->notification_unread += $count;
     return $user->save();
   }
-  /**
-   * 添加用户的 我的未读系统消息数
-   * @param int $user_id 用户ID
-   * @param int $count 数量
-   * @return bool
-   */
-  public static function AddInboxSystem($user_id, $count = 1): bool
-  {
-    $user = self::find($user_id);
-    $user->inbox_system += $count;
-    return $user->save();
-  }
-  /**
-   * 添加用户的 我的未读用户组消息数
-   * @param int $user_id 用户ID
-   * @param int $count 数量
-   * @return bool
-   */
-  public static function AddInboxUserGroup($user_id, $count = 1): bool
-  {
-    $user = self::find($user_id);
-    $user->inbox_user_group += $count;
-    return $user->save();
-  }
-  /**
-   * 添加用户的 我的私信数
-   * @param int $user_id 用户ID
-   * @param int $count 数量
-   * @return bool
-   */
-  public static function AddInboxPrivateMessage($user_id, $count = 1): bool
-  {
-    $user = self::find($user_id);
-    $user->inbox_private_message += $count;
-    return $user->save();
-  }
+  // /**
+  //  * 添加用户的 我的未读系统消息数
+  //  * @param int $user_id 用户ID
+  //  * @param int $count 数量
+  //  * @return bool
+  //  */
+  // public static function AddInboxSystem($user_id, $count = 1): bool
+  // {
+  //   $user = self::find($user_id);
+  //   $user->inbox_system += $count;
+  //   return $user->save();
+  // }
+  // /**
+  //  * 添加用户的 我的未读用户组消息数
+  //  * @param int $user_id 用户ID
+  //  * @param int $count 数量
+  //  * @return bool
+  //  */
+  // public static function AddInboxUserGroup($user_id, $count = 1): bool
+  // {
+  //   $user = self::find($user_id);
+  //   $user->inbox_user_group += $count;
+  //   return $user->save();
+  // }
+  // /**
+  //  * 添加用户的 我的私信数
+  //  * @param int $user_id 用户ID
+  //  * @param int $count 数量
+  //  * @return bool
+  //  */
+  // public static function AddInboxPrivateMessage($user_id, $count = 1): bool
+  // {
+  //   $user = self::find($user_id);
+  //   $user->inbox_private_message += $count;
+  //   return $user->save();
+  // }
   /**
    * 减少用户的 关注我的人数
    * @param int $user_id 用户ID
@@ -384,42 +384,42 @@ class User extends Eloquent
     $user->notification_unread -= $count;
     return $user->save();
   }
-  /**
-   * 减少用户的 我的系统消息数
-   * @param int $user_id 用户ID
-   * @param int $count 数量
-   * @return bool
-   */
-  public static function SubInboxSystem($user_id, $count = 1): bool
-  {
-    $user = self::find($user_id);
-    $user->inbox_system -= $count;
-    return $user->save();
-  }
-  /**
-   * 减少用户的 我的用户组消息数
-   * @param int $user_id 用户ID
-   * @param int $count 数量
-   * @return bool
-   */
-  public static function SubInboxUserGroup($user_id, $count = 1): bool
-  {
-    $user = self::find($user_id);
-    $user->inbox_user_group -= $count;
-    return $user->save();
-  }
-  /**
-   * 减少用户的 我的私信数
-   * @param int $user_id 用户ID
-   * @param int $count 数量
-   * @return bool
-   */
-  public static function SubInboxPrivateMessage($user_id, $count = 1): bool
-  {
-    $user = self::find($user_id);
-    $user->inbox_private_message -= $count;
-    return $user->save();
-  }
+  // /**
+  //  * 减少用户的 我的系统消息数
+  //  * @param int $user_id 用户ID
+  //  * @param int $count 数量
+  //  * @return bool
+  //  */
+  // public static function SubInboxSystem($user_id, $count = 1): bool
+  // {
+  //   $user = self::find($user_id);
+  //   $user->inbox_system -= $count;
+  //   return $user->save();
+  // }
+  // /**
+  //  * 减少用户的 我的用户组消息数
+  //  * @param int $user_id 用户ID
+  //  * @param int $count 数量
+  //  * @return bool
+  //  */
+  // public static function SubInboxUserGroup($user_id, $count = 1): bool
+  // {
+  //   $user = self::find($user_id);
+  //   $user->inbox_user_group -= $count;
+  //   return $user->save();
+  // }
+  // /**
+  //  * 减少用户的 我的私信数
+  //  * @param int $user_id 用户ID
+  //  * @param int $count 数量
+  //  * @return bool
+  //  */
+  // public static function SubInboxPrivateMessage($user_id, $count = 1): bool
+  // {
+  //   $user = self::find($user_id);
+  //   $user->inbox_private_message -= $count;
+  //   return $user->save();
+  // }
   public static function HandlePassword($password)
   {
     //return password_hash($password, PASSWORD_DEFAULT);
