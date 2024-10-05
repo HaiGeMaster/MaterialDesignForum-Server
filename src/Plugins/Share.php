@@ -91,7 +91,7 @@ class Share
    * @param string $script 脚本
    * @return string
    */
-  public static function HandleAdminPage($lang, $theme='MaterialDesignForum-Vuetify2')
+  public static function HandleAdminPage($lang, $theme = 'MaterialDesignForum-Vuetify2')
   {
     if ($theme == '') {
       //$theme = self::GetClientThemeName();
@@ -303,24 +303,66 @@ class Share
    * @param string $name Cookie名称
    * @return string
    */
-  public static function GetCookie($name = '')
+  public static function GetCookie($name = ''):string
   {
     if (isset($_COOKIE[$name])) {
       return $_COOKIE[$name];
     } else {
-      return isset(self::GetRequestData()[$name]) ? self::GetRequestData()[$name] : '';
+      return isset(self::GetRequestData()[$name]) ? self::GetRequestData()[$name] : Option::Get('theme') || Config::GetDefaultTheme();
     }
   }
   /**
    * 获取客户端主题名称
    * @return string
    */
-  public static function GetClientThemeName()
+  public static function GetClientThemeName():string
   {
+
+    // //停止报错
+    // error_reporting(0);
+
+    // if(!isset($_COOKIE['theme'])){
+    //   //开启报错
+    //   error_reporting(E_ALL);
+    //   $sql_theme = Option::Get('theme');
+    //   return self::GetRequestData()['theme'] || $sql_theme || Config::GetDefaultTheme();
+    // }else{
+    //   //开启报错
+    //   error_reporting(E_ALL);
+    //   return $_COOKIE['theme'];
+    // }
+
+    // 停止报错（不推荐长期使用）
+    error_reporting(0);
+
+    $theme = '';
+
+    // 检查 cookie 是否存在
+    if (!isset($_COOKIE['theme'])) {
+        // 开启报错
+        error_reporting(E_ALL);
+
+        // 检查其他来源的主题
+        $sql_theme = Option::Get('theme');
+        $request_data = self::GetRequestData();
+
+        // 使用空合并运算符获取主题，确保不会报错
+        $theme = $request_data['theme'] ?? $sql_theme ?? Config::GetDefaultTheme();
+    } else {
+        // 开启报错
+        error_reporting(E_ALL);
+        $theme = $_COOKIE['theme'];
+    }
+    
+    return $theme;
+    
+
+    // return $_COOKIE['theme'] || self::GetRequestData()['theme'] || Option::Get('theme') || Config::GetDefaultTheme();
+    // return $_COOKIE['theme'];
     //只需要cookie中指定的主题名称,不需要localsotrage中的主题名称
     //因为localsotrage中的主题名称是为了前端在切换主题风格时使用的
     //优先级：cookie用户浏览器cookie存储的 > request用户浏览器请求时网址携带的参数/?theme=xxx > option网站数据库定义的theme > config网站默认的theme
-    return self::GetCookie('theme') || self::GetRequestData()['theme'] || Option::Get('theme') || Config::GetDefaultTheme();
+    // return self::GetCookie('theme') || self::GetRequestData()['theme'] || Option::Get('theme') || Config::GetDefaultTheme();
   }
   /**
    * 获取客户端用户token

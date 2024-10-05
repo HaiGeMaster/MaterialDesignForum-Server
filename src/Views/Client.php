@@ -331,7 +331,8 @@ class Client
   }
   private static function ReturnView()
   {
-    self::$theme = Option::Get('theme');
+    // self::$theme = Option::Get('theme');
+    self::$theme = Share::GetClientThemeName();
     // self::$description = Config::GetWebDescription();
     // self::$keywords = Config::GetWebKeywords();
     // self::$content = '';
