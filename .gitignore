@@ -8,6 +8,8 @@ public/locale/json/ja_JP.json
 public/locale/json/ko_KR.json
 public/locale/json/ru_RU.json
 public/locale/json/zh_TW.json
+
 /vendor
 /help
 *.zip
+assets/info_content

@@ -677,6 +677,7 @@ class User extends UserModel
     }
     return [
       'is_reset' => $is_reset,
+      'user' => self::GetUser($user_id, $user_token)['user'],
     ];
   }
   /**
@@ -718,6 +719,7 @@ class User extends UserModel
     }
     return [
       'is_reset' => $is_reset,
+      'user' => self::GetUser($user_id, $user_token)['user'],
     ];
   }
   /**
