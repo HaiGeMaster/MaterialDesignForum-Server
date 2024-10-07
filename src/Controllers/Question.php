@@ -2,7 +2,7 @@
 /**
  * author HaiGeMaster
  * @package MaterialDesignForum
- * @link https://demo.xbedorck.com
+ * @link https://github.com/HaiGeMaster/MaterialDesignForum-Server
  */
 
 namespace MaterialDesignForum\Controllers;
@@ -19,7 +19,10 @@ use MaterialDesignForum\Controllers\Answer as AnswerController;
 use MaterialDesignForum\Controllers\Comment as CommentController;
 use MaterialDesignForum\Controllers\Reply as ReplyController;
 use MaterialDesignForum\Plugins\Share;
-use MaterialDesignForum\Config\Config;
+use MaterialDesignForum\Controllers\Notification as NotificationController;
+use MaterialDesignForum\Models\Notification;
+
+// use MaterialDesignForum\Config\Config;
 
 class Question extends QuestionModel
 {
@@ -326,6 +329,16 @@ class Question extends QuestionModel
           $question->delete_time = Share::ServerTime();
           UserController::SubQuestionCount($question->user_id);
           TopicController::SubQuestionCount($question->topics);
+          NotificationController::AddNotification(
+            $question->user_id,
+            $user_id,
+            'question_delete',
+            0,
+            $question->question_id,
+            0,
+            0,
+            0
+          );
 
           //联动删除此问题下的所有回答、评论、回复
           //将该问题下的所有回答的delete_time设置为当前时间

@@ -2,7 +2,7 @@
 /**
  * author HaiGeMaster
  * @package MaterialDesignForum
- * @link https://demo.xbedorck.com
+ * @link https://github.com/HaiGeMaster/MaterialDesignForum-Server
  */
 
 namespace MaterialDesignForum\Controllers;
@@ -193,23 +193,23 @@ class Inbox extends InboxModel
         $is_add = $inbox->save();
 
         if ($is_add) {
-          UserController::AddNotificationUnread($receiver_id);
+          UserController::AddNotificationCount($receiver_id);
           switch ($sender_type) {
             case 'user_to_user':
               // UserController::AddInboxPrivateMessage($receiver_id);
-              UserController::AddNotificationUnread($receiver_id);
+              UserController::AddNotificationCount($receiver_id);
               break;
             case 'user_to_chat_group':
               // UserController::AddInboxUserGroup($receiver_id);
-              UserController::AddNotificationUnread($receiver_id);
+              UserController::AddNotificationCount($receiver_id);
               break;
             case 'system_to_user':
               // UserController::AddInboxSystem($receiver_id);
-              UserController::AddNotificationUnread($receiver_id);
+              UserController::AddNotificationCount($receiver_id);
               break;
             case 'system_to_user_group':
               // UserController::AddInboxSystem($receiver_id);
-              UserController::AddNotificationUnread($receiver_id);
+              UserController::AddNotificationCount($receiver_id);
               break;
           }
         }

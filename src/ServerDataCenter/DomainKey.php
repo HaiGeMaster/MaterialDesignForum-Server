@@ -2,7 +2,7 @@
 /**
  * author HaiGeMaster
  * @package MaterialDesignForum
- * @link https://demo.xbedorck.com
+ * @link https://github.com/HaiGeMaster/MaterialDesignForum-Server
  */
 //请注意 ActivationKey 文件不开放给用户使用，仅供创建者使用
 

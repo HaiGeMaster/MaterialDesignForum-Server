@@ -2,7 +2,7 @@
 /**
  * author HaiGeMaster
  * @package MaterialDesignForum
- * @link https://demo.xbedorck.com
+ * @link https://github.com/HaiGeMaster/MaterialDesignForum-Server
  */
 
 namespace MaterialDesignForum\Controllers;
@@ -15,13 +15,14 @@ use MaterialDesignForum\Controllers\Question as QuestionController;
 use MaterialDesignForum\Controllers\Answer as AnswerController;
 use MaterialDesignForum\Controllers\Article as ArticleController;
 use MaterialDesignForum\Controllers\Reply as ReplyController;
-
 use MaterialDesignForum\Controllers\Vote as VoteController;
+use MaterialDesignForum\Controllers\Notification as NotificationController;
 
-use MaterialDesignForum\Controllers\Inbox as InboxController;
+// use MaterialDesignForum\Controllers\Inbox as InboxController;
 
 use MaterialDesignForum\Plugins\Share;
 use MaterialDesignForum\Config\Config;
+use MaterialDesignForum\Models\Notification;
 
 class Comment extends CommentModel
 {
@@ -76,12 +77,35 @@ class Comment extends CommentModel
           case 'article':
             ArticleController::AddCommentCount($commentable_id);
             //获取文章作者用户ID
+            $article = ArticleController::GetArticle($commentable_id, $user_token)['article'];
+            NotificationController::AddNotification(
+              $article->user_id,
+              $user_id,
+              'article_comment',
+              $article->article_id,
+              0,
+              0,
+              $comment->comment_id,
+              0
+            );
             // $article = ArticleController::GetArticle($commentable_id, $user_token)['article'];
             // $target_user_id = $article->user_id;
             // $target_user_message = '您的文章有新评论:%user_name: %content';
             break;
           case 'question':
             QuestionController::AddCommentCount($commentable_id);
+            //根据问题ID获取问题
+            $question = QuestionController::GetQuestion($commentable_id, $user_token)['question'];
+            NotificationController::AddNotification(
+              $question->user_id,
+              $user_id,
+              'question_comment',
+              0,
+              $question->question_id,
+              0,
+              $comment->comment_id,
+              0
+            );
             //获取问题作者用户ID
             // $question = QuestionController::GetQuestion($commentable_id, $user_token)['question'];
             // $target_user_id = $question->user_id;
@@ -89,6 +113,18 @@ class Comment extends CommentModel
             break;
           case 'answer':
             AnswerController::AddCommentCount($commentable_id);
+            //根据回答ID获取回答
+            $answer = AnswerController::GetAnswer($commentable_id, $user_token)['answer'];
+            NotificationController::AddNotification(
+              $answer->user_id,
+              $user_id,
+              'answer_comment',
+              0,
+              0,
+              $answer->answer_id,
+              $comment->comment_id,
+              0
+            );
             //获取回答作者用户ID
             // $answer = AnswerController::GetAnswer($commentable_id, $user_token)['answer'];
             // $target_user_id = $answer->user_id;
@@ -340,6 +376,17 @@ class Comment extends CommentModel
         ) {
           $comment->delete_time = Share::ServerTime();
           UserController::SubCommentCount($comment->user_id);
+          NotificationController::AddNotification(
+            $comment->user_id,
+            $user_id,
+            'comment_delete',
+            0,
+            0,
+            0,
+            $comment->comment_id,
+            0
+          );
+
           switch($comment->commentable_type){
             case 'article':
               ArticleController::SubCommentCount($comment->commentable_id);

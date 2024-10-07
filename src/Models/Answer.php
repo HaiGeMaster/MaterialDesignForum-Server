@@ -2,7 +2,7 @@
 /**
  * author HaiGeMaster
  * @package MaterialDesignForum
- * @link https://demo.xbedorck.com
+ * @link https://github.com/HaiGeMaster/MaterialDesignForum-Server
  */
 
 namespace MaterialDesignForum\Models;
@@ -77,6 +77,10 @@ class Answer extends Eloquent
   public static function SubCommentCount($answer_id, $count = 1): bool
   {
     $answer = self::find($answer_id);
+    if($answer->comment_count <= 0){
+      $answer->comment_count = 0;
+      return $answer->save();
+    }
     $answer->comment_count -= $count;
     return $answer->save();
   }

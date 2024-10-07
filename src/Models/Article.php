@@ -2,7 +2,7 @@
 /**
  * author HaiGeMaster
  * @package MaterialDesignForum
- * @link https://demo.xbedorck.com
+ * @link https://github.com/HaiGeMaster/MaterialDesignForum-Server
  */
 
 namespace MaterialDesignForum\Models;
@@ -90,6 +90,10 @@ class Article extends Eloquent
   public static function SubCommentCount($article_id, $count = 1): bool
   {
     $article = self::find($article_id);
+    if($article->comment_count <= 0){
+      $article->comment_count = 0;
+      return $article->save();
+    }
     $article->comment_count -= $count;
     return $article->save();
   }
@@ -102,6 +106,10 @@ class Article extends Eloquent
   public static function SubFollowerCount($article_id, $count = 1): bool
   {
     $article = self::find($article_id);
+    if($article->follower_count <= 0){
+      $article->follower_count = 0;
+      return $article->save();
+    }
     $article->follower_count -= $count;
     return $article->save();
   }

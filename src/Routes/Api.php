@@ -2,7 +2,7 @@
 /**
  * author HaiGeMaster
  * @package MaterialDesignForum
- * @link https://demo.xbedorck.com
+ * @link https://github.com/HaiGeMaster/MaterialDesignForum-Server
  */
 
 namespace MaterialDesignForum\Routes;
@@ -244,7 +244,7 @@ class Api
       return Share::HandleArrayToJSON(
         \MaterialDesignForum\Controllers\Follow::GetFollowMutualAttentionList(
           $data['user_token']??'',
-          $data['page'],
+          $data['page']??1,
           $data['per_page'] ?? Config::GetMySQLMaxQuery()
         )
       );
@@ -290,7 +290,7 @@ class Api
         \MaterialDesignForum\Controllers\User::GetUserQuestions(
           $data['user_id'],
           $data['order'],
-          $data['page'],
+          $data['page']??1,
           $data['user_token']??''
         )
       );
@@ -301,7 +301,7 @@ class Api
         \MaterialDesignForum\Controllers\User::GetUserAnswers(
           $data['user_id'],
           $data['order'],
-          $data['page'],
+          $data['page']??1,
           $data['user_token']??''
         )
       );
@@ -312,7 +312,7 @@ class Api
         \MaterialDesignForum\Controllers\User::GetUserArticles(
           $data['user_id'],
           $data['order'],
-          $data['page'],
+          $data['page']??1,
           $data['user_token']??''
         )
       );
@@ -322,7 +322,7 @@ class Api
       return Share::HandleArrayToJSON(
         \MaterialDesignForum\Controllers\User::GetUsers(
           $data['order'],
-          $data['page'],
+          $data['page']??1,
           $data['type'],
           $data['user_token']??'',
           $data['per_page'] ?? Config::GetMySQLMaxQuery(),
@@ -339,7 +339,7 @@ class Api
           $data['modes'],
           $data['type'],
           $data['followable_id'],
-          $data['page'],
+          $data['page']??1,
           $data['user_token']??''
         )
       );
@@ -381,7 +381,7 @@ class Api
       return Share::HandleArrayToJSON(
         \MaterialDesignForum\Controllers\Topic::GetTopics(
           $data['order'],
-          $data['page'],
+          $data['page']??1,
           $data['following']??false,
           $data['user_token']??'',
           $data['per_page'] ?? Config::GetMySQLMaxQuery(),
@@ -438,7 +438,7 @@ class Api
       return Share::HandleArrayToJSON(
         \MaterialDesignForum\Controllers\Question::GetQuestions(
           $data['order'],
-          $data['page'],
+          $data['page']??1,
           $data['following']??false,
           $data['user_token']??'',
           $data['per_page'] ?? Config::GetMySQLMaxQuery(),
@@ -496,7 +496,7 @@ class Api
       return Share::HandleArrayToJSON(
         \MaterialDesignForum\Controllers\Article::GetArticles(
           $data['order'],
-          $data['page'],
+          $data['page']??1,
           $data['following']??false,
           $data['user_token']??'',
           $data['per_page'] ?? Config::GetMySQLMaxQuery(),
@@ -551,7 +551,7 @@ class Api
         \MaterialDesignForum\Controllers\Answer::GetAnswers(
           $data['question_id'],
           $data['order'],
-          $data['page'],
+          $data['page']??1,
           $data['user_token']??'',
           $data['per_page'] ?? Config::GetMySQLMaxQuery(),
           $data['search_keywords']??'',
@@ -596,7 +596,7 @@ class Api
           $data['commentable_id'],
           $data['commentable_type'],
           $data['order'],
-          $data['page'],
+          $data['page']??1,
           $data['user_token']??'',
           $data['per_page'] ?? Config::GetMySQLMaxQuery(),
           $data['search_keywords']??'',
@@ -642,7 +642,7 @@ class Api
         \MaterialDesignForum\Controllers\Reply::GetReplys(
           $data['replyable_comment_id'],
           $data['order'],
-          $data['page'],
+          $data['page']??1,
           $data['user_token']??'',
           $data['per_page'] ?? Config::GetMySQLMaxQuery(),
           $data['search_keywords']??'',
@@ -716,7 +716,7 @@ class Api
       return Share::HandleArrayToJSON(
         \MaterialDesignForum\Controllers\UserGroup::GetUserGroups(
           $data['order'],
-          $data['page'],
+          $data['page']??1,
           $data['user_token']??'',
           $data['per_page'] ?? Config::GetMySQLMaxQuery(),
           $data['search_keywords']??'',
@@ -759,7 +759,7 @@ class Api
       return Share::HandleArrayToJSON(
         \MaterialDesignForum\Controllers\Report::GetReports(
           $data['order'],
-          $data['page'],
+          $data['page']??1,
           $data['user_token']??'',
           $data['per_page'] ?? Config::GetMySQLMaxQuery(),
           $data['search_keywords']??'',
@@ -814,6 +814,17 @@ class Api
       return Share::HandleArrayToJSON(
         \MaterialDesignForum\Controllers\Option::GetThemeTypedParamJson(
           $data['user_token']??''
+        )
+      );
+    });
+    $collector->post('/api/user/notifications/get', function () {
+      $data = Share::GetRequestData();
+      return Share::HandleArrayToJSON(
+        \MaterialDesignForum\Controllers\Notification::GetUserNotifications(
+          $data['user_token']??'',
+          $data['order'],
+          $data['page']??1,
+          $data['per_page'] ?? Config::GetMySQLMaxQuery()
         )
       );
     });

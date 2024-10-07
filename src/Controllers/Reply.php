@@ -3,7 +3,7 @@
 /**
  * author HaiGeMaster
  * @package MaterialDesignForum
- * @link https://demo.xbedorck.com
+ * @link https://github.com/HaiGeMaster/MaterialDesignForum-Server
  */
 
 namespace MaterialDesignForum\Controllers;
@@ -12,13 +12,14 @@ use MaterialDesignForum\Models\Reply as ReplyModel;
 use MaterialDesignForum\Controllers\User as UserController;
 use MaterialDesignForum\Controllers\Token as TokenController;
 use MaterialDesignForum\Controllers\UserGroup as UserGroupController;
-use MaterialDesignForum\Controllers\Follow as FollowController;
+// use MaterialDesignForum\Controllers\Follow as FollowController;
 use MaterialDesignForum\Controllers\Comment as CommentController;
 use MaterialDesignForum\Controllers\Vote as VoteController;
 use MaterialDesignForum\Controllers\Answer as AnswerController;
 // use MaterialDesignForum\Controllers\Question as QuestionController;
 use MaterialDesignForum\Plugins\Share;
-use MaterialDesignForum\Config\Config;
+use MaterialDesignForum\Controllers\Notification as NotificationController;
+// use MaterialDesignForum\Config\Config;
 
 class Reply extends ReplyModel
 {
@@ -71,10 +72,36 @@ class Reply extends ReplyModel
         switch ($replyable_type) {
           case 'comment':
             CommentController::AddReplyCount($replyable_id);
+            //此时$replyable_id为评论ID
+            //根据回复的评论ID获取评论
+            $comment = CommentController::GetComment($replyable_id, $user_token)['comment'];
+            NotificationController::AddNotification(
+              $comment->user_id,
+              $user_id,
+              'comment_reply',
+              $comment->commentable_type == 'article' ? $comment->commentable_id : 0,
+              $comment->commentable_type == 'question' ? $comment->commentable_id : 0,
+              $comment->commentable_type == 'answer' ? $comment->commentable_id : 0,
+              $replyable_id,
+              $reply->reply_id
+            );
             break;
           case 'reply':
             CommentController::AddReplyCount($replyable_comment_id);
             self::AddReplyCount($replyable_id);
+            //根据回复的回复ID获取回复
+            $reply = self::GetReply($replyable_id, $user_token)['reply'];
+            $comment = CommentController::GetComment($reply->replyable_comment_id, $user_token)['comment'];
+            NotificationController::AddNotification(
+              $reply->user_id,
+              $user_id,
+              'reply_reply',
+              $comment->commentable_type == 'article' ? $comment->commentable_id : 0,
+              $comment->commentable_type == 'question' ? $comment->commentable_id : 0,
+              $comment->commentable_type == 'answer' ? $comment->commentable_id : 0,
+              $replyable_id,
+              $reply->reply_id
+            );
             break;
         }
         $reply_id = $reply->reply_id;
@@ -350,6 +377,17 @@ class Reply extends ReplyModel
         ) {
           $reply->delete_time = Share::ServerTime();
           UserController::SubReplyCount($reply->user_id);
+          NotificationController::AddNotification(
+            $reply->user_id,
+            $user_id,
+            'reply_delete',
+            0,
+            0,
+            0,
+            0,
+            $reply->reply_id
+          );
+
           switch ($reply->replyable_type) {
             case 'comment':
               CommentController::SubReplyCount($reply->replyable_id);

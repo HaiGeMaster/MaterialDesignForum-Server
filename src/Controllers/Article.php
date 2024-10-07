@@ -2,7 +2,7 @@
 /**
  * author HaiGeMaster
  * @package MaterialDesignForum
- * @link https://demo.xbedorck.com
+ * @link https://github.com/HaiGeMaster/MaterialDesignForum-Server
  */
 
 namespace MaterialDesignForum\Controllers;
@@ -17,6 +17,7 @@ use MaterialDesignForum\Controllers\Vote as VoteController;
 use MaterialDesignForum\Controllers\Comment as CommentController;
 use MaterialDesignForum\Controllers\Reply as ReplyController;
 use MaterialDesignForum\Plugins\Share;
+use MaterialDesignForum\Controllers\Notification as NotificationController;
 // use MaterialDesignForum\Config\Config;
 
 use MaterialDesignForum\Controllers\User as UserController;
@@ -315,6 +316,16 @@ class Article extends ArticleModel
           $article->delete_time = Share::ServerTime();
           UserController::SubArticleCount($article->user_id);
           TopicController::SubArticleCount($article->topics);
+          NotificationController::AddNotification(
+            $article->user_id,
+            $user_id,
+            'article_delete',
+            $article->article_id,
+            0,
+            0,
+            0,
+            0
+          );
 
           //联动删除此文章下的所有评论和回复
           //将文章下的所有评论删除

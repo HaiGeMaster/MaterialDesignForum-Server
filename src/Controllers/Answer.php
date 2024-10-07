@@ -2,7 +2,7 @@
 /**
  * author HaiGeMaster
  * @package MaterialDesignForum
- * @link https://demo.xbedorck.com
+ * @link https://github.com/HaiGeMaster/MaterialDesignForum-Server
  */
 
 namespace MaterialDesignForum\Controllers;
@@ -10,12 +10,15 @@ namespace MaterialDesignForum\Controllers;
 use MaterialDesignForum\Models\Answer as AnswerModel;
 use MaterialDesignForum\Controllers\Token as TokenController;
 use MaterialDesignForum\Controllers\UserGroup as UserGroupController;
-use MaterialDesignForum\Models\Question as QuestionModel;
+use MaterialDesignForum\Controllers\Question as QuestionController;
 use MaterialDesignForum\Controllers\User as UserController;
 use MaterialDesignForum\Controllers\Vote as VoteController;
 use MaterialDesignForum\Controllers\Comment as CommentController;
 use MaterialDesignForum\Controllers\Reply as ReplyController;
 use MaterialDesignForum\Plugins\Share;
+use MaterialDesignForum\Controllers\Notification as NotificationController;
+use MaterialDesignForum\Models\Notification;
+
 // use MaterialDesignForum\Config\Config;
 
 class Answer extends AnswerModel
@@ -63,7 +66,19 @@ class Answer extends AnswerModel
       if ($is_add) {
         // UserController::AddAnswerCount($user_id)['user'];
         UserController::AddAnswerCount($user_id);//['user'];
-        QuestionModel::AddAnswerCount($question_id);
+        QuestionController::AddAnswerCount($question_id);
+        //根据问题ID获取问题
+        $question = QuestionController::GetQuestion($question_id, $user_token)['question'];
+        NotificationController::AddNotification(
+          $question->user_id,
+          $user_id,
+          'question_answer',
+          0,
+          $question->question_id,
+          $answer->answer_id,
+          0,
+          0
+        );
       }
     }
     return [
@@ -252,7 +267,17 @@ class Answer extends AnswerModel
         ) {
           $answer->delete_time = Share::ServerTime();
           UserController::SubAnswerCount($answer->user_id);
-          QuestionModel::SubAnswerCount($answer->question_id);
+          QuestionController::SubAnswerCount($answer->question_id);
+          NotificationController::AddNotification(
+            $answer->user_id,
+            $user_id,
+            'answer_delete',
+            0,
+            $answer->question_id,
+            $answer->answer_id,
+            0,
+            0
+          );
 
           //联动删除此回答下的评论和回复
           //删除此回答下的评论
