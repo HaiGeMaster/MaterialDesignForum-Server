@@ -102,7 +102,7 @@ class MailCaptcha
    * @param string $content 内容
    * @return bool 发送邮件
    */
-  public function SendMail($to = "", $subject = '', $content = '<h1>Hello World Test</h1>')
+  public static function SendMail($to = "", $subject = '', $content = '<h1>Hello World Test</h1>')
   {
     //include_once __DIR__ . '/../../plugins/share.php';
     $config = Config::getConfig();

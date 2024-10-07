@@ -69,14 +69,19 @@ class Reply extends ReplyModel
       $is_add = $reply->save();
       if ($is_add) {
         UserController::AddReplyCount($user_id);
+        $reply_to_reply_id = $reply->reply_id;
 
-        $$reply_to_reply_id = $reply->reply_id;
         switch ($replyable_type) {
           case 'comment':
             CommentController::AddReplyCount($replyable_id);
             //此时$replyable_id为评论ID
             //根据回复的评论ID获取评论
             $comment = CommentController::GetComment($replyable_id, $user_token)['comment'];
+            // $reply1 = self::where('replyable_id', '=', $replyable_id)
+            //   ->where('replyable_type', '=', 'comment')
+            //   ->where('replyable_comment_id', '=', $replyable_comment_id)
+            //   ->where('delete_time', '=', 0)
+            //   ->first();
             NotificationController::AddNotification(
               $comment->user_id,
               $user_id,
@@ -85,6 +90,7 @@ class Reply extends ReplyModel
               $comment->commentable_type == 'question' ? $comment->commentable_id : 0,
               $comment->commentable_type == 'answer' ? $comment->commentable_id : 0,
               $comment->comment_id,
+              $reply->reply_id,
               0
             );
             break;

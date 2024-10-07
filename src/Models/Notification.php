@@ -70,4 +70,19 @@ class Notification extends Eloquent
     ];
     return in_array($type, $types);
   }
+  /**
+   * 设置消息已读
+   * @param int $notification_id 消息ID
+   * @param int $read_time 阅读时间
+   */
+  public static function SetReadTime($notification_id, $read_time)
+  {
+    $notification = Notification::find($notification_id);
+    if ($notification) {
+      $notification->read_time = $read_time;
+      $notification->save();
+      return true;
+    }
+    return false;
+  }
 }

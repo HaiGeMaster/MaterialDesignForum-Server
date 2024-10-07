@@ -211,7 +211,7 @@ class User extends UserModel
     if ($client_lang != '') {
       i18n::i18n()->setLocale($client_lang);
     }
-    $v = $MailCaptcha->SendMail(
+    $v = MailCaptchaModel::SendMail(
       $client_email,
       $config['smtp_send_name'] . ':' . i18n::t('Message.Components.Account.Code'),
       $Captcha['code']
