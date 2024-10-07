@@ -51,6 +51,7 @@ class User extends Eloquent
     'blog', // 博客链接
     'company', // 公司
     'location', // 地址
+    'language', // 语言
     'create_time', // 创建时间
     'update_time', // 更新时间
     'disable_time' // 禁用时间

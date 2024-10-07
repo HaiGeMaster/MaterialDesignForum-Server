@@ -195,7 +195,8 @@ class Api
           $data['email'],
           $data['password'],
           $data['email_captcha'],
-          $data['username']
+          $data['username'],
+          $data['language']??Config::GetWebDefaultLanguage()||'en_US'
         )
       );
     });
@@ -827,6 +828,14 @@ class Api
           $data['per_page'] ?? Config::GetMySQLMaxQuery()
         )
       );
+    });
+    $collector->post('/api/user/set/language', function () {
+      $data = Share::GetRequestData();
+      return Share::HandleArrayToJSON(
+        \MaterialDesignForum\Controllers\User::SetUserLanguage(
+          $data['user_token'],
+          $data['language']
+        ));
     });
     $dispatcher = new Dispatcher($collector->getData());
     try {

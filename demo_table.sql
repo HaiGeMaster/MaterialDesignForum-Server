@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主机： localhost
--- 生成日期： 2024-08-11 12:02:01
+-- 生成日期： 2024-10-07 17:24:53
 -- 服务器版本： 8.0.12
 -- PHP 版本： 7.4.3
 
@@ -196,7 +196,7 @@ CREATE TABLE `notification` (
   `answer_id` int(11) NOT NULL COMMENT '回答ID',
   `comment_id` int(11) NOT NULL COMMENT '评论ID',
   `reply_id` int(11) NOT NULL COMMENT '回复ID',
-  `content_deleted` text NOT NULL COMMENT '被删除的内容的备份',
+  `reply_to_reply_id` int(11) NOT NULL,
   `create_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '发送时间',
   `read_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '阅读时间',
   `delete_time` int(11) NOT NULL COMMENT '删除时间'
@@ -219,21 +219,21 @@ CREATE TABLE `option` (
 
 INSERT INTO `option` (`name`, `value`) VALUES
 ('default_language', 'zh_CN'),
-('site_description', '基于 Vuetify 的 Material Design 样式的社区;A community based on Vuetify for Material Design styles'),
-('site_gongan_beian', ''),
-('site_icp_beian', ''),
-('site_keywords', 'Material Design Forum,Vuetify'),
+('site_description', '基于 Vuetify2与MDUI2 的 Material Design 样式的社区;A community based on Vuetify And MDUI2 for Material Design styles'),
+('site_gongan_beian', '粤公网安备44020002000103号'),
+('site_icp_beian', '粤ICP备2023097526号'),
+('site_keywords', 'Material Design Forum,Vuetify,MDUI,MDForum'),
 ('site_name', 'Material Design Forum'),
 ('site_static_url', ''),
-('smtp_host', ''),
+('smtp_host', 'smtp.qq.com'),
 ('smtp_password', ''),
 ('smtp_port', '465'),
-('smtp_reply_to', ''),
+('smtp_reply_to', '2652549974@qq.com'),
 ('smtp_secure', 'ssl'),
 ('smtp_send_name', 'MDF'),
-('smtp_username', ''),
-('theme', 'MaterialDesignVuetify2'),
-('theme_color_param', '{\"light\":{\"primary\":\"#415f91\",\"secondary\":\"#d6e3ff\",\"accent\":\"#8eace3\"},\"dark\":{\"primary\":\"#415f91\",\"secondary\":\"#d6e3ff\",\"accent\":\"#8eace3\"}}'),
+('smtp_username', '2652549974@qq.com'),
+('theme', 'MaterialDesignForum-Vuetify2'),
+('theme_color_param', '{\"light\":{\"primary\":\"#2196F3\",\"secondary\":\"#FF9800\",\"accent\":\"#E91E63\"},\"dark\":{\"primary\":\"#2196F3\",\"secondary\":\"#FF9800\",\"accent\":\"#E91E63\"},\"name\":\"\"}'),
 ('theme_typed_param', '{\"header\":\"Message.Components.TextPlay.With\",\"body\":\"Message.Components.TextPlay.MaterialDesign,Message.Components.TextPlay.VueAsTheCore,Message.Components.TextPlay.ImplementedByVuetify,Message.Components.TextPlay.MoreElegant,Message.Components.TextPlay.UnlimitedDistance,Message.Components.TextPlay.CrossPlatform,Message.Components.TextPlay.DynamicResponsive\",\"footer_header\":\"Message.Components.TextPlay.TheWay\",\"footer_tail\":\"Message.Components.TextPlay.EnjoyCommunication\"}');
 
 -- --------------------------------------------------------
@@ -378,14 +378,15 @@ CREATE TABLE `user` (
   `comment_count` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '我发表的评论数量',
   `reply_count` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '我发表的回复数量',
   `notification_unread` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '未读通知数量',
-  `inbox_system` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '未读系统信息数量',
-  `inbox_user_group` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '未读用户组信息数量',
-  `inbox_private_message` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '未读私信数',
+  `inbox_system` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '（暂停用）未读系统信息数量',
+  `inbox_user_group` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '（暂停用）未读用户组信息数量',
+  `inbox_private_message` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '（暂停用）未读私信数',
   `headline` varchar(40) DEFAULT NULL COMMENT '一句话介绍',
   `bio` varchar(160) DEFAULT NULL COMMENT '个人简介',
   `blog` varchar(255) DEFAULT NULL COMMENT '个人主页',
   `company` varchar(255) DEFAULT NULL COMMENT '公司名称',
   `location` varchar(255) DEFAULT NULL COMMENT '地址',
+  `language` varchar(30) NOT NULL COMMENT '使用的语言',
   `create_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '注册时间',
   `update_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '更新时间',
   `disable_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '禁用时间'
@@ -395,9 +396,9 @@ CREATE TABLE `user` (
 -- 转存表中的数据 `user`
 --
 
-INSERT INTO `user` (`user_id`, `user_group_id`, `username`, `email`, `avatar`, `cover`, `password`, `create_ip`, `create_location`, `last_login_time`, `last_login_ip`, `last_login_location`, `follower_count`, `followee_count`, `following_topic_count`, `following_article_count`, `following_question_count`, `topic_count`, `article_count`, `question_count`, `answer_count`, `comment_count`, `reply_count`, `notification_unread`, `inbox_system`, `inbox_user_group`, `inbox_private_message`, `headline`, `bio`, `blog`, `company`, `location`, `create_time`, `update_time`, `disable_time`) VALUES
-(1, 1, 'Admin', '1', '{\"original\":\"\\/public\\/static\\/upload\\/user\\/avatars\\/1\\/original\\/67a71ed8fa2aa8ec9f5a61d12df656ec.png\",\"small\":\"\\/public\\/static\\/upload\\/user\\/avatars\\/1\\/small\\/67a71ed8fa2aa8ec9f5a61d12df656ec.png\",\"middle\":\"\\/public\\/static\\/upload\\/user\\/avatars\\/1\\/middle\\/67a71ed8fa2aa8ec9f5a61d12df656ec.png\",\"large\":\"\\/public\\/static\\/upload\\/user\\/avatars\\/1\\/large\\/67a71ed8fa2aa8ec9f5a61d12df656ec.png\"}', '{\"original\":\"\\/public\\/static\\/upload\\/user\\/covers\\/1\\/original\\/32b6cebbab2c9e53ab3bf3921fcf0a95.png\",\"small\":\"\\/public\\/static\\/upload\\/user\\/covers\\/1\\/small\\/32b6cebbab2c9e53ab3bf3921fcf0a95.png\",\"middle\":\"\\/public\\/static\\/upload\\/user\\/covers\\/1\\/middle\\/32b6cebbab2c9e53ab3bf3921fcf0a95.png\",\"large\":\"\\/public\\/static\\/upload\\/user\\/covers\\/1\\/large\\/32b6cebbab2c9e53ab3bf3921fcf0a95.png\"}', '81dc9bdb52d04dc20036dbd8313ed055', '127.0.0.1', '本机地址    ', 1723348439, '127.0.0.1', '本机地址    ', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'TestAdmin', 'bio', 'blog', 'company', 'location', 1702210759, 1722911537, 0),
-(2, 2, 'User', '2', '{\"original\":\"\\/public\\/static\\/upload\\/user\\/avatars\\/2\\/original\\/36b48d839c9aed83036387bd2de430f1.png\",\"small\":\"\\/public\\/static\\/upload\\/user\\/avatars\\/2\\/small\\/36b48d839c9aed83036387bd2de430f1.png\",\"middle\":\"\\/public\\/static\\/upload\\/user\\/avatars\\/2\\/middle\\/36b48d839c9aed83036387bd2de430f1.png\",\"large\":\"\\/public\\/static\\/upload\\/user\\/avatars\\/2\\/large\\/36b48d839c9aed83036387bd2de430f1.png\"}', '{\"original\":\"\\/public\\/static\\/upload\\/user\\/covers\\/2\\/original\\/cbaae5f023c23787dcfb8fb7f1e1d57b.png\",\"small\":\"\\/public\\/static\\/upload\\/user\\/covers\\/2\\/small\\/cbaae5f023c23787dcfb8fb7f1e1d57b.png\",\"middle\":\"\\/public\\/static\\/upload\\/user\\/covers\\/2\\/middle\\/cbaae5f023c23787dcfb8fb7f1e1d57b.png\",\"large\":\"\\/public\\/static\\/upload\\/user\\/covers\\/2\\/large\\/cbaae5f023c23787dcfb8fb7f1e1d57b.png\"}', '81dc9bdb52d04dc20036dbd8313ed055', '127.0.0.1', '本机地址    ', 1722948142, '127.0.0.1', '本机地址    ', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'TestUser', '', '', '', '', 1702210759, 1722938278, 0);
+INSERT INTO `user` (`user_id`, `user_group_id`, `username`, `email`, `avatar`, `cover`, `password`, `create_ip`, `create_location`, `last_login_time`, `last_login_ip`, `last_login_location`, `follower_count`, `followee_count`, `following_topic_count`, `following_article_count`, `following_question_count`, `topic_count`, `article_count`, `question_count`, `answer_count`, `comment_count`, `reply_count`, `notification_unread`, `inbox_system`, `inbox_user_group`, `inbox_private_message`, `headline`, `bio`, `blog`, `company`, `location`, `language`, `create_time`, `update_time`, `disable_time`) VALUES
+(1, 1, 'Admin', '1', '{\"original\":\"\\/public\\/static\\/upload\\/user\\/avatars\\/1\\/original\\/88fe3a21d11588f63d6ba8ea20efcd71.png\",\"small\":\"\\/public\\/static\\/upload\\/user\\/avatars\\/1\\/small\\/88fe3a21d11588f63d6ba8ea20efcd71.png\",\"middle\":\"\\/public\\/static\\/upload\\/user\\/avatars\\/1\\/middle\\/88fe3a21d11588f63d6ba8ea20efcd71.png\",\"large\":\"\\/public\\/static\\/upload\\/user\\/avatars\\/1\\/large\\/88fe3a21d11588f63d6ba8ea20efcd71.png\"}', '{\"original\":\"\\/public\\/static\\/default\\/user\\/covers\\/1\\/original\\/default.png\",\"small\":\"\\/public\\/static\\/default\\/user\\/covers\\/1\\/small\\/default.png\",\"middle\":\"\\/public\\/static\\/default\\/user\\/covers\\/1\\/middle\\/default.png\",\"large\":\"\\/public\\/static\\/default\\/user\\/covers\\/1\\/large\\/default.png\"}', '81dc9bdb52d04dc20036dbd8313ed055', '127.0.0.1', '本机地址    ', 1728292687, '127.0.0.1', '本机地址    ', 1, 1, 1, 0, 1, 1, 1, 1, 2, 6, 5, 0, 0, 0, 0, 'TestAdmin', 'bio', 'blog', 'company', 'location', 'zh_CN', 1702210759, 1722911537, 0),
+(2, 2, 'User', '2', '{\"original\":\"\\/public\\/static\\/upload\\/user\\/avatars\\/2\\/original\\/f54400331a048ac22268805e482e5693.png\",\"small\":\"\\/public\\/static\\/upload\\/user\\/avatars\\/2\\/small\\/f54400331a048ac22268805e482e5693.png\",\"middle\":\"\\/public\\/static\\/upload\\/user\\/avatars\\/2\\/middle\\/f54400331a048ac22268805e482e5693.png\",\"large\":\"\\/public\\/static\\/upload\\/user\\/avatars\\/2\\/large\\/f54400331a048ac22268805e482e5693.png\"}', '{\"original\":\"\\/public\\/static\\/default\\/user\\/covers\\/1\\/original\\/default.png\",\"small\":\"\\/public\\/static\\/default\\/user\\/covers\\/1\\/small\\/default.png\",\"middle\":\"\\/public\\/static\\/default\\/user\\/covers\\/1\\/middle\\/default.png\",\"large\":\"\\/public\\/static\\/default\\/user\\/covers\\/1\\/large\\/default.png\"}', '81dc9bdb52d04dc20036dbd8313ed055', '127.0.0.1', '本机地址    ', 1728292564, '127.0.0.1', '本机地址    ', 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 'TestUser', 'bio', '6688899', 'company', 'location', 'zh_CN', 1702210759, 1727579545, 0);
 
 -- --------------------------------------------------------
 
@@ -482,8 +483,8 @@ CREATE TABLE `user_group` (
 --
 
 INSERT INTO `user_group` (`user_group_id`, `user_group_name`, `user_group_description`, `user_group_icon`, `user_group_icon_show`, `user_group_color`, `user_group_user_count`, `create_time`, `update_time`, `delete_time`, `is_admin`, `ability_normal_login`, `ability_admin_login`, `ability_admin_manage_user_group`, `ability_admin_manage_user`, `ability_admin_manage_topic`, `ability_admin_manage_question`, `ability_admin_manage_article`, `ability_admin_manage_comment`, `ability_admin_manage_answer`, `ability_admin_manage_reply`, `ability_admin_manage_report`, `ability_admin_manage_option`, `ability_create_article`, `ability_create_question`, `ability_create_answer`, `ability_create_comment`, `ability_create_reply`, `ability_create_topic`, `ability_edit_own_article`, `ability_edit_own_question`, `ability_edit_own_answer`, `ability_edit_own_comment`, `ability_edit_own_reply`, `ability_edit_own_topic`, `ability_delete_own_article`, `ability_delete_own_question`, `ability_delete_own_answer`, `ability_delete_own_comment`, `ability_delete_own_reply`, `ability_delete_own_topic`, `time_before_edit_article`, `time_before_edit_question`, `time_before_edit_answer`, `time_before_edit_comment`, `time_before_edit_reply`, `time_before_edit_topic`, `time_before_delete_article`, `time_before_delete_question`, `time_before_delete_answer`, `time_before_delete_comment`, `time_before_delete_reply`, `time_before_delete_topic`, `ability_edit_article_only_no_comment`, `ability_edit_question_only_no_answer`, `ability_edit_answer_only_no_comment`, `ability_edit_question_only_no_comment`, `ability_edit_comment_only_no_reply`, `ability_edit_reply_only_no_reply`, `ability_edit_topic_only_no_article_or_question`, `ability_delete_article_only_no_comment`, `ability_delete_question_only_no_answer`, `ability_delete_answer_only_no_comment`, `ability_delete_question_only_no_comment`, `ability_delete_comment_only_no_reply`, `ability_delete_reply_only_no_reply`, `ability_delete_topic_only_no_article_or_question`, `ability_edit_own_info`, `ability_vote`) VALUES
-(1, '管理员', '管理员', 'mdi-security', 1, 'primary', 1, 1702216648, 1723136495, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1),
-(2, '用户', '用户', 'mdi-account', 0, 'primary', 1, 1702216648, 1722867682, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+(1, 'Message.Admin.UserGroups.Admin', 'Message.Admin.UserGroups.Admin', 'mdi-security', 1, 'primary', 1, 1702216648, 1725418346, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1),
+(2, 'Message.Admin.UserGroups.User', 'Message.Admin.UserGroups.User', 'mdi-account', 0, 'primary', 1, 1702216648, 1723980867, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 5, 5, 5, 5, 5, 5, 5, 0, 5, 5, 5, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -656,6 +657,12 @@ ALTER TABLE `follow`
 --
 ALTER TABLE `inbox`
   MODIFY `inbox_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '私信ID';
+
+--
+-- 使用表AUTO_INCREMENT `notification`
+--
+ALTER TABLE `notification`
+  MODIFY `notification_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '通知ID';
 
 --
 -- 使用表AUTO_INCREMENT `question`

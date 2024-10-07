@@ -69,6 +69,8 @@ class Reply extends ReplyModel
       $is_add = $reply->save();
       if ($is_add) {
         UserController::AddReplyCount($user_id);
+
+        $$reply_to_reply_id = $reply->reply_id;
         switch ($replyable_type) {
           case 'comment':
             CommentController::AddReplyCount($replyable_id);
@@ -82,8 +84,8 @@ class Reply extends ReplyModel
               $comment->commentable_type == 'article' ? $comment->commentable_id : 0,
               $comment->commentable_type == 'question' ? $comment->commentable_id : 0,
               $comment->commentable_type == 'answer' ? $comment->commentable_id : 0,
-              $replyable_id,
-              $reply->reply_id
+              $comment->comment_id,
+              0
             );
             break;
           case 'reply':
@@ -99,8 +101,9 @@ class Reply extends ReplyModel
               $comment->commentable_type == 'article' ? $comment->commentable_id : 0,
               $comment->commentable_type == 'question' ? $comment->commentable_id : 0,
               $comment->commentable_type == 'answer' ? $comment->commentable_id : 0,
-              $replyable_id,
-              $reply->reply_id
+              $comment->comment_id,
+              $reply->reply_id,
+              $reply_to_reply_id,
             );
             break;
         }
@@ -377,14 +380,15 @@ class Reply extends ReplyModel
         ) {
           $reply->delete_time = Share::ServerTime();
           UserController::SubReplyCount($reply->user_id);
+          $comment = CommentController::GetComment($reply->replyable_comment_id, $user_token)['comment'];
           NotificationController::AddNotification(
             $reply->user_id,
             $user_id,
             'reply_delete',
-            0,
-            0,
-            0,
-            0,
+            $comment->commentable_type == 'article' ? $comment->commentable_id : 0,
+            $comment->commentable_type == 'question' ? $comment->commentable_id : 0,
+            $comment->commentable_type == 'answer' ? $comment->commentable_id : 0,
+            $comment->comment_id,
             $reply->reply_id
           );
 

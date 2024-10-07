@@ -42,6 +42,7 @@ class Notification extends Eloquent
     'answer_id',
     'comment_id',
     'reply_id',
+    'reply_to_reply_id',
     // 'content_deleted',
     'create_time',
     'read_time',

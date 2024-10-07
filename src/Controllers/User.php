@@ -1,4 +1,5 @@
 <?php
+
 /**
  * author HaiGeMaster
  * @package MaterialDesignForum
@@ -33,7 +34,7 @@ class User extends UserModel
    * @param string $username 用户名
    * @return json {is_register:是否注册成功}
    */
-  public static function AddUser($email, $password, $email_captcha, $username = "")
+  public static function AddUser($email, $password, $email_captcha, $username = "", $language = "")
   {
     $v = false;
     $client_email = base64_decode($email);
@@ -61,6 +62,7 @@ class User extends UserModel
           $user->create_ip = self::GetClientIP();
           $user->create_location =  self::GetClientLocation();
           $user->location = self::GetClientLocation();
+          $user->language = $language;
           $user->create_time = Share::ServerTime();
           $user->update_time = Share::ServerTime();
           //获取网络时间
@@ -98,29 +100,30 @@ class User extends UserModel
    * @param string $edit_target_user_id 要编辑的用户id
    * @return json {is_edit:是否更新成功,user:新的用户信息}
    */
-  public static function EditInfo($email,$username, $user_group_id, $headline, $blog, $company, $location, $bio, $user_token, $edit_target_user_id)
+  public static function EditInfo($email, $username, $user_group_id, $headline, $blog, $company, $location, $bio, $user_token, $edit_target_user_id)
   {
     $is_edit = false;
     // $user = null;
 
     $user_id = TokenController::GetUserId($user_token);
     $user_data = UserModel::find($edit_target_user_id);
-    try{
+    try {
       if ($user_data != null) {
-        if ($user_data->user_id == $user_id && 
-        UserGroupController::Ability($user_token, 'ability_edit_own_info') || UserGroupController::IsAdmin($user_token)
+        if (
+          $user_data->user_id == $user_id &&
+          UserGroupController::Ability($user_token, 'ability_edit_own_info') || UserGroupController::IsAdmin($user_token)
         ) {
           $user_data->username = $username;
           $user_data->email = $email;
 
-          if (UserGroupController::IsAdmin($user_token)) {//确定是否是管理员再修改用户组
-            if (UserGroupController::SubUserGroupUserCount($user_data->user_group_id)) {//减少原来的用户组人数
-              if (UserGroupController::AddUserGroupUserCount($user_group_id)) {//增加新的用户组人数
-                $user_data->user_group_id = $user_group_id;//修改用户组
+          if (UserGroupController::IsAdmin($user_token)) { //确定是否是管理员再修改用户组
+            if (UserGroupController::SubUserGroupUserCount($user_data->user_group_id)) { //减少原来的用户组人数
+              if (UserGroupController::AddUserGroupUserCount($user_group_id)) { //增加新的用户组人数
+                $user_data->user_group_id = $user_group_id; //修改用户组
               }
             } else {
               // UserGroupController::AddUserGroupUserCount($user_data->user_group_id);//如果减少失败则恢复
-              UserGroupController::AddUserGroupUserCount($user_group_id);//直接增加新的用户组人数，因为减少失败说明原来的用户组人数为0或不存在
+              UserGroupController::AddUserGroupUserCount($user_group_id); //直接增加新的用户组人数，因为减少失败说明原来的用户组人数为0或不存在
               // return [
               //   'is_edit' => false,
               //   // 'user' => $user,
@@ -128,7 +131,7 @@ class User extends UserModel
               // ];
             }
           }
-          
+
           $user_data->headline = $headline;
           $user_data->blog = $blog;
           $user_data->company = $company;
@@ -139,7 +142,7 @@ class User extends UserModel
           // $user = $user_data;
         }
       }
-    }catch(\Exception $e){
+    } catch (\Exception $e) {
       return [
         'is_edit' => $is_edit,
         'user' => self::GetUser($edit_target_user_id, $user_token)['user'],
@@ -368,29 +371,29 @@ class User extends UserModel
   {
     $user = self::find($user_id);
     $_user_id = '';
-    if($user_token!=''&&$user!=null){
+    if ($user_token != '' && $user != null) {
       $_user_id = TokenController::GetUserId($user_token);
     }
 
-    
-    if($user->cover==null){
+
+    if ($user->cover == null) {
       $user->cover = self::CreateDefaultCover();
       // $user->save();
     }
 
-    if($user_id == $_user_id){//用户自己查看自己的信息 必须安全的访问用户信息
+    if ($user_id == $_user_id) { //用户自己查看自己的信息 必须安全的访问用户信息
       if ($user) {
-        $user->is_follow = false;//用户不可能关注自己//FollowController::IsFollow($user_token, 'user', $user_id, true);
+        $user->is_follow = false; //用户不可能关注自己//FollowController::IsFollow($user_token, 'user', $user_id, true);
         $user->user_group = UserGroupController::find($user->user_group_id);
       }
       if (!$is_admin && $user != null) {
         // $user->email = null;
         $user->password = null;
       }
-    }else{//其他用户查看用户信息
+    } else { //其他用户查看用户信息
       $user = self::GetUserInfo($user_id, $user_token)['user'];
     }
-    
+
     $data = [
       'is_get' => $user != null,
       'user' => $user != null ? $user : null,
@@ -411,7 +414,7 @@ class User extends UserModel
     if ($user) {
       $user->is_follow = FollowController::IsFollow($user_token, 'user', $user_id, true);
       $user->user_group = UserGroupController::GetUserGroupInfo($user->user_group_id);
-      if($user->cover==null){
+      if ($user->cover == null) {
         $user->cover = self::CreateDefaultCover();
         // $user->save();
       }
@@ -465,7 +468,7 @@ class User extends UserModel
     $search_field = [],
     $is_admin = false
   ) {
-    if($search_field == []){
+    if ($search_field == []) {
       $search_field = self::$search_field;
     }
     $data = Share::HandleDataAndPagination(null);
@@ -577,9 +580,9 @@ class User extends UserModel
     }
 
     //循环检查有人的背景图是否为空
-    if ($data['data'] != null){
+    if ($data['data'] != null) {
       foreach ($data['data'] as $key => $value) {
-        if($value['cover']==null){
+        if ($value['cover'] == null) {
           $value['cover'] = self::CreateDefaultCover();
         }
       }
@@ -903,26 +906,47 @@ class User extends UserModel
    * @param string $file 图片base64
    * @return json {is_upload:是否上传成功,upload_url:上传的图片url}
    */
-  public static function UploadImage($user_token, $type, $file){
+  public static function UploadImage($user_token, $type, $file)
+  {
     $data = [
       'is_upload' => false,
       'upload_url' => null,
     ];
     $user_id = TokenController::GetUserId($user_token);
-    if($user_id!=null){
+    if ($user_id != null) {
       //确保type是正确的
-      if($type!='question'&&$type!='article'&&$type!='answer'){
+      if ($type != 'question' && $type != 'article' && $type != 'answer') {
         return $data;
       }
       $upload_url = ImageController::SaveUploadImage($type, $file, $user_id);
       //上传成功,保存一份记录到数据库
-      if($upload_url!=null){
-        ImageController::AddImageRecord($type,0,$user_id,$upload_url['original']);
+      if ($upload_url != null) {
+        ImageController::AddImageRecord($type, 0, $user_id, $upload_url['original']);
       }
       $is_upload = $upload_url != null;
       $data['is_upload'] = $is_upload;
       $data['upload_url'] = $upload_url['original'];
     }
     return $data;
+  }
+  /**
+   * 设置用户语言
+   * @param string $user_token token字符串
+   * @param string $lang 语言
+   */
+  public static function SetUserLanguage($user_token, $lang)
+  {
+    $is_set = false;
+    $user_id = TokenController::GetUserId($user_token);
+    $user = self::find($user_id);
+    if ($user != null) {
+      $user->language = $lang;
+      $is_set = $user->save();
+    }
+    $user->language = $lang;
+    return [
+      'is_set' => $is_set,
+      'user' => self::GetUser($user_id, $user_token)['user'],
+    ];
   }
 }
