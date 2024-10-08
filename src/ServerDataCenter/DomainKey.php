@@ -1,8 +1,8 @@
 <?php
 /**
- * author HaiGeMaster
+ * Author HaiGeMaster
  * @package MaterialDesignForum
- * @link https://github.com/HaiGeMaster/MaterialDesignForum-Server
+ * @link https://github.com/HaiGeMaster
  */
 //请注意 ActivationKey 文件不开放给用户使用，仅供创建者使用
 

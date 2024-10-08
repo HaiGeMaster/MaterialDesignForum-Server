@@ -1,8 +1,8 @@
 <?php
 /**
- * author HaiGeMaster
+ * Author HaiGeMaster
  * @package MaterialDesignForum
- * @link https://github.com/HaiGeMaster/MaterialDesignForum-Server
+ * @link https://github.com/HaiGeMaster
  */
 
 namespace MaterialDesignForum\Controllers;
