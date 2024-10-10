@@ -77,22 +77,19 @@ class Reply extends ReplyModel
             //此时$replyable_id为评论ID
             //根据回复的评论ID获取评论
             $comment = CommentController::GetComment($replyable_id, $user_token)['comment'];
-            // $reply1 = self::where('replyable_id', '=', $replyable_id)
-            //   ->where('replyable_type', '=', 'comment')
-            //   ->where('replyable_comment_id', '=', $replyable_comment_id)
-            //   ->where('delete_time', '=', 0)
-            //   ->first();
-            NotificationController::AddNotification(
-              $comment->user_id,
-              $user_id,
-              'comment_reply',
-              $comment->commentable_type == 'article' ? $comment->commentable_id : 0,
-              $comment->commentable_type == 'question' ? $comment->commentable_id : 0,
-              $comment->commentable_type == 'answer' ? $comment->commentable_id : 0,
-              $comment->comment_id,
-              $reply->reply_id,
-              0
-            );
+            if($comment!=null){
+              NotificationController::AddNotification(
+                $comment->user_id,
+                $user_id,
+                'comment_reply',
+                $comment->commentable_type == 'article' ? $comment->commentable_id : 0,
+                $comment->commentable_type == 'question' ? $comment->commentable_id : 0,
+                $comment->commentable_type == 'answer' ? $comment->commentable_id : 0,
+                $comment->comment_id,
+                $reply->reply_id,
+                0
+              );
+            }
             break;
           case 'reply':
             CommentController::AddReplyCount($replyable_comment_id);
@@ -100,17 +97,19 @@ class Reply extends ReplyModel
             //根据回复的回复ID获取回复
             $reply = self::GetReply($replyable_id, $user_token)['reply'];
             $comment = CommentController::GetComment($reply->replyable_comment_id, $user_token)['comment'];
-            NotificationController::AddNotification(
-              $reply->user_id,
-              $user_id,
-              'reply_reply',
-              $comment->commentable_type == 'article' ? $comment->commentable_id : 0,
-              $comment->commentable_type == 'question' ? $comment->commentable_id : 0,
-              $comment->commentable_type == 'answer' ? $comment->commentable_id : 0,
-              $comment->comment_id,
-              $reply->reply_id,
-              $reply_to_reply_id,
-            );
+            if($comment!=null&&$reply!=null){
+              NotificationController::AddNotification(
+                $reply->user_id,
+                $user_id,
+                'reply_reply',
+                $comment->commentable_type == 'article' ? $comment->commentable_id : 0,
+                $comment->commentable_type == 'question' ? $comment->commentable_id : 0,
+                $comment->commentable_type == 'answer' ? $comment->commentable_id : 0,
+                $comment->comment_id,
+                $reply_to_reply_id,
+                $reply->reply_id
+              );
+            }
             break;
         }
         $reply_id = $reply->reply_id;
@@ -387,16 +386,18 @@ class Reply extends ReplyModel
           $reply->delete_time = Share::ServerTime();
           UserController::SubReplyCount($reply->user_id);
           $comment = CommentController::GetComment($reply->replyable_comment_id, $user_token)['comment'];
-          NotificationController::AddNotification(
-            $reply->user_id,
-            $user_id,
-            'reply_delete',
-            $comment->commentable_type == 'article' ? $comment->commentable_id : 0,
-            $comment->commentable_type == 'question' ? $comment->commentable_id : 0,
-            $comment->commentable_type == 'answer' ? $comment->commentable_id : 0,
-            $comment->comment_id,
-            $reply->reply_id
-          );
+          if($comment!=null){
+            NotificationController::AddNotification(
+              $reply->user_id,
+              $user_id,
+              'reply_delete',
+              $comment->commentable_type == 'article' ? $comment->commentable_id : 0,
+              $comment->commentable_type == 'question' ? $comment->commentable_id : 0,
+              $comment->commentable_type == 'answer' ? $comment->commentable_id : 0,
+              $comment->comment_id,
+              $reply->reply_id
+            );
+          }
 
           switch ($reply->replyable_type) {
             case 'comment':

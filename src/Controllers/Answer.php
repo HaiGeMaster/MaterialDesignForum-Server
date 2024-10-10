@@ -69,16 +69,18 @@ class Answer extends AnswerModel
         QuestionController::AddAnswerCount($question_id);
         //根据问题ID获取问题
         $question = QuestionController::GetQuestion($question_id, $user_token)['question'];
-        NotificationController::AddNotification(
-          $question->user_id,
-          $user_id,
-          'question_answer',
-          0,
-          $question->question_id,
-          $answer->answer_id,
-          0,
-          0
-        );
+        if($question != null){
+          NotificationController::AddNotification(
+            $question->user_id,
+            $user_id,
+            'question_answer',
+            0,
+            $question->question_id,
+            $answer->answer_id,
+            0,
+            0
+          );
+        }
       }
     }
     return [

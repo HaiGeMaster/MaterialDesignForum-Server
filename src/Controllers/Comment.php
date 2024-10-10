@@ -78,77 +78,54 @@ class Comment extends CommentModel
             ArticleController::AddCommentCount($commentable_id);
             //获取文章作者用户ID
             $article = ArticleController::GetArticle($commentable_id, $user_token)['article'];
-            NotificationController::AddNotification(
-              $article->user_id,
-              $user_id,
-              'article_comment',
-              $article->article_id,
-              0,
-              0,
-              $comment->comment_id,
-              0
-            );
-            // $article = ArticleController::GetArticle($commentable_id, $user_token)['article'];
-            // $target_user_id = $article->user_id;
-            // $target_user_message = '您的文章有新评论:%user_name: %content';
+            if($article != null){
+              NotificationController::AddNotification(
+                $article->user_id,
+                $user_id,
+                'article_comment',
+                $article->article_id,
+                0,
+                0,
+                $comment->comment_id,
+                0
+              );
+            }
             break;
           case 'question':
             QuestionController::AddCommentCount($commentable_id);
             //根据问题ID获取问题
             $question = QuestionController::GetQuestion($commentable_id, $user_token)['question'];
-            NotificationController::AddNotification(
-              $question->user_id,
-              $user_id,
-              'question_comment',
-              0,
-              $question->question_id,
-              0,
-              $comment->comment_id,
-              0
-            );
-            //获取问题作者用户ID
-            // $question = QuestionController::GetQuestion($commentable_id, $user_token)['question'];
-            // $target_user_id = $question->user_id;
-            // $target_user_message = '您的问题有新评论:%user_name: %content';
+            if($question != null){
+              NotificationController::AddNotification(
+                $question->user_id,
+                $user_id,
+                'question_comment',
+                0,
+                $question->question_id,
+                0,
+                $comment->comment_id,
+                0
+              );
+            }
             break;
           case 'answer':
             AnswerController::AddCommentCount($commentable_id);
             //根据回答ID获取回答
             $answer = AnswerController::GetAnswer($commentable_id, $user_token)['answer'];
-            NotificationController::AddNotification(
-              $answer->user_id,
-              $user_id,
-              'answer_comment',
-              0,
-              0,
-              $answer->answer_id,
-              $comment->comment_id,
-              0
-            );
-            //获取回答作者用户ID
-            // $answer = AnswerController::GetAnswer($commentable_id, $user_token)['answer'];
-            // $target_user_id = $answer->user_id;
-            // $target_user_message = '您的回答有新评论:%user_name: %content';
+            if($answer != null){
+              NotificationController::AddNotification(
+                $answer->user_id,
+                $user_id,
+                'answer_comment',
+                0,
+                0,
+                $answer->answer_id,
+                $comment->comment_id,
+                0
+              );
+            }
             break;
         }
-
-        // $target_user_message = str_replace('%user_name', $comment_user_name, $target_user_message);
-        // $target_user_message = str_replace('%content', $content, $target_user_message);
-
-        // InboxController::Server_AddInbox(
-        //   'system',
-        //   'system_to_user',
-        //   $user_id,
-        //   '您的评论已发布',
-        //   '您的评论已发布'
-        // );
-        // InboxController::Server_AddInbox(
-        //   'system',
-        //   'system_to_user',
-        //   $target_user_id,
-        //   $target_user_message,
-        //   $target_user_message
-        // );
       }
     }
     return [

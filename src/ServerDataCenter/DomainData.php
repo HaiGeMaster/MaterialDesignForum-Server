@@ -27,11 +27,13 @@ class DomainData extends Eloquent
     'number_activities', //活动次数
     'allow_use', //允许使用
     'renewal_expiration_date', //续费到期时间
-    'recent_use_keys' //最近使用的产品序列号
+    'recent_use_keys', //最近使用的产品序列号
+    'allow_use_langpack' //允许使用的语言包
   ];
 
   protected $casts = [
     'allow_use' => 'boolean',
+    'allow_use_langpack' => 'array'
   ];
 
   /**
@@ -45,6 +47,7 @@ class DomainData extends Eloquent
     $item = self::where('domain_name', '=', $domain_name)->first();
     $v = false;
     $t = 0;
+    $l = [];
     if ($item == null) {
       $item = new self();
       $item->domain_name = $domain_name;
@@ -54,19 +57,26 @@ class DomainData extends Eloquent
       $item->allow_use = true;
       //renewal_expiration_date默认设置为 现在时间+3天试用期
       $item->renewal_expiration_date = Share::ServerTime() + 3 * 24 * 60 * 60;
+      $item->allow_use_langpack = ['zh_CN'];//默认设置为中文和英文
       $item->save();
       $v = $item->allow_use;
       $t = $item->renewal_expiration_date;
+      $l = $item->allow_use_langpack;
     } else {
       $item->recent_activity_time = Share::ServerTime();
       $item->number_activities += 1;
+      if($item->allow_use_langpack==null){
+        $item->allow_use_langpack = ['zh_CN'];//默认设置为中文和英文
+      }
       $item->save();
       $v = $item->allow_use;
       $t = $item->renewal_expiration_date;
+      $l = $item->allow_use_langpack;
     }
     return [
       'v' => base64_encode($v),
       't' => base64_encode($t),
+      'l' => base64_encode(json_encode($l)),
     ];
   }
   /**
@@ -92,6 +102,7 @@ class DomainData extends Eloquent
       ->first();
     $v = false;
     $t = 0;
+    $l = [];
     if ($item != null) {
       //开始续费
       $item->renewal_domain = $domain_name;
@@ -109,6 +120,7 @@ class DomainData extends Eloquent
           if($domain->save()){
             $v = $domain->allow_use;
             $t = $domain->renewal_expiration_date;
+            $l = $domain->allow_use_langpack;
           }
         }
       }
@@ -118,11 +130,13 @@ class DomainData extends Eloquent
       if ($domain != null) {
         $v = $domain->allow_use;
         $t = $domain->renewal_expiration_date;
+        $l = $domain->allow_use_langpack;
       }
     }
     return [
       'v' => base64_encode($v),
       't' => base64_encode($t),
+      'l' => base64_encode(json_encode($l)),
       // 'v' => $v,
       // 't' => $t,
     ];
