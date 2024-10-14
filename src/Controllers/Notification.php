@@ -48,12 +48,8 @@ class Notification extends NotificationModel
     ) {
         $is_add = false;
         $notification = null;
-
-        if (
-            self::IsVaildType($type) == true &&
-            ($sender_id != $receiver_id)
-        ) {
-
+    
+        if (self::IsVaildType($type) && ($sender_id != $receiver_id)) {
             $notification = new NotificationModel;
             $notification->receiver_id = $receiver_id;
             $notification->sender_id = $sender_id;
@@ -66,41 +62,112 @@ class Notification extends NotificationModel
             $notification->reply_to_reply_id = $reply_to_reply_id;
             $notification->create_time = Share::ServerTime();
             $notification->delete_time = 0;
+    
             $is_add = $notification->save();
             if ($is_add) {
                 UserController::AddNotificationCount($receiver_id);
-
-                //获取收件人邮箱
+    
+                // 获取收件人邮箱
                 $receiver = UserController::where('user_id', '=', $receiver_id)->first();
-                if ($receiver != null) {
+                if ($receiver && isset($receiver->email)) {
                     $receiver_email = $receiver->email;
                     $receiver_language = $receiver->language;
-
+    
                     $mail_title = i18n::t('Message.Client.Notifications.YouHaveNewNotifications', $receiver_language);
                     $mail_content = i18n::t('Message.Client.Notifications.Type.' . $type, $receiver_language);
-
-                    //把$mail_content里面的{value}替换成发送者的名字
+    
+                    // 替换发送者名字
                     $sender = UserController::where('user_id', $sender_id)->first();
-                    if ($sender != null) {
+                    if ($sender && isset($sender->username)) {
                         $sender_name = $sender->username;
                         $mail_content = str_replace('{value}', $sender_name, $mail_content);
                     }
-
-
-                    MailCaptchaModel::SendMail(
-                        $receiver_email,
-                        $mail_title,
-                        $mail_content
-                    );
+    
+                    // 发送邮件
+                    try {
+                        MailCaptchaModel::SendMail($receiver_email, $mail_title, $mail_content);
+                    } catch (\Exception $e) {
+                        error_log("Email sending failed: " . $e->getMessage());
+                    }
+                } else {
+                    // 处理未找到用户的情况
+                    error_log("Receiver not found or email is missing.");
                 }
             }
         }
-
+    
         return [
             'is_add' => $is_add,
             'notification' => $notification
         ];
     }
+    
+    // public static function AddNotification(
+    //     $receiver_id = 0,
+    //     $sender_id = '',
+    //     $type = '',
+    //     $article_id = 0,
+    //     $question_id = 0,
+    //     $answer_id = 0,
+    //     $comment_id = 0,
+    //     $reply_id = 0,
+    //     $reply_to_reply_id = 0
+    // ) {
+    //     $is_add = false;
+    //     $notification = null;
+
+    //     if (
+    //         self::IsVaildType($type) == true &&
+    //         ($sender_id != $receiver_id)
+    //     ) {
+
+    //         $notification = new NotificationModel;
+    //         $notification->receiver_id = $receiver_id;
+    //         $notification->sender_id = $sender_id;
+    //         $notification->type = $type;
+    //         $notification->article_id = $article_id;
+    //         $notification->question_id = $question_id;
+    //         $notification->answer_id = $answer_id;
+    //         $notification->comment_id = $comment_id;
+    //         $notification->reply_id = $reply_id;
+    //         $notification->reply_to_reply_id = $reply_to_reply_id;
+    //         $notification->create_time = Share::ServerTime();
+    //         $notification->delete_time = 0;
+    //         $is_add = $notification->save();
+    //         if ($is_add) {
+    //             UserController::AddNotificationCount($receiver_id);
+
+    //             //获取收件人邮箱
+    //             $receiver = UserController::where('user_id', '=', $receiver_id)->first();
+    //             if ($receiver != null) {
+    //                 $receiver_email = $receiver->email;
+    //                 $receiver_language = $receiver->language;
+
+    //                 $mail_title = i18n::t('Message.Client.Notifications.YouHaveNewNotifications', $receiver_language);
+    //                 $mail_content = i18n::t('Message.Client.Notifications.Type.' . $type, $receiver_language);
+
+    //                 //把$mail_content里面的{value}替换成发送者的名字
+    //                 $sender = UserController::where('user_id', $sender_id)->first();
+    //                 if ($sender != null) {
+    //                     $sender_name = $sender->username;
+    //                     $mail_content = str_replace('{value}', $sender_name, $mail_content);
+    //                 }
+
+
+    //                 MailCaptchaModel::SendMail(
+    //                     $receiver_email,
+    //                     $mail_title,
+    //                     $mail_content
+    //                 );
+    //             }
+    //         }
+    //     }
+
+    //     return [
+    //         'is_add' => $is_add,
+    //         'notification' => $notification
+    //     ];
+    // }
     /**
      * 获取用户通知
      * @param string $user_token 用户Token
