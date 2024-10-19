@@ -61,8 +61,11 @@ class User extends UserModel
           $user->username = $client_username;
           $user->create_ip = self::GetClientIP();
           $user->create_location =  self::GetClientLocation();
+          $user->last_login_time = Share::ServerTime();
+          $user->last_login_ip = self::GetClientIP();
+          $user->last_login_location= self::GetClientLocation();
           $user->location = self::GetClientLocation();
-          $user->language = $language;
+          $user->language = $language || Config::GetWebDefaultLanguage();
           $user->create_time = Share::ServerTime();
           $user->update_time = Share::ServerTime();
           //获取网络时间
