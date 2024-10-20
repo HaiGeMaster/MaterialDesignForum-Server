@@ -41,7 +41,8 @@ class User extends UserModel
     $client_password = self::HandlePassword(base64_decode($password)); //base64_decode($password);
     $client_email_captcha = md5(base64_decode($email_captcha));
     //$client_username = base64_decode($username);
-    $client_username = $username == "" ? "User" . Share::ServerTime() : $username;
+    // $client_username = $username == "" ? "User" . Share::ServerTime() : $username;
+    $client_username = $username == "" ? "User" . Share::ServerTime() : base64_decode($username);
     if ($client_username == "") {
       $client_username = $client_email;
     }

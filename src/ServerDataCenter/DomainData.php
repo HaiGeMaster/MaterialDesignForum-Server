@@ -95,9 +95,9 @@ class DomainData extends Eloquent
     $domain_name = base64_decode($domain_name_base64);
     $renewal_key = base64_decode($renewal_key_base64);
     $renewal_email = base64_decode($renewal_email_base64);
-    //从DomainKey中查找renewal_key=renewal_key且renewal_domain=null且use_time=0的记录
+    //从DomainKey中查找renewal_key=renewal_key 且 renewal_domain=null 且 use_time=0 的记录
     $item = DomainKey::where('renewal_key', '=', $renewal_key)
-      ->where('renewal_domain', '=', null)
+      ->where('renewal_domain', '=', '')
       ->where('use_time', '=', 0)
       ->first();
     $v = false;

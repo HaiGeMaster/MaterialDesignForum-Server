@@ -188,11 +188,11 @@ class Share
       $nextPageUrl = $nextPageUrl != null ? intval(str_replace('/?page=', '', $nextPageUrl)) : null;
       $data_items = $data->items();
       //如果$data_items是空数组，则返回null
-      if (count($data_items) == 0 || $data_items == null) {
+      if (count($data_items) == 0 || $data_items == null || $data_items == []) {
         $data_items = null;
       }
       $rdata = [
-        'is_get' => $data != null,
+        'is_get' => $data_items != null,
         'data' => $data_items, //bug 可能为[]空数组
         'pagination' => [
           'page' => $data->total() == 1 ? 1 : $data->currentPage(), //当前页码
@@ -231,9 +231,14 @@ class Share
       $nextPageUrl = $pagination->total() == 1 ? null : $pagination->nextPageUrl();
       $previousPageUrl = $previousPageUrl != null ? intval(str_replace('/?page=', '', $previousPageUrl)) : null;
       $nextPageUrl = $nextPageUrl != null ? intval(str_replace('/?page=', '', $nextPageUrl)) : null;
+      $data_items = $data;
+      //如果$data_items是空数组，则返回null
+      if (count($data_items) == 0 || $data_items == null || $data_items == []) {
+        $data_items = null;
+      }
       $rdata = [
-        'is_get' => $data != null,
-        'data' => $data,
+        'is_get' => $data_items != null,
+        'data' => $data_items,
         'pagination' => [
           'page' => $pagination->total() == 1 ? 1 : $pagination->currentPage(), //当前页码
           'per_page' => $pagination->total() == 1 ? 1 : $pagination->perPage(), //每页显示的数量
