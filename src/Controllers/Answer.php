@@ -17,7 +17,7 @@ use MaterialDesignForum\Controllers\Comment as CommentController;
 use MaterialDesignForum\Controllers\Reply as ReplyController;
 use MaterialDesignForum\Plugins\Share;
 use MaterialDesignForum\Controllers\Notification as NotificationController;
-use MaterialDesignForum\Models\Notification;
+// use MaterialDesignForum\Models\Notification;
 
 // use MaterialDesignForum\Config\Config;
 

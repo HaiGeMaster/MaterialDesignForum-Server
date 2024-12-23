@@ -8,7 +8,7 @@
 namespace MaterialDesignForum\Controllers;
 
 use MaterialDesignForum\Models\TopicAble as TopicAbleModel;
-use MaterialDesignForum\Controllers\Topic as TopicController;
+// use MaterialDesignForum\Controllers\Topic as TopicController;
 use MaterialDesignForum\Plugins\Share;
 
 class TopicAble extends TopicAbleModel
