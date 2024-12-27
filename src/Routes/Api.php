@@ -712,6 +712,15 @@ class Api
         )
       );
     });
+    $collector->post('/api/user_group/get', function () {
+      $data = Share::GetRequestData();
+      return Share::HandleArrayToJSON(
+        \MaterialDesignForum\Controllers\UserGroup::GetUserGroup(
+          $data['user_group_id'],
+          $data['user_token']??'',
+        )
+      );
+    });
     $collector->post('/api/user_groups/get', function () {
       $data = Share::GetRequestData();
       return Share::HandleArrayToJSON(

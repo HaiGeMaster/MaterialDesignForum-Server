@@ -227,6 +227,24 @@ class UserGroup extends UserGroupModel
   }
   /**
    * 获取用户组列表
+   * @param int $user_group_id 用户组id
+   * @param string $user_token 用户token
+   * @return array
+   */
+  public static function GetUserGroup($user_group_id, $user_token)
+  {
+    $is_admin = self::IsAdmin($user_token);
+    $data = null;
+    if ($is_admin) {
+      $data = self::where('user_group_id', '=', $user_group_id)->first();
+    }
+    return [
+      'is_get' => $data != null,
+      'user_group' => $data
+    ];
+  }
+  /**
+   * 获取用户组列表
    * @param string $order 排序方式
    * @param int $page 页码
    * @param string $user_token 用户Token
