@@ -46,10 +46,10 @@ class User extends UserModel
     if ($client_username == "") {
       $client_username = $client_email;
     }
-    $client_user = self::where('email', '=', $client_email)->first() == null;
-    if ($client_user) {
-      $client_user = self::where('username', '=', $client_username)->first() == null;
-      if ($client_user) {
+    $client_user = self::where('email', '=', $client_email)->first();// == null;
+    if ($client_user==null) {
+      $client_user = self::where('username', '=', $client_username)->first();// == null;
+      if ($client_user==null) {
         if (CacheController::IsVaildCaptcha($client_email_captcha)) {
           $user = new self();
           if (self::count() == 0) {

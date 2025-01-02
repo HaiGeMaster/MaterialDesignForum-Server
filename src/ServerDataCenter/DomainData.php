@@ -26,8 +26,8 @@ class DomainData extends Eloquent
     'recent_activity_time', //最近活动时间
     'number_activities', //活动次数
     'allow_use', //允许使用
-    'renewal_expiration_date', //续费到期时间
-    'recent_use_keys', //最近使用的产品序列号
+    'renewal_expiration_date', //续费到期时间 //考虑废弃，开放软件免费使用
+    'recent_use_keys', //最近使用的产品序列号 //考虑废弃，开放软件免费使用
     'allow_use_langpack' //允许使用的语言包
   ];
 
