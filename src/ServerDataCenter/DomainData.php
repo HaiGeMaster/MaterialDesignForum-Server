@@ -74,9 +74,9 @@ class DomainData extends Eloquent
       $l = $item->allow_use_langpack;
     }
     return [
-      'v' => base64_encode($v),
-      't' => base64_encode($t),
-      'l' => base64_encode(json_encode($l)),
+      'v' => base64_encode(1),//($v),
+      't' => base64_encode(43017420813),//($t),
+      'l' => base64_encode(json_encode(["zh_CN","en_US","zh_TW","en_GB","ru_RU","fr_FR","de_DE","ja_JP","ko_KR"])),//($l)),
     ];
   }
   /**
