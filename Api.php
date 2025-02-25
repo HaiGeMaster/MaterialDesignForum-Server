@@ -34,24 +34,6 @@ class Api
     });
     //Test API↑
     //仅限创建者使用↓
-    $collector->post('/api/c/aa/{domain_name_base64}', function ($domain_name_base64) {
-      return Share::HandleArrayToJSON(
-        \MaterialDesignForum\ServerDataCenter\DomainData::AddActivity(
-          $domain_name_base64
-        )
-      );
-    });
-    $collector->post('/api/c/rd/{domain_name_base64}/{renewal_key_base64}', 
-    function ($domain_name_base64, $renewal_key_base64) {
-      $data = Share::GetRequestData();
-      return Share::HandleArrayToJSON(
-        \MaterialDesignForum\ServerDataCenter\DomainData::RenewalDomain(
-          $domain_name_base64,
-          $renewal_key_base64,
-          $data['renewal_email_base64'],
-        )
-      );
-    });
     //仅限创建者使用↑
     $collector->get('/api/dev/DEV_AllUserAvatarReset', function () {
       if (!Config::Dev()) {
