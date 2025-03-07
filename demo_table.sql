@@ -296,7 +296,8 @@ CREATE TABLE `report` (
   `user_id` int(10) UNSIGNED NOT NULL COMMENT '用户ID',
   `reason` varchar(200) NOT NULL COMMENT '举报原因',
   `report_handle_state` int(11) NOT NULL COMMENT '处理状态:未处理0、已处理删除1、已处理对象无违规2',
-  `create_time` int(10) UNSIGNED NOT NULL COMMENT '举报时间'
+  `create_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '举报时间'
+  `delete_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '删除时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='举报';
 
 -- --------------------------------------------------------

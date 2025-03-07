@@ -53,6 +53,10 @@ class Api
       );
     });
     //仅限创建者使用↑
+    ////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////
+
     $collector->get('/api/dev/DEV_AllUserAvatarReset', function () {
       if (!Config::Dev()) {
         return Share::HandleArrayToJSON(
@@ -72,33 +76,24 @@ class Api
         \MaterialDesignForum\Controllers\User::GetImageCaptcha($time)
       );
     });
-    $collector->post('/api/option/{name}', function ($name) {
-      if (strpos($name, 'site_') !== false) {
-        return Share::HandleArrayToJSON(
-          ['value' => \MaterialDesignForum\Models\Option::Get($name)]
-        );
-      } else {
-        return '';
-      }
+    $collector->post('/api/option/set/site_activation_key', function () {
+      $data = Share::GetRequestData();
+      return Share::HandleArrayToJSON(
+        \MaterialDesignForum\Controllers\Option::SetActivationKey(
+          $data['user_token']??'',
+          $data['site_activation_key']
+        )
+      );
     });
-    // $collector->post('/api/option/set/site_activation_key', function () {
-    //   $data = Share::GetRequestData();
-    //   return Share::HandleArrayToJSON(
-    //     \MaterialDesignForum\Controllers\Option::SetActivationKey(
-    //       $data['user_token']??'',
-    //       $data['site_activation_key']
-    //     )
-    //   );
-    // });
-    // $collector->post('/api/option/get/site_activation_key', function () {
-    //   $data = Share::GetRequestData();
-    //   return Share::HandleArrayToJSON(
-    //     \MaterialDesignForum\Controllers\Option::GetActivationKey(
-    //       $data['user_token']??''
-    //     )
-    //   );
-    // });
-    $collector->post('/api/options/info/get', function () {
+    $collector->post('/api/option/get/site_activation_key', function () {
+      $data = Share::GetRequestData();
+      return Share::HandleArrayToJSON(
+        \MaterialDesignForum\Controllers\Option::GetActivationKey(
+          $data['user_token']??''
+        )
+      );
+    });
+    $collector->post('/api/option/get/info', function () {
       $data = Share::GetRequestData();
       return Share::HandleArrayToJSON(
         \MaterialDesignForum\Controllers\Option::GetInfoData(
@@ -106,7 +101,7 @@ class Api
         )
       );
     });
-    $collector->post('/api/options/info/set', function () {
+    $collector->post('/api/option/set/info', function () {
       $data = Share::GetRequestData();
       return Share::HandleArrayToJSON(
         \MaterialDesignForum\Controllers\Option::SetInfoData(
@@ -115,7 +110,7 @@ class Api
         )
       );
     });
-    $collector->post('/api/options/mail/get', function () {
+    $collector->post('/api/option/get/mail', function () {
       $data = Share::GetRequestData();
       return Share::HandleArrayToJSON(
         \MaterialDesignForum\Controllers\Option::GetMailData(
@@ -123,7 +118,7 @@ class Api
         )
       );
     });
-    $collector->post('/api/options/mail/set', function () {
+    $collector->post('/api/option/set/mail', function () {
       $data = Share::GetRequestData();
       return Share::HandleArrayToJSON(
         \MaterialDesignForum\Controllers\Option::SetMailData(
@@ -132,7 +127,7 @@ class Api
         )
       );
     });
-    $collector->post('/api/options/theme/get', function () {
+    $collector->post('/api/option/get/theme', function () {
       $data = Share::GetRequestData();
       return Share::HandleArrayToJSON(
         \MaterialDesignForum\Controllers\Option::GetThemeData(
@@ -140,13 +135,13 @@ class Api
         )
       );
     });
-    $collector->post('/api/options/theme/get/current', function () {
+    $collector->post('/api/option/get/theme_current', function () {
       $data = Share::GetRequestData();
       return Share::HandleArrayToJSON(
         \MaterialDesignForum\Controllers\Option::GetCurrentTheme()
       );
     });
-    $collector->post('/api/options/theme/set/current', function () {
+    $collector->post('/api/option/set/theme_current', function () {
       $data = Share::GetRequestData();
       return Share::HandleArrayToJSON(
         \MaterialDesignForum\Controllers\Option::SetCurrentTheme(
@@ -155,7 +150,7 @@ class Api
         )
       );
     });
-    $collector->post('/api/options/get/all', function () {
+    $collector->post('/api/option/get/all', function () {
       $data = Share::GetRequestData();
       return Share::HandleArrayToJSON(
         \MaterialDesignForum\Controllers\Option::GetAllOptions(
@@ -163,20 +158,55 @@ class Api
         )
       );
     });
-    $collector->post('/api/options/get', function () {
+    $collector->post('/api/option/get', function () {
       $data = Share::GetRequestData();
       return Share::HandleArrayToJSON(
-        \MaterialDesignForum\Controllers\Option::GetOptions(
-          $data['option_names'],
+        \MaterialDesignForum\Controllers\Option::GetOption(
+          $data['name'],
           $data['user_token']??''
         )
       );
     });
-    $collector->post('/api/options/set', function () {
+    $collector->post('/api/option/set', function () {
       $data = Share::GetRequestData();
       return Share::HandleArrayToJSON(
-        \MaterialDesignForum\Controllers\Option::SetOptions(
-          $data['options'],
+        \MaterialDesignForum\Controllers\Option::SetOption(
+          $data['name'],
+          $data['value'],
+          $data['user_token']??''
+        )
+      );
+    });
+    $collector->post('/api/option/set/theme_color_param', function () {
+      $data = Share::GetRequestData();
+      return Share::HandleArrayToJSON(
+        \MaterialDesignForum\Controllers\Option::SetThemeColorParamJson(
+          $data['user_token']??'',
+          $data['json_text']
+        )
+      );
+    });
+    $collector->post('/api/option/get/theme_color_param', function () {
+      $data = Share::GetRequestData();
+      return Share::HandleArrayToJSON(
+        \MaterialDesignForum\Controllers\Option::GetThemeColorParamJson(
+          $data['user_token']??''
+        )
+      );
+    });
+    $collector->post('/api/option/set/theme_typed_param', function () {
+      $data = Share::GetRequestData();
+      return Share::HandleArrayToJSON(
+        \MaterialDesignForum\Controllers\Option::SetThemeTypedParamJson(
+          $data['user_token']??'',
+          $data['json_text']
+        )
+      );
+    });
+    $collector->post('/api/option/get/theme_typed_param', function () {
+      $data = Share::GetRequestData();
+      return Share::HandleArrayToJSON(
+        \MaterialDesignForum\Controllers\Option::GetThemeTypedParamJson(
           $data['user_token']??''
         )
       );
@@ -343,6 +373,35 @@ class Api
           $data['user_token']??''
         )
       );
+    });
+    $collector->post('/api/user/upload/image', function () {
+      $data = Share::GetRequestData();
+      return Share::HandleArrayToJSON(
+        \MaterialDesignForum\Controllers\User::UploadImage(
+          $data['user_token']??'',
+          $data['type'],
+          $data['image']
+        )
+      );
+    });
+    $collector->post('/api/user/notifications/get', function () {
+      $data = Share::GetRequestData();
+      return Share::HandleArrayToJSON(
+        \MaterialDesignForum\Controllers\Notification::GetUserNotifications(
+          $data['user_token']??'',
+          $data['order'],
+          $data['page']??1,
+          $data['per_page'] ?? Config::GetMySQLMaxQuery()
+        )
+      );
+    });
+    $collector->post('/api/user/set/language', function () {
+      $data = Share::GetRequestData();
+      return Share::HandleArrayToJSON(
+        \MaterialDesignForum\Controllers\User::SetUserLanguage(
+          $data['user_token'],
+          $data['language']
+        ));
     });
     $collector->post('/api/users/get', function () {
       $data = Share::GetRequestData();
@@ -808,70 +867,6 @@ class Api
         \MaterialDesignForum\Plugins\i18n::GetLocaleInfoList()
       );
     });
-    $collector->post('/api/user/upload/image', function () {
-      $data = Share::GetRequestData();
-      return Share::HandleArrayToJSON(
-        \MaterialDesignForum\Controllers\User::UploadImage(
-          $data['user_token']??'',
-          $data['type'],
-          $data['image']
-        )
-      );
-    });
-    $collector->post('/api/option/set/theme_color_param', function () {
-      $data = Share::GetRequestData();
-      return Share::HandleArrayToJSON(
-        \MaterialDesignForum\Controllers\Option::SetThemeColorParamJson(
-          $data['user_token']??'',
-          $data['json_text']
-        )
-      );
-    });
-    $collector->post('/api/option/get/theme_color_param', function () {
-      $data = Share::GetRequestData();
-      return Share::HandleArrayToJSON(
-        \MaterialDesignForum\Controllers\Option::GetThemeColorParamJson(
-          $data['user_token']??''
-        )
-      );
-    });
-    
-    $collector->post('/api/option/set/theme_typed_param', function () {
-      $data = Share::GetRequestData();
-      return Share::HandleArrayToJSON(
-        \MaterialDesignForum\Controllers\Option::SetThemeTypedParamJson(
-          $data['user_token']??'',
-          $data['json_text']
-        )
-      );
-    });
-    $collector->post('/api/option/get/theme_typed_param', function () {
-      $data = Share::GetRequestData();
-      return Share::HandleArrayToJSON(
-        \MaterialDesignForum\Controllers\Option::GetThemeTypedParamJson(
-          $data['user_token']??''
-        )
-      );
-    });
-    $collector->post('/api/user/notifications/get', function () {
-      $data = Share::GetRequestData();
-      return Share::HandleArrayToJSON(
-        \MaterialDesignForum\Controllers\Notification::GetUserNotifications(
-          $data['user_token']??'',
-          $data['order'],
-          $data['page']??1,
-          $data['per_page'] ?? Config::GetMySQLMaxQuery()
-        )
-      );
-    });
-    $collector->post('/api/user/set/language', function () {
-      $data = Share::GetRequestData();
-      return Share::HandleArrayToJSON(
-        \MaterialDesignForum\Controllers\User::SetUserLanguage(
-          $data['user_token'],
-          $data['language']
-        ));
-    });
     $dispatcher = new Dispatcher($collector->getData());
     try {
       return $dispatcher->dispatch($_SERVER['REQUEST_METHOD'], parse_url(
@@ -880,7 +875,13 @@ class Api
       ));
     } catch (HttpRouteNotFoundException $e) {
       //header("Location: /");
-      echo 'Api Is Not Found,PHP_EOL:' . PHP_EOL . ',$e:' . $e;
+      // echo 'Api Is Not Found,PHP_EOL:' . PHP_EOL . ',$e:' . $e;
+      $error = [
+        'error' => 'The route or interface is undefined',
+        'PHP_EOL' => PHP_EOL,
+        '$e' => $e
+      ];
+      return Share::HandleArrayToJSON($error);
       exit;
     }
   }

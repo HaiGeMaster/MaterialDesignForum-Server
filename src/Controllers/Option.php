@@ -285,6 +285,11 @@ class Option extends OptionModel
       'is_set' => $is_set,
     ];
   }
+  /**
+   * 获取激活码
+   * @param  string $user_token 用户token
+   * @return array [is_get, key]
+   */
   public static function GetActivationKey($user_token)
   {
     $option = self::find('site_activation_key');
