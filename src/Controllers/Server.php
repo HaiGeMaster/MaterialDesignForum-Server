@@ -72,7 +72,9 @@ class Server
   public static function GetDataBetweenTimestamps($user_token, $time_type, $model_type/*, $startTimestamp, $endTimestamp*/)
   {
     // items: ['最近 7 天', '本月', '上月', '最近 30 天', '今年', '去年', '最近 1 年'],
-    if (!UserGroupController::IsAdmin($user_token)) {
+    if (!UserGroupController::IsAdmin($user_token)||
+    !UserGroupController::Ability($user_token, 'ability_admin_login')
+    ) {
       return [
         'is_get' => false,
         'data' => null,
@@ -172,7 +174,9 @@ class Server
    */
   public static function GetDataBetweenTimestampsAll($user_token, $time_type)
   {
-    if (!UserGroupController::IsAdmin($user_token)) {
+    if (!UserGroupController::IsAdmin($user_token)||
+    !UserGroupController::Ability($user_token, 'ability_admin_login')
+    ) {
       return [
         'is_get' => false,
         'data' => null,
