@@ -109,6 +109,9 @@ class i18n
       //   $fallbackLocale = Option::Get('default_language') || array_keys($localization)[0];
       // }
       $fallbackLocale = Option::Get('default_language');
+      if($fallbackLocale==null||$fallbackLocale==''){
+        $fallbackLocale = array_keys($localization)[0];
+      }
       $i18n = new i18nModel($locale, $fallbackLocale, $localization);
       return $i18n;
     } catch (\Exception $e) {

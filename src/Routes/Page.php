@@ -191,26 +191,26 @@ class Page
   }
   public static function HandleInstallRoute()
   {
-    // $collector = new RouteCollector();
-    // $collector->get('/install', function () {
-    //   return Install::InstallView();
-    // });
-    // $collector->get('/{lang:[a-z]{2}_[A-Z]{2}}/install', function () {
-    //   return Install::InstallView();
-    // });
-    // $collector->get('/language/get/{name}', function ($name) {
-    //   return Share::GetLanguage($name);
-    // });
-    // $dispatcher = new Dispatcher($collector->getData());
-    // try {
-    //   return $dispatcher->dispatch($_SERVER['REQUEST_METHOD'], parse_url(
-    //     $_SERVER['REQUEST_URI'] == '' ? '/' : $_SERVER['REQUEST_URI'],
-    //     PHP_URL_PATH
-    //   ));
-    // } catch (HttpRouteNotFoundException $e) {
-    //   header("Location: /install");
-    //   exit;
-    // }
+    $collector = new RouteCollector();
+    $collector->get('/install', function () {
+      return Install::InstallView();
+    });
+    $collector->get('/{lang:[a-z]{2}_[A-Z]{2}}/install', function ($lang) {
+      return Install::InstallView($lang);
+    });
+    $collector->get('/language/get/{name}', function ($name) {
+      return Share::GetLanguage($name);
+    });
+    $dispatcher = new Dispatcher($collector->getData());
+    try {
+      return $dispatcher->dispatch($_SERVER['REQUEST_METHOD'], parse_url(
+        $_SERVER['REQUEST_URI'] == '' ? '/' : $_SERVER['REQUEST_URI'],
+        PHP_URL_PATH
+      ));
+    } catch (HttpRouteNotFoundException $e) {
+      header("Location: /install");
+      exit;
+    }
 
     return 'No install';
   }

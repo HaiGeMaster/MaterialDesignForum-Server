@@ -17,11 +17,42 @@ use PHPMailer\PHPMailer\SMTP;
 
 use Illuminate\Support\Facades\DB;
 
+use Illuminate\Database\Capsule\Manager as Capsule;
+
+// class SensitiveParameterValue
+// {
+//     private $value;
+
+//     public function __construct($value)
+//     {
+//         $this->value = $value;
+//     }
+
+//     public function getValue()
+//     {
+//         return $this->value;
+//     }
+// }
+
+// class SensitiveParameterValue {
+//   private $value;
+
+//   public function __construct($value) {
+//       $this->value = $value;
+//   }
+
+//   public function getValue() {
+//       return $this->value;
+//   }
+// }
+
+
 class Install
 {
   public static $path = '././src/Config/Install.json';
-  public static $installIndexFilePath = '././public/themes/MaterialDesignVuetify2/install.html';
-  public static $defaultConfigFiePath = '././src/Config/Config.php';
+  public static $installIndexFilePath = '././public/themes/MaterialDesignForum-Vuetify2/install.html';
+  public static $defaultConfigFiePath = '././src/Config/Config.default.php.txt';
+  public static $configFiePath = '././src/Config/Config.php';
   public static $defaultSQLFilePath = '././demo_table.sql';
 
   /**
@@ -36,9 +67,19 @@ class Install
         self::SaveInstallJSON(false, 1);
         return false;
       } else {
-        mysqli_close($conn);
-        return true;
+        // self::SaveInstallJSON(false, 2);
+
+        //如果路由含没有localhost则返回true
+        if (!preg_match('/localhost/', $_SERVER['HTTP_HOST'])) {
+          mysqli_close($conn);
+          
+          
+          return true;
+        }
+        // mysqli_close($conn);
+        // return true;
       }
+      //默认情况下返回false
       $json = file_get_contents(self::$path);
     } catch (Exception $e) {
       $json = false;
@@ -46,6 +87,10 @@ class Install
     if ($json === false) {
       return true;
     }
+    //如果请求路由文本中含有[a-z]{2}_[A-Z]{2}}/install则返回true
+    // if (preg_match('/[a-z]{2}_[A-Z]{2}}\/install/', $_SERVER['REQUEST_URI'])) {
+    //   return true;
+    // }
     $json = json_decode($json, true);
     return $json['install'];
   }
@@ -67,11 +112,13 @@ class Install
     if ($lang == '') {
       $lang = i18n::i18n()->locale;
     }
+    $upcoming = i18n::t('Message.App.UpComing', $lang);
     $index_html = file_get_contents(self::$installIndexFilePath);
     $index_html = str_replace('{lang}', $lang, $index_html);
     $index_html = str_replace('{title}', i18n::t('Message.App.Install'), $index_html);
     $index_html = str_replace('{description}', i18n::t('Message.App.Install'), $index_html);
     $index_html = str_replace('{keywords}', i18n::t('Message.App.Install'), $index_html);
+    $index_html = str_replace('{upcoming}', $upcoming, $index_html);
     // $index_html = str_replace('{content}', '', $index_html);
     $index_html = str_replace('{script}', '', $index_html);
     return $index_html;
@@ -95,42 +142,157 @@ class Install
    * @param string $mysqlPrefix 数据库前缀
    * @return array [sql=>bool]
    */
+//   public static function SetConfigPHP($mysqlHostname, $mysqlUsername, $mysqlPassword, $mysqlDatabase, $mysqlPrefix = '')
+// {
+//     if (self::AsInstall()) {
+//         return [
+//             'install' => true,
+//             'data' => self::GetInstallInfoJson()
+//         ];
+//     }
+
+//     $data = false;
+//     $errorLog = [];
+    
+//     try {
+//         // 1. 测试数据库连接
+//         $conn = @mysqli_connect(
+//             $mysqlHostname, 
+//             $mysqlUsername, 
+//             $mysqlPassword,
+//             $mysqlDatabase
+//         );
+        
+//         if (!$conn) {
+//             throw new Exception("mysqli_connect_error: " . mysqli_connect_error());
+//         }
+
+//         // 2. 读取并处理SQL文件
+//         // $sqlFilePath = self::$defaultSQLFilePath;
+//         // if (!file_exists($sqlFilePath)) {
+//         //     throw new Exception("SQL Not Found: " . $sqlFilePath);
+//         // }
+
+//         // $sqlContent = file_get_contents($sqlFilePath);
+//         // if ($mysqlPrefix && $mysqlPrefix !== '') {
+//         //     // // 使用正则表达式安全替换表名前缀
+//         //     // $pattern = '/`([^`]+)`/'; 
+//         //     // $replacement = '`' . $mysqlPrefix . '`\\1';
+//         //     // $sqlContent = preg_replace_callback($pattern, function($matches) use ($mysqlPrefix) {
+//         //     //     return str_replace($matches[0], $replacement, $matches[0]);
+//         //     // }, $sqlContent);
+
+//         //     //使用普通替换表名前缀
+//         //     $sqlContent = str_replace('CREATE TABLE `', 'CREATE TABLE `' . $mysqlPrefix, $sqlContent);
+//         // }
+
+//         // 3. 执行SQL导入（使用事务处理）
+//         // $conn->begin_transaction();
+//         // $batchSize = 1000; // 每批提交1000条
+//         // $statements = explode(';', $sqlContent);
+//         // $successCount = 0;
+//         // $errorCount = 0;
+
+//         // foreach ($statements as $stmt) {
+//         //     $stmt = trim($stmt);
+            
+//         //     // 跳过空语句和注释
+//         //     if (empty($stmt) || strpos($stmt, '//') === 0 || strpos($stmt, '--') === 0) {
+//         //         continue;
+//         //     }
+
+//         //     if (!$conn->query($stmt)) {
+//         //         $errorLog[] = [
+//         //             'line' => $successCount + 1,
+//         //             'error' => $conn->error
+//         //         ];
+//         //         $errorCount++;
+                
+//         //         if ($errorCount > 5) { // 最多允许5次错误后回滚
+//         //             throw new Exception("error 5");
+//         //         }
+//         //     } else {
+//         //         $successCount++;
+//         //     }
+
+//         //     // 分批提交
+//         //     if ($successCount % $batchSize === 0) {
+//         //         $conn->commit();
+//         //         $conn->begin_transaction(); // 开启新事务
+//         //     }
+//         // }
+
+//         // // 提交剩余语句
+//         // $conn->commit();
+
+//         // 4. 保存配置文件
+//         $config = file_get_contents(self::$defaultConfigFiePath);
+//         $config = str_replace('{mysql_hostname}', $mysqlHostname, $config);
+//         $config = str_replace('{mysql_username}', $mysqlUsername, $config);
+//         $config = str_replace('{mysql_password}', $mysqlPassword, $config);
+//         $config = str_replace('{mysql_database}', $mysqlDatabase, $config);
+//         $config = str_replace('{mysqlPrefix}', $mysqlPrefix, $config);
+        
+//         if (file_put_contents(self::$defaultConfigFiePath, $config) === false) {
+//             throw new Exception("save config error");
+//         }
+
+//         // 5. 记录安装信息
+//         $data = self::SaveInstallJSON(false, 2);
+        
+//     } catch (Exception $e) {
+//         // 发生错误时回滚事务
+//         if ($conn) {
+//             $conn->rollback();
+//         }
+        
+//         // 记录详细错误信息
+//         $errorLog[] = [
+//             'message' => $e->getMessage(),
+//             'stack' => $e->getTrace(),
+//             'error' => $conn->error
+//         ];
+//     } finally {
+//         // 关闭数据库连接
+//         if ($conn) {
+//             mysqli_close($conn);
+//         }
+//     }
+
+//     // 构建返回结果
+//     return [
+//         // 'success' => $data !== false,
+//         // 'errors' => $errorLog,
+//         // 'imported_rows' => $successCount,
+//         // 'errored_rows' => $errorCount,
+//         'sql' => $data
+//     ];
+// }
   public static function SetConfigPHP($mysqlHostname, $mysqlUsername, $mysqlPassword, $mysqlDatabase, $mysqlPrefix = '')
   {
     if (self::AsInstall()) {
       return [
-        'install' => true,
+        'is_install' => true,
         'data' => self::GetInstallInfoJson()
       ];
     }
 
     $data = false;
-    try {
-      //先测试是否能连接数据库
-      $conn = mysqli_connect($mysqlHostname, $mysqlUsername, $mysqlPassword);
-      if (!$conn) {
-        $data = false;
-      } else {
+    // try {
+    //   //先测试是否能连接数据库
+    //   $conn = mysqli_connect($mysqlHostname, $mysqlUsername, $mysqlPassword);
+    //   if (!$conn) {
+    //     $data = false;
+    //   } else {
         $config = file_get_contents(self::$defaultConfigFiePath);
-        $config = str_replace('//namespace', 'namespace', $config);
+        // $config = str_replace('// namespace', 'namespace', $config);
         $config = str_replace('{mysql_hostname}', $mysqlHostname, $config);
         $config = str_replace('{mysql_username}', $mysqlUsername, $config);
         $config = str_replace('{mysql_password}', $mysqlPassword, $config);
         $config = str_replace('{mysql_database}', $mysqlDatabase, $config);
         //$config = str_replace('{mysqlPrefix}', $mysqlPrefix, $config);
-        //$set = file_put_contents(self::$defaultConfigFiePath . '.test', $config);
-        $set = file_put_contents(self::$defaultConfigFiePath, $config);
+        $set = file_put_contents(self::$configFiePath, $config);
         if ($set) {
-          // //读取SQL文件导入数据库
-          // $sql = file_get_contents(self::$defaultSQLFilePath);
-          // //$sql = str_replace("CREATE TABLE `", $mysqlPrefix, $sql);
-          // if ($conn->multi_query($sql)==true) {
-          //   mysqli_close($conn);
-          //   $data = self::SaveInstallJSON(false, 2);
-          //   //$data = true;
-          // } else {
-          //   $data = false;
-          // }
 
           $sql = file_get_contents(self::$defaultSQLFilePath);
           $sql_is_install = DB::unprepared($sql);
@@ -142,12 +304,13 @@ class Install
         } else {
           $data = false;
         }
-      }
-    } catch (Exception $e) {
-      $data = false;
-    }
+      // }
+    // } catch (Exception $e) {
+    //   $data = false;
+    //   echo $e->getMessage();
+    // }
     return [
-      'sql' => $data
+      'is_install' => $data
     ];
   }
   /**

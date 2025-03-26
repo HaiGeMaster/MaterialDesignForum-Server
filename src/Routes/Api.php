@@ -879,8 +879,17 @@ class Api
       $error = [
         'error' => 'The route or interface is undefined',
         'PHP_EOL' => PHP_EOL,
+        'request_uri' => $_SERVER['REQUEST_URI'],
         '$e' => $e
       ];
+
+      //如果是非API请求，返回错误信息
+      // if (!self::IsApi()) {
+        // return '';//Share::HandleArrayToJSON($error);
+
+        // return $_SERVER['REQUEST_URI'];
+      // }
+
       return Share::HandleArrayToJSON($error);
       exit;
     }
@@ -893,14 +902,30 @@ class Api
   {
     $collector = new RouteCollector();
 
-    $collector->post('/api/lang/get/locale/Info/list', function () {
+    $collector->post('/api/lang/get/locale/info/list', function () {
       return Share::HandleArrayToJSON(
         \MaterialDesignForum\Plugins\i18n::GetLocaleInfoList()
+      );
+    });
+    $collector->post('/api/option/get/theme_color_param', function () {
+      $data = Share::GetRequestData();
+      return Share::HandleArrayToJSON(
+        \MaterialDesignForum\Controllers\Option::GetThemeColorParamJson(
+          $data['user_token']??''
+        )
       );
     });
     $collector->post('/api/install/get_install_info_json', function () {
       return Share::HandleArrayToJSON(
         Install::GetInstallInfoJson()
+      );
+    });
+    $collector->post('/api/option/get/info', function () {
+      $data = Share::GetRequestData();
+      return Share::HandleArrayToJSON(
+        \MaterialDesignForum\Controllers\Option::GetInfoData(
+          $data['user_token']??''
+        )
       );
     });
     $collector->post('/api/install/set_config', function () {

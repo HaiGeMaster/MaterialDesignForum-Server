@@ -15,8 +15,8 @@ $capsule->addConnection([
     'database' => Config::GetMySqlDatabase(),
     'username' => Config::GetMySqlUsername(),
     'password' => Config::GetMySqlPassword(),
-    'charset' => 'utf8',
-    'collation' => 'utf8_general_ci',
+    // 'charset' => 'utf8',
+    // 'collation' => 'utf8_general_ci',
     'prefix' => Config::GetMySqlPrefix(),
 ]);
 $capsule->bootEloquent();
