@@ -46,10 +46,10 @@ class User extends UserModel
     if ($client_username == "") {
       $client_username = $client_email;
     }
-    $client_user = self::where('email', '=', $client_email)->first();// == null;
-    if ($client_user==null) {
-      $client_user = self::where('username', '=', $client_username)->first();// == null;
-      if ($client_user==null) {
+    $client_user = self::where('email', '=', $client_email)->first(); // == null;
+    if ($client_user == null) {
+      $client_user = self::where('username', '=', $client_username)->first(); // == null;
+      if ($client_user == null) {
         if (CacheController::IsVaildCaptcha($client_email_captcha)) {
           $user = new self();
           if (self::count() == 0) {
@@ -64,7 +64,7 @@ class User extends UserModel
           $user->create_location =  self::GetClientLocation();
           $user->last_login_time = Share::ServerTime();
           $user->last_login_ip = self::GetClientIP();
-          $user->last_login_location= self::GetClientLocation();
+          $user->last_login_location = self::GetClientLocation();
           $user->location = self::GetClientLocation();
           $user->language = $language || Config::GetWebDefaultLanguage();
           $user->create_time = Share::ServerTime();
@@ -134,9 +134,9 @@ class User extends UserModel
             //   //   'user' => self::GetUser($edit_target_user_id, $user_token)['user'],
             //   // ];
             // }
-            UserGroupController::MoveUserGroup(
+            UserGroupController::MoveUserGroups(
               $user_group_id,
-              $edit_target_user_id
+              [$edit_target_user_id]
             ); //移动用户组
           }
 
@@ -270,9 +270,11 @@ class User extends UserModel
       $password = self::HandlePassword(base64_decode($password));
       $image_capthca = $image_capthca ? md5(base64_decode($image_capthca)) : '';
 
-      $user = self::where('email', '=', $username_or_email)->first();
+      $user = self::where('email', '=', $username_or_email)
+        ->where('disable_time', '=', 0)->first();
       if ($user == null) {
-        $user = self::where('username', '=', $username_or_email)->first();
+        $user = self::where('username', '=', $username_or_email)
+          ->where('disable_time', '=', 0)->first();
       }
       $token = '';
       $is_login = false;
@@ -350,7 +352,9 @@ class User extends UserModel
     $user_id = TokenController::GetUserId($token);
     $user = null;
     if ($user_id) {
-      $user = self::where('user_id', '=', $user_id)->first();
+      $user = self::where('user_id', '=', $user_id)
+        ->where('disable_time', '=', 0)
+        ->first();
       if ($user) {
         $user->last_login_ip = self::GetClientIP();
         $user->last_login_location = self::GetClientLocation();
@@ -557,20 +561,35 @@ class User extends UserModel
       //   ->paginate($per_page, ['*'], 'page', $page);
       // $data = Share::HandleDataAndPagination($data);
 
-      if ($search_keywords != '') {
-        $data = self::where('disable_time', '=', 0)
-          //->where($search_field, 'like', '%' . $search_keywords . '%')
-          ->where(function ($query) use ($search_field, $search_keywords) {
-            foreach ($search_field as $key => $value) {
-              $query->orWhere($value, 'like', '%' . $search_keywords . '%');
-            }
-          })
-          ->orderBy($field, $order)
-          ->paginate($per_page, ['*'], 'page', $page);
-      } else {
-        $data = self::where('disable_time', '=', 0)
-          ->orderBy($field, $order)
-          ->paginate($per_page, ['*'], 'page', $page);
+      if (!$is_admin) {
+        if ($search_keywords != '') {
+          $data = self::where('disable_time', '=', 0)
+            //->where($search_field, 'like', '%' . $search_keywords . '%')
+            ->where(function ($query) use ($search_field, $search_keywords) {
+              foreach ($search_field as $key => $value) {
+                $query->orWhere($value, 'like', '%' . $search_keywords . '%');
+              }
+            })
+            ->orderBy($field, $order)
+            ->paginate($per_page, ['*'], 'page', $page);
+        } else {
+          $data = self::where('disable_time', '=', 0)
+            ->orderBy($field, $order)
+            ->paginate($per_page, ['*'], 'page', $page);
+        }
+      }else if($is_admin) {
+        if ($search_keywords != '') {
+          $data = self::where(function ($query) use ($search_field, $search_keywords) {
+              foreach ($search_field as $key => $value) {
+                $query->orWhere($value, 'like', '%' . $search_keywords . '%');
+              }
+            })
+            ->orderBy($field, $order)
+            ->paginate($per_page, ['*'], 'page', $page);
+        } else {
+          $data = self::orderBy($field, $order)
+            ->paginate($per_page, ['*'], 'page', $page);
+        }
       }
 
       $data = Share::HandleDataAndPagination($data);
@@ -955,6 +974,43 @@ class User extends UserModel
     return [
       'is_set' => $is_set,
       'user' => self::GetUser($user_id, $user_token)['user'],
+    ];
+  }
+  /**
+   * 设置多个用户的用户组为新的用户组
+   * @param string $user_token token 操作者用户token字符串
+   * @param string $user_group_id 用户组id
+   * @param array $user_ids 用户id数组
+   */
+  public static function SetUsersUserGroup($user_token, $user_group_id, $user_ids)
+  {
+    $is_set = false;
+    $is_admin = UserGroupController::IsAdmin($user_token);
+    if ($is_admin) {
+      $is_set = UserGroupController::MoveUserGroups($user_group_id, $user_ids);
+    }
+    return [
+      'is_set' => $is_set,
+    ];
+  }
+  /**
+   * 设置多个用户的禁用时间
+   * @param string $user_token token 操作者用户token字符串
+   * @param string $user_ids 用户id数组
+   * @param string $disable_time 禁用时间默认0是不禁用,其他值是禁用时间
+   */
+  public static function SetUsersDisableTime($user_token, $user_ids, $disable_time = 0)
+  {
+    $is_set = false;
+    $disable_time != 0 ? Share::ServerTime() : 0;
+    $is_admin = UserGroupController::IsAdmin($user_token);
+    if ($is_admin) {
+      $is_set = self::whereIn('user_id', $user_ids)->update([
+        'disable_time' => $disable_time,
+      ]);
+    }
+    return [
+      'is_delete' => $is_set,
     ];
   }
 }

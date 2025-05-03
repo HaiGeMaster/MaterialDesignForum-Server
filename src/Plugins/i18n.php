@@ -29,7 +29,9 @@ class i18n
    */
   public static function i18n()
   {
-    self::Init();
+    if (self::$i18n == null) {
+      self::Init();
+    }
     return self::$i18n;
   }
   /**
@@ -56,69 +58,172 @@ class i18n
     }
   }
 
+  // private static function CreateInstance()
+  // {
+  //   $dataFolder = Config::GetWebLocalePath(); //'././public/locale/json/'
+
+  //   //遍历语言文件夹，获取语言文件，为.json文件
+  //   $localization = array();
+  //   $dir = opendir($dataFolder);
+  //   while (($file = readdir($dir)) !== false) {
+  //     if ($file != '.' && $file != '..') {
+  //       $localization[str_replace('.json', '', $file)] = json_decode(file_get_contents($dataFolder . $file), true); //$localization['zh_CN']=array()
+  //     }
+  //   }
+
+  //   try {
+
+  //     $lang = '';
+
+  //     foreach ($localization as $key => $value) { //$key=zh_CN,$value=array()
+  //       //如果$_SERVER['REQUEST_URI']的部分与$key相同，那么就是$key
+  //       if (str_contains($_SERVER['REQUEST_URI'], $key)) {
+  //         $lang = $key;
+  //         break;
+  //       }
+  //     }
+
+  //     if ($lang == '' || !isset($localization[$lang])) { //如果为空或不来自localization
+  //       //停止任何报错
+  //       // error_reporting(0);
+
+  //       // $lang = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 5); //从请求协议中获取语言符号
+  //       $acceptLanguage = $_SERVER['HTTP_ACCEPT_LANGUAGE'] || '';
+  //       if ($lang != '' && $acceptLanguage != '') {
+  //         $lang = substr($acceptLanguage, 0, 5); //从请求协议中获取语言符号
+  //         $lang = str_replace("-", "_", $lang);
+  //       }
+
+  //       //开启报错
+  //       // error_reporting(E_ALL);
+  //     }
+
+  //     $locale = $lang ?? $_COOKIE['lang'] ?? Option::Get('default_language') ?? 'en_US';//?? array_keys($localization)[0] ?? 'en_US';
+
+
+  //     $fallbackLocale = Option::Get('default_language') ?? 'en_US';
+
+  //     if (is_numeric($locale)||$locale == ''||$locale == null) {
+  //       $locale = array_keys($localization)[0] ?? 'en_US';
+  //     }
+  //     if ($fallbackLocale == null || $fallbackLocale == '') {
+  //       $fallbackLocale = array_keys($localization)[0]??'en_US';
+  //     }
+
+  //     $i18n = new i18nModel($locale, $fallbackLocale, $localization);
+  //     return $i18n;
+  //   } catch (\Exception $e) {
+  //     $locale = 'en_US';
+  //     return new i18nModel($locale, $locale, $localization);
+  //   }
+  // }
+
   private static function CreateInstance()
   {
-    $dataFolder = Config::GetWebLocalePath(); //'././public/locale/json/'
+    $dataFolder = Config::GetWebLocalePath();
 
-    //遍历语言文件夹，获取语言文件，为.json文件
     $localization = array();
     $dir = opendir($dataFolder);
     while (($file = readdir($dir)) !== false) {
       if ($file != '.' && $file != '..') {
-        $localization[str_replace('.json', '', $file)] = json_decode(file_get_contents($dataFolder . $file), true); //$localization['zh_CN']=array()
+        $localization[str_replace('.json', '', $file)] = json_decode(file_get_contents($dataFolder . $file), true);
       }
     }
 
     try {
-
       $lang = '';
 
-      foreach ($localization as $key => $value) { //$key=zh_CN,$value=array()
-        //如果$_SERVER['REQUEST_URI']的部分与$key相同，那么就是$key
+      foreach ($localization as $key => $value) {
         if (str_contains($_SERVER['REQUEST_URI'], $key)) {
           $lang = $key;
           break;
         }
       }
 
-      if ($lang == '' || !isset($localization[$lang])) { //如果为空或不来自localization
-        //停止任何报错
-        // error_reporting(0);
-
-        // $lang = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 5); //从请求协议中获取语言符号
-        $acceptLanguage = $_SERVER['HTTP_ACCEPT_LANGUAGE'] || '';
-        if ($lang != '' && $acceptLanguage != '') {
-          $lang = substr($acceptLanguage, 0, 5); //从请求协议中获取语言符号
+      if ($lang === '' || !isset($localization[$lang])) {
+        $acceptLanguage = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '';
+        if ($acceptLanguage !== '') {
+          $lang = substr($acceptLanguage, 0, 5);
           $lang = str_replace("-", "_", $lang);
         }
+      }
 
-        //开启报错
-        // error_reporting(E_ALL);
-      }
-      // $lang = str_replace("-", "_", $lang);
+      // 确保默认值逻辑正确
+      $defaultLang = Option::Get('default_language') ?: array_keys($localization)[0];
+      $locale = isset($localization[$lang]) ? $lang : $defaultLang;
 
-      $locale  = isset($localization[$lang]) ? $lang : Option::Get('default_language') || array_keys($localization)[0];
-      //如果 $locale 是数字，那么$locale=Option::Get('default_language')||array_keys($localization)[0]
-      if (is_numeric($locale)) {
-        $locale = Option::Get('default_language') || array_keys($localization)[0];
-      }
-      // $fallbackLocale = isset($localization[$lang]) ? $lang : array_keys($localization)[0];
-      //导致locale出现1的情况
-      ///$fallbackLocale = isset($localization[$lang]) ? $lang : Option::Get('default_language') || array_keys($localization)[0];
-      // if($fallbackLocale==1){
-      //   $fallbackLocale = Option::Get('default_language') || array_keys($localization)[0];
-      // }
-      $fallbackLocale = Option::Get('default_language');
-      if ($fallbackLocale == null || $fallbackLocale == '') {
-        $fallbackLocale = array_keys($localization)[0];
-      }
-      $i18n = new i18nModel($locale || 'en_US', $fallbackLocale, $localization);
+      // 强制类型转换
+      $locale = (string)$locale;
+      $fallbackLocale = (string)(Option::Get('default_language') ?: $defaultLang);
+
+      $i18n = new i18nModel($locale, $fallbackLocale, $localization);
       return $i18n;
     } catch (\Exception $e) {
-      $locale = Option::Get('default_language') || 'en_US';
+      // 异常时确保 locale 有效
+      $locale = (string)(Option::Get('default_language') ?: 'en_US');
       return new i18nModel($locale, $locale, $localization);
     }
   }
+
+  // private static function CreateInstance()
+  // {
+  //   $dataFolder = Config::GetWebLocalePath(); //'././public/locale/json/'
+
+  //   //遍历语言文件夹，获取语言文件，为.json文件
+  //   $localization = array();
+  //   $dir = opendir($dataFolder);
+  //   while (($file = readdir($dir)) !== false) {
+  //     if ($file != '.' && $file != '..') {
+  //       $localization[str_replace('.json', '', $file)] = json_decode(file_get_contents($dataFolder . $file), true); //$localization['zh_CN']=array()
+  //     }
+  //   }
+
+  //   try {
+
+  //     $lang = '';
+
+  //     foreach ($localization as $key => $value) { //$key=zh_CN,$value=array()
+  //       //如果$_SERVER['REQUEST_URI']的部分与$key相同，那么就是$key
+  //       if (str_contains($_SERVER['REQUEST_URI'], $key)) {
+  //         $lang = $key;
+  //         break;
+  //       }
+  //     }
+
+  //     if ($lang == '' || !isset($localization[$lang])) { //如果为空或不来自localization
+  //       //停止任何报错
+  //       // error_reporting(0);
+
+  //       // $lang = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 5); //从请求协议中获取语言符号
+  //       $acceptLanguage = $_SERVER['HTTP_ACCEPT_LANGUAGE'] || '';
+  //       if ($lang != '' && $acceptLanguage != '') {
+  //         $lang = substr($acceptLanguage, 0, 5); //从请求协议中获取语言符号
+  //         $lang = str_replace("-", "_", $lang);
+  //       }
+
+  //       //开启报错
+  //       // error_reporting(E_ALL);
+  //     }
+
+  //     $locale  = isset($localization[$lang]) ? $lang : (Option::Get('default_language') ?? $_COOKIE['lang'] ?? array_keys($localization)[0] ?? 'en_US');
+
+  //     if (is_numeric($locale)||$locale == ''||$locale == null) {
+  //       $locale = array_keys($localization)[0] ?? 'en_US';
+  //     }
+
+  //     $fallbackLocale = Option::Get('default_language') ?? $_COOKIE['lang'] ?? array_keys($localization)[0] ?? 'en_US';
+
+  //     if ($fallbackLocale == null || $fallbackLocale == '') {
+  //       $fallbackLocale = array_keys($localization)[0]??'en_US';
+  //     }
+
+  //     $i18n = new i18nModel($locale || 'en_US', $fallbackLocale, $localization);
+  //     return $i18n;
+  //   } catch (\Exception $e) {
+  //     $locale = 'en_US';
+  //     return new i18nModel($locale, $locale, $localization);
+  //   }
+  // }
 
   /**
    * 获取语言列表

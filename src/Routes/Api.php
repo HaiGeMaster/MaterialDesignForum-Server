@@ -418,6 +418,26 @@ class Api
         )
       );
     });
+    $collector->post('/api/users/user_group/set', function () {
+      $data = Share::GetRequestData();
+      return Share::HandleArrayToJSON(
+        \MaterialDesignForum\Controllers\User::SetUsersUserGroup(
+          $data['user_token']??'',
+          $data['user_group_id'],
+          $data['user_ids']
+        )
+      );
+    });
+    $collector->post('/api/users/delete', function () {
+      $data = Share::GetRequestData();
+      return Share::HandleArrayToJSON(
+        \MaterialDesignForum\Controllers\User::SetUsersDisableTime(
+          $data['user_token']??'',
+          $data['user_ids'],
+          $data['disable_time']??0
+        )
+      );
+    });
     $collector->post('/api/follows/get', function () {
       $data = Share::GetRequestData();
       return Share::HandleArrayToJSON(

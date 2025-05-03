@@ -32,6 +32,10 @@ class i18n
       // throw new \InvalidArgumentException('Locale "' . $locale . '" does not exist in the messages array');
       $locale = $fallbackLocale;
     }
+    //确定$locale符合表达式xx_XX
+    if (!preg_match('/^[a-z]{2}_[A-Z]{2}$/', $locale)) {
+      // throw new \InvalidArgumentException('Locale "' . $locale . '" is not a valid locale format');
+    }
     // 构造函数的逻辑
     $this->locale = $locale;
     $this->fallbackLocale = $fallbackLocale;
