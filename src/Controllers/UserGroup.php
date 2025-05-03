@@ -473,4 +473,34 @@ class UserGroup extends UserGroupModel
       'data' => $user_groups,
     ];
   }
+  /**
+   * 将用户从一个用户组移动到另一个用户组，同时变更新旧用户组人数
+   * @param int $user_group_id 用户组ID
+   * @param int $user_id 用户ID
+   * @return bool
+   */
+  public static function MoveUserGroup($user_group_id, $user_id): bool
+  {
+    $user_group = self::where('user_group_id', '=', $user_group_id)
+      ->where('delete_time', '=', 0)
+      ->first();
+    if ($user_group != null) {
+      $user = UserModel::where('user_id', '=', $user_id)
+        ->where('disable_time', '=', 0)
+        ->first();
+      if ($user != null) {
+        //首先保存旧的用户组ID
+        $old_user_group_id = $user->user_group_id;
+        //然后将用户组ID修改为新的用户组ID
+        $user->user_group_id = $user_group_id;
+        //如果修改成功
+        if ($user->save()) {
+          //然后将旧的用户组ID的用户组人数减1，最后将新的用户组ID的用户组人数加1
+          return self::SubUserGroupUserCount($old_user_group_id) &&
+            self::AddUserGroupUserCount($user_group_id);
+        }
+      }
+    }
+    return false;
+  }
 }

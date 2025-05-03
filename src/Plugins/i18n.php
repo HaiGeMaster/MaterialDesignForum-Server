@@ -86,7 +86,7 @@ class i18n
         // error_reporting(0);
 
         // $lang = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 5); //从请求协议中获取语言符号
-        $acceptLanguage = $_SERVER['HTTP_ACCEPT_LANGUAGE']||'';
+        $acceptLanguage = $_SERVER['HTTP_ACCEPT_LANGUAGE'] || '';
         if ($lang != '' && $acceptLanguage != '') {
           $lang = substr($acceptLanguage, 0, 5); //从请求协议中获取语言符号
           $lang = str_replace("-", "_", $lang);
@@ -109,13 +109,13 @@ class i18n
       //   $fallbackLocale = Option::Get('default_language') || array_keys($localization)[0];
       // }
       $fallbackLocale = Option::Get('default_language');
-      if($fallbackLocale==null||$fallbackLocale==''){
+      if ($fallbackLocale == null || $fallbackLocale == '') {
         $fallbackLocale = array_keys($localization)[0];
       }
-      $i18n = new i18nModel($locale, $fallbackLocale, $localization);
+      $i18n = new i18nModel($locale || 'en_US', $fallbackLocale, $localization);
       return $i18n;
     } catch (\Exception $e) {
-      $locale = Option::Get('default_language')||'en_US';
+      $locale = Option::Get('default_language') || 'en_US';
       return new i18nModel($locale, $locale, $localization);
     }
   }

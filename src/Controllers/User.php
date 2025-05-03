@@ -121,19 +121,23 @@ class User extends UserModel
           $user_data->email = $email;
 
           if (UserGroupController::IsAdmin($user_token)) { //确定是否是管理员再修改用户组
-            if (UserGroupController::SubUserGroupUserCount($user_data->user_group_id)) { //减少原来的用户组人数
-              if (UserGroupController::AddUserGroupUserCount($user_group_id)) { //增加新的用户组人数
-                $user_data->user_group_id = $user_group_id; //修改用户组
-              }
-            } else {
-              // UserGroupController::AddUserGroupUserCount($user_data->user_group_id);//如果减少失败则恢复
-              UserGroupController::AddUserGroupUserCount($user_group_id); //直接增加新的用户组人数，因为减少失败说明原来的用户组人数为0或不存在
-              // return [
-              //   'is_edit' => false,
-              //   // 'user' => $user,
-              //   'user' => self::GetUser($edit_target_user_id, $user_token)['user'],
-              // ];
-            }
+            // if (UserGroupController::SubUserGroupUserCount($user_data->user_group_id)) { //减少原来的用户组人数
+            //   if (UserGroupController::AddUserGroupUserCount($user_group_id)) { //增加新的用户组人数
+            //     $user_data->user_group_id = $user_group_id; //修改用户组
+            //   }
+            // } else {
+            //   // UserGroupController::AddUserGroupUserCount($user_data->user_group_id);//如果减少失败则恢复
+            //   UserGroupController::AddUserGroupUserCount($user_group_id); //直接增加新的用户组人数，因为减少失败说明原来的用户组人数为0或不存在
+            //   // return [
+            //   //   'is_edit' => false,
+            //   //   // 'user' => $user,
+            //   //   'user' => self::GetUser($edit_target_user_id, $user_token)['user'],
+            //   // ];
+            // }
+            UserGroupController::MoveUserGroup(
+              $user_group_id,
+              $edit_target_user_id
+            ); //移动用户组
           }
 
           $user_data->headline = $headline;
