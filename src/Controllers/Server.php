@@ -27,6 +27,7 @@ use MaterialDesignForum\Plugins\Share;
 // use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Capsule\Manager as DB;
 
+
 class Server
 {
   public static function GetDataCount($user_token)
@@ -214,6 +215,83 @@ class Server
    * @param $user_token string
    * @return array|null
    */
+  // public static function GetServerInfo($user_token)
+  // {
+  //   $data = null;
+  //   try {
+  //     // 获取操作系统
+  //     $os = php_uname();
+  //     // 获取PHP版本
+  //     $php_version = phpversion();
+  //     // 获取Web服务器软件
+  //     $web_server = $_SERVER['SERVER_SOFTWARE'];
+  //     // 获取数据库版本 (假设使用MySQL)
+  //     $db_version = DB::select('SELECT VERSION() AS version');
+  //     $db_version = $db_version[0]->version ?? null;
+  //     // 获取上传文件限制
+  //     $upload_max_filesize = ini_get('upload_max_filesize');
+  //     // 获取PHP执行时长限制
+  //     $max_execution_time = ini_get('max_execution_time') . 's';
+  //     // 获取剩余硬盘空间
+  //     $disk_free_space = disk_free_space("/"); // 获取根目录的剩余空间
+  //     // 获取数据库大小（假设使用MySQL）
+  //     $db_size = null;
+  //     $database_name = Config::GetMySqlDatabase(); // 获取数据库名
+  //     if ($database_name) {
+  //       $query = DB::select(
+  //         "SELECT table_schema AS db_name, 
+  //                   SUM(data_length + index_length) AS db_size 
+  //                   FROM information_schema.tables 
+  //                   WHERE table_schema = :db_name 
+  //                   GROUP BY table_schema",
+  //         ['db_name' => $database_name]
+  //       );
+  //       if (!empty($query)) {
+  //         $db_size = $query[0]->db_size;
+  //       }
+  //     }
+  //     // 将字节转换为T、G、M、KB
+  //     function formatSize($bytes)
+  //     {
+  //       if ($bytes >= 1099511627776) { // 1 TB = 1,099,511,627,776 bytes
+  //         return number_format($bytes / 1099511627776, 2) . ' TB';
+  //       } elseif ($bytes >= 1073741824) { // 1 GB = 1,073,741,824 bytes
+  //         return number_format($bytes / 1073741824, 2) . ' GB';
+  //       } elseif ($bytes >= 1048576) { // 1 MB = 1,048,576 bytes
+  //         return number_format($bytes / 1048576, 2) . ' MB';
+  //       } elseif ($bytes >= 1024) { // 1 KB = 1,024 bytes
+  //         return number_format($bytes / 1024, 2) . ' KB';
+  //       } else {
+  //         return $bytes . ' B'; // 小于1KB时显示为字节
+  //       }
+  //     }
+  //     // 格式化剩余硬盘空间和数据库大小
+  //     $disk_free_space = formatSize($disk_free_space);
+  //     $db_size = $db_size ? formatSize($db_size) : null;
+
+  //     $data = [
+  //       // 'MDF_VERSION' => '1.0.0',
+  //       'OS' => $os,
+  //       'PHP_VERSION' => $php_version,
+  //       'WEB_SERVER' => $web_server,
+  //       'DB_VERSION' => $db_version,
+  //       'UPLOAD_MAX_FILESIZE' => $upload_max_filesize,
+  //       'MAX_EXECUTION_TIME' => $max_execution_time,
+  //       'DISK_FREE_SPACE' => $disk_free_space,
+  //       'DB_SIZE' => $db_size
+  //     ];
+  //     // 返回服务器信息
+  //     return [
+  //       'is_get' => true,
+  //       'data' => $data
+  //     ];
+  //   } catch (\Exception $e) {
+  //     return [
+  //       'is_get' => true,
+  //       'data' => $data,
+  //     ];
+  //   }
+  // }
   public static function GetServerInfo($user_token)
   {
     // 获取操作系统
@@ -226,32 +304,49 @@ class Server
     $web_server = $_SERVER['SERVER_SOFTWARE'];
 
     // 获取数据库版本 (假设使用MySQL)
-    $db_version = DB::select('SELECT VERSION() AS version');
-    $db_version = $db_version[0]->version ?? null;
+    try {
+      $db_version = DB::select('SELECT VERSION() AS version');
+      $db_version = !empty($db_version) ? $db_version[0]->version : null;
+    } catch (\Exception $e) {
+      $db_version = null;
+    }
 
     // 获取上传文件限制
     $upload_max_filesize = ini_get('upload_max_filesize');
 
     // 获取PHP执行时长限制
-    $max_execution_time = ini_get('max_execution_time').'s';
+    $max_execution_time = ini_get('max_execution_time') . 's';
+
+    //关闭所有错误报告
+    error_reporting(0);
 
     // 获取剩余硬盘空间
     $disk_free_space = disk_free_space("/"); // 获取根目录的剩余空间
+    if ($disk_free_space === false) {
+      $disk_free_space = null; // 如果获取不到，设置为null
+    }
+
+    // 恢复错误报告
+    error_reporting(E_ALL);
 
     // 获取数据库大小（假设使用MySQL）
     $db_size = null;
     $database_name = Config::GetMySqlDatabase(); // 获取数据库名
     if ($database_name) {
-      $query = DB::select(
-        "SELECT table_schema AS db_name, 
-                    SUM(data_length + index_length) AS db_size 
-                    FROM information_schema.tables 
-                    WHERE table_schema = :db_name 
-                    GROUP BY table_schema",
-        ['db_name' => $database_name]
-      );
-      if (!empty($query)) {
-        $db_size = $query[0]->db_size;
+      try {
+        $query = DB::select(
+          "SELECT table_schema AS db_name, 
+                        SUM(data_length + index_length) AS db_size 
+                 FROM information_schema.tables 
+                 WHERE table_schema = :db_name 
+                 GROUP BY table_schema",
+          ['db_name' => $database_name]
+        );
+        if (!empty($query)) {
+          $db_size = $query[0]->db_size;
+        }
+      } catch (\Exception $e) {
+        $db_size = null;
       }
     }
 
@@ -272,24 +367,13 @@ class Server
     }
 
     // 格式化剩余硬盘空间和数据库大小
-    $disk_free_space = formatSize($disk_free_space);
-    $db_size = $db_size ? formatSize($db_size) : null;
+    $disk_free_space = $disk_free_space !== null ? formatSize($disk_free_space) : '/error';
+    $db_size = $db_size !== null ? formatSize($db_size) : '/error';
 
     // 返回服务器信息
-    // return [
-    //     'os' => $os,
-    //     'php_version' => $php_version,
-    //     'web_server' => $web_server,
-    //     'db_version' => $db_version,
-    //     'upload_max_filesize' => $upload_max_filesize,
-    //     'max_execution_time' => $max_execution_time,
-    //     'disk_free_space' => $disk_free_space,
-    //     'db_size' => $db_size
-    // ];
     return [
       'is_get' => true,
       'data' => [
-        // 'MDF_VERSION' => '1.0.0',
         'OS' => $os,
         'PHP_VERSION' => $php_version,
         'WEB_SERVER' => $web_server,
@@ -301,4 +385,5 @@ class Server
       ]
     ];
   }
+
 }

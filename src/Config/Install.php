@@ -81,7 +81,7 @@ class Install
       }
       //默认情况下返回false
       $json = file_get_contents(self::$path);
-    } catch (Exception $e) {
+    } catch (\Exception $e) {
       $json = false;
     }
     if ($json === false) {
@@ -103,7 +103,7 @@ class Install
     try {
       $json = file_get_contents(self::$path);
       $json = json_decode($json, true);
-    } catch (Exception $e) {
+    } catch (\Exception $e) {
     }
     return $json;
   }
@@ -164,13 +164,13 @@ class Install
 //         );
         
 //         if (!$conn) {
-//             throw new Exception("mysqli_connect_error: " . mysqli_connect_error());
+//             throw new \Exception("mysqli_connect_error: " . mysqli_connect_error());
 //         }
 
 //         // 2. 读取并处理SQL文件
 //         // $sqlFilePath = self::$defaultSQLFilePath;
 //         // if (!file_exists($sqlFilePath)) {
-//         //     throw new Exception("SQL Not Found: " . $sqlFilePath);
+//         //     throw new \Exception("SQL Not Found: " . $sqlFilePath);
 //         // }
 
 //         // $sqlContent = file_get_contents($sqlFilePath);
@@ -209,7 +209,7 @@ class Install
 //         //         $errorCount++;
                 
 //         //         if ($errorCount > 5) { // 最多允许5次错误后回滚
-//         //             throw new Exception("error 5");
+//         //             throw new \Exception("error 5");
 //         //         }
 //         //     } else {
 //         //         $successCount++;
@@ -234,13 +234,13 @@ class Install
 //         $config = str_replace('{mysqlPrefix}', $mysqlPrefix, $config);
         
 //         if (file_put_contents(self::$defaultConfigFiePath, $config) === false) {
-//             throw new Exception("save config error");
+//             throw new \Exception("save config error");
 //         }
 
 //         // 5. 记录安装信息
 //         $data = self::SaveInstallJSON(false, 2);
         
-//     } catch (Exception $e) {
+//     } catch (\Exception $e) {
 //         // 发生错误时回滚事务
 //         if ($conn) {
 //             $conn->rollback();
@@ -305,7 +305,7 @@ class Install
           $data = false;
         }
       // }
-    // } catch (Exception $e) {
+    // } catch (\Exception $e) {
     //   $data = false;
     //   echo $e->getMessage();
     // }
