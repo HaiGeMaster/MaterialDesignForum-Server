@@ -233,7 +233,7 @@ class Server
     $upload_max_filesize = ini_get('upload_max_filesize');
 
     // 获取PHP执行时长限制
-    $max_execution_time = ini_get('max_execution_time');
+    $max_execution_time = ini_get('max_execution_time').'s';
 
     // 获取剩余硬盘空间
     $disk_free_space = disk_free_space("/"); // 获取根目录的剩余空间
