@@ -32,6 +32,12 @@ class Api
         )
       );
     });
+    $collector->get('/api/test/GetServerInfo', function () {
+      $data = Share::GetRequestData();
+      return Share::HandleArrayToJSON(
+        \MaterialDesignForum\Controllers\Server::GetServerInfo(0)
+      );
+    });
     //Test API↑
     //仅限创建者使用↓
     $collector->post('/api/c/aa/{domain_name_base64}', function ($domain_name_base64) {
@@ -805,6 +811,14 @@ class Api
           // $data['model_type'],
           // $data['start_timestamp'],
           // $data['end_timestamp']
+        )
+      );
+    });
+    $collector->post('/api/admin/data/server_info', function () {
+      $data = Share::GetRequestData();
+      return Share::HandleArrayToJSON(
+        \MaterialDesignForum\Controllers\Server::GetServerInfo(
+          $data['user_token']??''
         )
       );
     });

@@ -19,5 +19,6 @@ $capsule->addConnection([
     // 'collation' => 'utf8_general_ci',
     'prefix' => Config::GetMySqlPrefix(),
 ]);
+$capsule->setAsGlobal();
 $capsule->bootEloquent();
 Config::$sql_is_connect = true;
