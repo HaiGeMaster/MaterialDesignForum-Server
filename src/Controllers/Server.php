@@ -115,6 +115,10 @@ class Server
     } else if ($time_type == 'last_1_year') {
       $startTimestamp = strtotime('-1 year');
       $endTimestamp = Share::ServerTime();
+    }//如果time_type是其他则将视为年份文本,startTimestamp为年份的1月1日，endTimestamp为年份的12月31日23:59:59
+    else if (is_numeric($time_type)) {
+      $startTimestamp = strtotime($time_type . '-01-01');
+      $endTimestamp = strtotime($time_type . '-12-31 23:59:59');
     }
 
     $model = null;
@@ -151,21 +155,64 @@ class Server
         break;
     }
 
+
     if ($model) {
+
       $formattedData = [];
+      // 如果$time_type包含year，最多只会有12条月份数据
+      if (strpos($time_type, 'year') !== false) {
 
-      // for ($currentDate = $startTimestamp; $currentDate <= $endTimestamp; $currentDate += 86400) {
-      //   $nextDate = $currentDate + 86400;
-      for ($currentDate = $startTimestamp; $currentDate < $endTimestamp; $currentDate += 86400) {
-        $nextDate = $currentDate + 86399; // 结束时间戳调整为当前日期的最后一秒
+        for ($currentDate = $startTimestamp; $currentDate < $endTimestamp; $currentDate = strtotime('+1 month', $currentDate)) {
+          // Calculate the start and end of the current month
+          $startOfMonth = $currentDate;
+          $endOfMonth = strtotime('last day of this month', $startOfMonth) + 86399; // Add 86399 seconds to get the last second of the month
 
-        $count = $model::whereBetween('create_time', [$currentDate, $nextDate])->count();
+          // Query for the count of entries within this month
+          $count = $model::whereBetween('create_time', [$startOfMonth, $endOfMonth])->count();
 
-        $formattedData[] = [
-          'date' => date('Y-m-d', $currentDate),
-          'count' => $count,
-          //'timestampArray' => [$currentDate, $nextDate],
-        ];
+          // Format and add the result to the array
+          $formattedData[] = [
+            'date' => date('Y-m', $startOfMonth),
+            //date要求转为时间戳
+            // 'date' => $startOfMonth,
+            'count' => $count,
+          ];
+        }
+      } // 如果$time_type包含this和last，最多只会有30条天数数据
+      else if(strpos($time_type, 'this') !== false || strpos($time_type, 'last') !== false) {
+        for ($currentDate = $startTimestamp; $currentDate < $endTimestamp; $currentDate += 86400) {
+          // 计算当前天的结束时间戳（当前日期的最后一秒）
+          $nextDate = $currentDate + 86399;
+
+          // 查询当前天的数量
+          $count = $model::whereBetween('create_time', [$currentDate, $nextDate])->count();
+
+          // 格式化为期望的日期格式并添加到结果数组中
+          $formattedData[] = [
+            'date' => date('Y-m-d', $currentDate),
+            //date要求转为时间戳
+            // 'date' => $currentDate,
+            'count' => $count,
+          ];
+        }
+      }//剩余的都视为年份数字，比如2023，则取2023年1月到2023年12月的数据，共12条
+      else{
+        for ($currentDate = $startTimestamp; $currentDate < $endTimestamp; $currentDate = strtotime('+1 month', $currentDate)) {
+          // Calculate the start and end of the current month
+          $startOfMonth = $currentDate;
+          $endOfMonth = strtotime('last day of this month', $startOfMonth) + 86399; // Add 86399 seconds to get the last second of the month
+
+          // Query for the count of entries within this month
+          $count = $model::whereBetween('create_time', [$startOfMonth, $endOfMonth])->count();
+
+          // Format and add the result to the array
+          $formattedData[] = [
+            'date' => date('Y-m', $startOfMonth),
+            //date要求转为时间戳
+            // 'date' => $startOfMonth,
+            'count' => $count,
+          ];
+        }
       }
 
       $data = $formattedData;
@@ -294,6 +341,17 @@ class Server
   // }
   public static function GetServerInfo($user_token)
   {
+
+    if (
+      // !UserGroupController::IsAdmin($user_token)||
+      !UserGroupController::Ability($user_token, 'ability_admin_login')
+    ) {
+      return [
+        'is_get' => false,
+        'data' => null,
+      ];
+    }
+
     // 获取操作系统
     $os = php_uname();
 
@@ -385,5 +443,4 @@ class Server
       ]
     ];
   }
-
 }
