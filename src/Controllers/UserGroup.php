@@ -4,6 +4,8 @@
  * Author HaiGeMaster
  * @package MaterialDesignForum
  * @link https://github.com/HaiGeMaster
+ * @copyright Copyright (c) 2023 HaiGeMaster
+ * @start-date 2023/07/03-16:17:41
  */
 
 namespace MaterialDesignForum\Controllers;
@@ -23,7 +25,6 @@ class UserGroup extends UserGroupModel
    */
   public static function IsAdmin($token): bool
   {
-    //return self::Ability($token, 'ability_admin_login');
     return self::Ability($token, 'is_admin');
   }
   /**
@@ -159,7 +160,8 @@ class UserGroup extends UserGroupModel
     if (!in_array($name, $ability)) {
       return false;
     }
-    $user_id = TokenController::where('token', '=', $token)->first()->user_id;
+    // $user_id = TokenController::where('token', '=', $token)->first()->user_id;
+    $user_id = TokenController::GetUserId($token);
     if ($user_id != null) {
       $user_group_id = UserModel::where('user_id', '=', $user_id)->first()->user_group_id;
       $user_group = self::where('user_group_id', '=', $user_group_id)->first();

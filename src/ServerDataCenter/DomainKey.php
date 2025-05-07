@@ -3,6 +3,8 @@
  * Author HaiGeMaster
  * @package MaterialDesignForum
  * @link https://github.com/HaiGeMaster
+ * @copyright Copyright (c) 2023 HaiGeMaster
+ * @start-date 2023/07/03-16:17:41
  */
 //请注意 ActivationKey 文件不开放给用户使用，仅供创建者使用
 

@@ -4,6 +4,8 @@
  * Author HaiGeMaster
  * @package MaterialDesignForum
  * @link https://github.com/HaiGeMaster
+ * @copyright Copyright (c) 2023 HaiGeMaster
+ * @start-date 2023/07/03-16:17:41
  */
 
 namespace MaterialDesignForum\Controllers;
@@ -42,6 +44,9 @@ class User extends UserModel
     $client_email_captcha = md5(base64_decode($email_captcha));
     //$client_username = base64_decode($username);
     // $client_username = $username == "" ? "User" . Share::ServerTime() : $username;
+
+    //不使用base64的原因是为了防止用户输入的用户名中包含base64编码的字符，导致解码失败
+    // $client_username = $username == "" ? "User" . Share::ServerTime() : base64_decode($username);
     $client_username = $username == "" ? "User" . Share::ServerTime() : base64_decode($username);
     if ($client_username == "") {
       $client_username = $client_email;
@@ -121,19 +126,6 @@ class User extends UserModel
           $user_data->email = $email;
 
           if (UserGroupController::IsAdmin($user_token)) { //确定是否是管理员再修改用户组
-            // if (UserGroupController::SubUserGroupUserCount($user_data->user_group_id)) { //减少原来的用户组人数
-            //   if (UserGroupController::AddUserGroupUserCount($user_group_id)) { //增加新的用户组人数
-            //     $user_data->user_group_id = $user_group_id; //修改用户组
-            //   }
-            // } else {
-            //   // UserGroupController::AddUserGroupUserCount($user_data->user_group_id);//如果减少失败则恢复
-            //   UserGroupController::AddUserGroupUserCount($user_group_id); //直接增加新的用户组人数，因为减少失败说明原来的用户组人数为0或不存在
-            //   // return [
-            //   //   'is_edit' => false,
-            //   //   // 'user' => $user,
-            //   //   'user' => self::GetUser($edit_target_user_id, $user_token)['user'],
-            //   // ];
-            // }
             UserGroupController::MoveUserGroups(
               $user_group_id,
               [$edit_target_user_id]
@@ -266,7 +258,8 @@ class User extends UserModel
   public static function Login($username_or_email, $password, $image_capthca = "")
   {
     try {
-      $username_or_email = base64_decode($username_or_email);
+      // 不使用base64的原因是为了防止用户输入的用户名中包含base64编码的字符，导致解码失败
+      // $username_or_email = base64_decode($username_or_email);
       $password = self::HandlePassword(base64_decode($password));
       $image_capthca = $image_capthca ? md5(base64_decode($image_capthca)) : '';
 
@@ -276,14 +269,30 @@ class User extends UserModel
         $user = self::where('username', '=', $username_or_email)
           ->where('disable_time', '=', 0)->first();
       }
+
+
+      // $mail_user = self::where('email', '=', $username_or_email)
+      // ->where('disable_time', '=', 0)->first();
+      // $name_user = self::where('username', '=', $username_or_email)
+      // ->where('disable_time', '=', 0)->first();
+      // return [
+      //   'is_login' => false,
+      //   'user' => $user,
+      //   'mail_user' => $mail_user,
+      //   'name_user' => $name_user,
+      // ];
+
+
       $token = '';
       $is_login = false;
       if ($user != null) {
+        // return 1;
         if (
           ($user->email == $username_or_email || $user->username == $username_or_email) &&
           $user->password == $password &&
           ($image_capthca == '' || CacheController::IsVaildCaptcha($image_capthca))
         ) {
+          // return 2;
           $local_user = $user;
           $token = TokenController::SpawnUserToken($local_user);
           $update_user = self::where('user_id', '=', $user->user_id)->update([
@@ -292,6 +301,7 @@ class User extends UserModel
             'last_login_time' => Share::ServerTime(),
           ]);
           if ($token != '' && $update_user) {
+            // return 3;
             if ($image_capthca != '') {
               CacheController::DeleteCaptcha($image_capthca);
             } //删除验证码
@@ -603,6 +613,17 @@ class User extends UserModel
     if ($data['data'] != null && !$is_admin) {
       foreach ($data['data'] as $key => $value) {
         $data['data'][$key] = self::GetUserInfo($value['user_id'], $user_token)['user'];
+      }
+    }
+
+    if ($data['data'] != null && !UserGroupController::IsAdmin($user_token)){
+      foreach ($data['data'] as $key => $value) {
+        $data['data'][$key]['email'] = null; //不返回邮箱
+        $data['data'][$key]['password'] = null; //不返回密码
+        $data['data'][$key]['create_ip'] = null; //不返回创建ip
+        $data['data'][$key]['create_location'] = null; //不返回创建位置
+        $data['data'][$key]['last_login_ip'] = null; //不返回最后登录ip
+        $data['data'][$key]['last_login_location'] = null; //不返回最后登录位置
       }
     }
 

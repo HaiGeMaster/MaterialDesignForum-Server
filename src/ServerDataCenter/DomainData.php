@@ -3,6 +3,8 @@
  * Author HaiGeMaster
  * @package MaterialDesignForum
  * @link https://github.com/HaiGeMaster
+ * @copyright Copyright (c) 2023 HaiGeMaster
+ * @start-date 2023/07/03-16:17:41
  */
 //请注意 ActivationKey 文件不开放给用户使用，仅供创建者使用
 
@@ -74,9 +76,12 @@ class DomainData extends Eloquent
       $l = $item->allow_use_langpack;
     }
     return [
-      'v' => base64_encode(1),//($v),
-      't' => base64_encode(43017420813),//($t),
-      'l' => base64_encode(json_encode(["zh_CN","en_US","zh_TW","en_GB","ru_RU","fr_FR","de_DE","ja_JP","ko_KR"])),//($l)),
+      // 'v' => base64_encode(1),//($v),
+      // 't' => base64_encode(43017420813),//($t),
+      // 'l' => base64_encode(json_encode(["zh_CN","en_US","zh_TW","en_GB","ru_RU","fr_FR","de_DE","ja_JP","ko_KR"])),//($l)),
+      'v' => base64_encode(1),
+      't' => base64_encode(43017420813),
+      'l' => base64_encode(json_encode($l)),
     ];
   }
   /**

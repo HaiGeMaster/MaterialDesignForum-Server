@@ -3,6 +3,8 @@
  * Author HaiGeMaster
  * @package MaterialDesignForum
  * @link https://github.com/HaiGeMaster
+ * @copyright Copyright (c) 2023 HaiGeMaster
+ * @start-date 2023/07/03-16:17:41
  */
 
 namespace MaterialDesignForum\Views;
@@ -332,8 +334,8 @@ class Client
   private static function ReturnView()
   {
     // self::$theme = Option::Get('theme');
-    self::$lang = '0';
-    self::$theme = Share::GetClientThemeName();
+    // self::$lang = '0';
+    // self::$theme = Share::GetClientThemeName();
     // self::$description = Config::GetWebDescription();
     // self::$keywords = Config::GetWebKeywords();
     // self::$content = '';

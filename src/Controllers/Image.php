@@ -4,6 +4,8 @@
  * Author HaiGeMaster
  * @package MaterialDesignForum
  * @link https://github.com/HaiGeMaster
+ * @copyright Copyright (c) 2023 HaiGeMaster
+ * @start-date 2023/07/03-16:17:41
  */
 
 namespace MaterialDesignForum\Controllers;
@@ -138,8 +140,12 @@ class Image extends ImageModel
       return false; // 如果写入失败
     }
 
+
+
     try {
       foreach ($sizeArray as $key => $size) {
+        error_reporting(E_ALL & ~E_WARNING);
+        ini_set('memory_limit', '256M');
         // 读取图片并生成不同大小的图片
         $image = imagecreatefrompng($locale_img);
 

@@ -4,6 +4,8 @@
  * Author HaiGeMaster
  * @package MaterialDesignForum
  * @link https://github.com/HaiGeMaster
+ * @copyright Copyright (c) 2023 HaiGeMaster
+ * @start-date 2023/07/03-16:17:41
  */
 
 namespace MaterialDesignForum\Controllers;
@@ -34,7 +36,7 @@ class Server
   {
     if (
       // !UserGroupController::IsAdmin($user_token)||
-      !UserGroupController::Ability($user_token, 'ability_admin_login')
+      !UserGroupController::IsAdminLogin($user_token)
     ) {
       return [
         'is_get' => false,
@@ -84,7 +86,7 @@ class Server
     // items: ['最近 7 天', '本月', '上月', '最近 30 天', '今年', '去年', '最近 1 年'],
     if (
       // !UserGroupController::IsAdmin($user_token)||
-      !UserGroupController::Ability($user_token, 'ability_admin_login')
+      !UserGroupController::IsAdminLogin($user_token)
     ) {
       return [
         'is_get' => false,
@@ -234,7 +236,7 @@ class Server
   {
     if (
       // !UserGroupController::IsAdmin($user_token)||
-      !UserGroupController::Ability($user_token, 'ability_admin_login')
+      !UserGroupController::IsAdminLogin($user_token)
     ) {
       return [
         'is_get' => false,
@@ -344,7 +346,7 @@ class Server
 
     if (
       // !UserGroupController::IsAdmin($user_token)||
-      !UserGroupController::Ability($user_token, 'ability_admin_login')
+      !UserGroupController::IsAdminLogin($user_token)
     ) {
       return [
         'is_get' => false,

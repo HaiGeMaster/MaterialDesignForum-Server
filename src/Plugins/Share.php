@@ -4,6 +4,8 @@
  * Author HaiGeMaster
  * @package MaterialDesignForum
  * @link https://github.com/HaiGeMaster
+ * @copyright Copyright (c) 2023 HaiGeMaster
+ * @start-date 2023/07/03-16:17:41
  */
 
 namespace MaterialDesignForum\Plugins;
@@ -40,14 +42,25 @@ class Share
     if ($lang == '') {
       $lang = i18n::i18n()->locale;
     }
-    //如果域名为localhost:8080则为开发环境
-    if (Config::Dev() && $_SERVER['HTTP_HOST'] == 'localhost:8080') {
-      // $index_html = 本地localhost:8080
-      $index_html = file_get_contents('http://localhost:8080');
-    } else {
-      // $index_html = 服务器
-      $index_html = file_get_contents(Config::GetWebThemePath() . $theme . '/index.html');
-    }
+    $index_html = '';
+
+    // //如果域名包含localhost则为开发环境
+    // // if (Config::Dev() && $_SERVER['HTTP_HOST'] == 'localhost:8080') {
+    // if (Config::Dev() && strpos($_SERVER['HTTP_HOST'], 'localhost') !== false) {
+    //   // $index_html = 本地localhost:8080
+    //   // $index_html = file_get_contents('http://localhost:8080');
+
+    //   //如果theme包含Vuetify2则为Vuetify2主题
+    //   if (strpos($theme, 'Vuetify2') !== false) {
+    //     $index_html = file_get_contents('http://localhost:8080');
+    //   } else {
+    //     $index_html = file_get_contents('http://localhost:5173');
+    //   }
+    // } else {
+    //   // $index_html = 服务器
+    //   $index_html = file_get_contents(Config::GetWebThemePath() . $theme . '/index.html');
+    // }
+    $index_html = file_get_contents(Config::GetWebThemePath() . $theme . '/index.html');
     $upcoming = i18n::t('Message.App.UpComing', $lang);
     if (i18n::VerificationLanguages($lang)) {
       $index_html = str_replace('{lang}', $lang, $index_html);
