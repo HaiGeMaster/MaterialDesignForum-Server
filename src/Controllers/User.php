@@ -577,7 +577,7 @@ class User extends UserModel
             ->orderBy($field, $order)
             ->paginate($per_page, ['*'], 'page', $page);
         }
-      }else if($is_admin&&UserGroupController::IsAdmin($user_token)){
+      }else if($is_admin&&(UserGroupController::IsAdmin($user_token)||UserGroupController::IsAdminLogin($user_token))){
         if ($search_keywords != '') {
           $data = self::where(function ($query) use ($search_field, $search_keywords) {
               foreach ($search_field as $key => $value) {

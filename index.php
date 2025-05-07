@@ -8,6 +8,10 @@ use MaterialDesignForum\Routes\Api;
 use MaterialDesignForum\Routes\Page;
 use MaterialDesignForum\Config\Install;
 
+    // //输出从请求标头中获取的内容
+    // echo json_encode(getallheaders());
+    // return;
+
 if (Install::AsInstall()) {
   if (Api::IsApi()) {
     header('Content-Type: application/json');

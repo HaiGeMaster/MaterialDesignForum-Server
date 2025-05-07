@@ -19,12 +19,21 @@ class UserGroup extends UserGroupModel
   /**
    * 验证token是否是管理员
    * @param string $token token字符串
-   * @return bool $user_group->ability_admin_login
+   * @return bool $user_group->is_admin
    */
   public static function IsAdmin($token): bool
   {
     //return self::Ability($token, 'ability_admin_login');
     return self::Ability($token, 'is_admin');
+  }
+  /**
+   * 验证token是否是能后台管理员登录
+   * @param string $token token字符串
+   * @return bool $user_group->ability_admin_login
+   */
+  public static function IsAdminLogin($token): bool
+  {
+    return self::Ability($token, 'ability_admin_login');
   }
   /**
    * 获取用户token所在的用户组

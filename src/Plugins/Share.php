@@ -34,84 +34,41 @@ class Share
     $script = '',
     $theme = ''
   ) {
-    $theme = $theme ?: self::GetClientThemeName();
-    $lang = $lang ?: i18n::i18n()->locale;
-
-    // 判断开发环境
-    $index_html = (Config::Dev() && $_SERVER['HTTP_HOST'] == 'localhost:8080')
-      ? file_get_contents('http://localhost:8080')
-      : file_get_contents(Config::GetWebThemePath() . $theme . '/index.html');
-
-    $upcoming = i18n::t('Message.App.UpComing', $lang);
-
-    // 替换内容
-    $replacements = [
-      '{lang}' => $lang,
-      '{title}' => $title ?: Option::Get('site_name'),
-      '{description}' => $description ?: Option::Get('site_description'),
-      '{keywords}' => $keywords ?: Option::Get('site_keywords'),
-      '{upcoming}' => $upcoming,
-      '{content}' => $content ?: Option::Get('site_name') . ' - ' . Option::Get('site_keywords') . ' - ' . Option::Get('site_description'),
-      '<script id="seo"></script>' => '<script id="seo">' . $script . '</script>',
-    ];
-
-    // 如果语言有效，则进行替换，否则使用默认值
-    if (i18n::VerificationLanguages($lang)) {
-      $index_html = str_replace(array_keys($replacements), array_values($replacements), $index_html);
+    if ($theme == '') {
+      $theme = self::GetClientThemeName();
+    }
+    if ($lang == '') {
+      $lang = i18n::i18n()->locale;
+    }
+    //如果域名为localhost:8080则为开发环境
+    if (Config::Dev() && $_SERVER['HTTP_HOST'] == 'localhost:8080') {
+      // $index_html = 本地localhost:8080
+      $index_html = file_get_contents('http://localhost:8080');
     } else {
-      // 如果语言无效，使用默认站点信息
-      $index_html = str_replace('{lang}', i18n::$i18n->locale, $index_html);
-      $index_html = str_replace(array_keys($replacements), array_values($replacements), $index_html);
+      // $index_html = 服务器
+      $index_html = file_get_contents(Config::GetWebThemePath() . $theme . '/index.html');
+    }
+    $upcoming = i18n::t('Message.App.UpComing', $lang);
+    if (i18n::VerificationLanguages($lang)) {
+      $index_html = str_replace('{lang}', $lang, $index_html);
+      $index_html = str_replace('{title}', $title, $index_html);
+      $index_html = str_replace('{description}', $description, $index_html);
+      $index_html = str_replace('{keywords}', $keywords, $index_html);
+      $index_html = str_replace('{upcoming}', $upcoming, $index_html);
+      $index_html = str_replace('{content}', $content, $index_html);
+      $index_html = str_replace('<script id="seo"></script>', '<script id="seo">' . $script . '</script>', $index_html);
+    } else {
+      $index_html = str_replace('{lang}', i18n::i18n()->locale, $index_html);
+      $index_html = str_replace('{title}', Option::Get('site_name'), $index_html);
+      $index_html = str_replace('{description}', Option::Get('site_description'), $index_html);
+      $index_html = str_replace('{keywords}', Option::Get('site_keywords'), $index_html);
+      $index_html = str_replace('{upcoming}', $upcoming, $index_html);
+      $index_html = str_replace('{content}', Option::Get('site_name') . ' - ' . Option::Get('site_keywords') . ' - ' . Option::Get('site_description'), $index_html);
+      $index_html = str_replace('<script id="seo"></script>', '<script id="seo">' . $script . '</script>', $index_html);
     }
 
     return $index_html;
   }
-
-  // public static function HandleThemePage(
-  //   $lang = '',
-  //   $title = '',
-  //   $description = '',
-  //   $keywords = '',
-  //   $content = '',
-  //   $script = '',
-  //   $theme = ''
-  // ) {
-  //   if ($theme == '') {
-  //     $theme = self::GetClientThemeName();
-  //   }
-  //   if (!$lang) {
-  //     $lang = i18n::i18n()->locale;
-  //     // $lang = i18n::$i18n->locale;
-  //   }
-  //   //如果域名为localhost:8080则为开发环境
-  //   if (Config::Dev() && $_SERVER['HTTP_HOST'] == 'localhost:8080') {
-  //     // $index_html = 本地localhost:8080
-  //     $index_html = file_get_contents('http://localhost:8080');
-  //   } else {
-  //     // $index_html = 服务器
-  //     $index_html = file_get_contents(Config::GetWebThemePath() . $theme . '/index.html');
-  //   }
-  //   // $upcoming = '...';
-  //   $upcoming = i18n::t('Message.App.UpComing', $lang);
-  //   if (i18n::VerificationLanguages($lang)) {
-  //     $index_html = str_replace('{lang}', $lang, $index_html);
-  //     $index_html = str_replace('{title}', $title, $index_html);
-  //     $index_html = str_replace('{description}', $description, $index_html);
-  //     $index_html = str_replace('{keywords}', $keywords, $index_html);
-  //     $index_html = str_replace('{upcoming}', $upcoming, $index_html);
-  //     $index_html = str_replace('{content}', $content, $index_html);
-  //     $index_html = str_replace('<script id="seo"></script>', '<script id="seo">' . $script . '</script>', $index_html);
-  //   } else {
-  //     $index_html = str_replace('{lang}', i18n::$i18n->locale, $index_html);
-  //     $index_html = str_replace('{title}', Option::Get('site_name'), $index_html);
-  //     $index_html = str_replace('{description}', Option::Get('site_description'), $index_html);
-  //     $index_html = str_replace('{keywords}', Option::Get('site_keywords'), $index_html);
-  //     $index_html = str_replace('{upcoming}', $upcoming, $index_html);
-  //     $index_html = str_replace('{content}', Option::Get('site_name') . ' - ' . Option::Get('site_keywords') . ' - ' . Option::Get('site_description'), $index_html);
-  //     $index_html = str_replace('<script id="seo"></script>', '<script id="seo">' . $script . '</script>', $index_html);
-  //   }
-  //   return $index_html;
-  // }
   /**
    * share.php
    * 读入index.html
@@ -340,20 +297,19 @@ class Share
    * @param string $name Cookie名称
    * @return string
    */
-  public static function GetCookie($name = ''): string
+  public static function GetCookie($name = ''):string
   {
     if (isset($_COOKIE[$name])) {
       return $_COOKIE[$name];
     } else {
-      return '';
-      // return isset(self::GetRequestData()[$name]) ? self::GetRequestData()[$name] : Option::Get('theme') || Config::GetDefaultTheme();
+      return isset(self::GetRequestData()[$name]) ? self::GetRequestData()[$name] : Option::Get('theme') || Config::GetDefaultTheme();
     }
   }
   /**
    * 获取客户端主题名称
    * @return string
    */
-  public static function GetClientThemeName(): string
+  public static function GetClientThemeName():string
   {
 
     // //停止报错
@@ -377,23 +333,23 @@ class Share
 
     // 检查 cookie 是否存在
     if (!isset($_COOKIE['theme'])) {
-      // 开启报错
-      error_reporting(E_ALL);
+        // 开启报错
+        error_reporting(E_ALL);
 
-      // 检查其他来源的主题
-      $sql_theme = Option::Get('theme');
-      $request_data = self::GetRequestData();
+        // 检查其他来源的主题
+        $sql_theme = Option::Get('theme');
+        $request_data = self::GetRequestData();
 
-      // 使用空合并运算符获取主题，确保不会报错
-      $theme = $request_data['theme'] ?? $sql_theme ?? Config::GetDefaultTheme();
+        // 使用空合并运算符获取主题，确保不会报错
+        $theme = $request_data['theme'] ?? $sql_theme ?? Config::GetDefaultTheme();
     } else {
-      // 开启报错
-      error_reporting(E_ALL);
-      $theme = $_COOKIE['theme'];
+        // 开启报错
+        error_reporting(E_ALL);
+        $theme = $_COOKIE['theme'];
     }
-
+    
     return $theme;
-
+    
 
     // return $_COOKIE['theme'] || self::GetRequestData()['theme'] || Option::Get('theme') || Config::GetDefaultTheme();
     // return $_COOKIE['theme'];
@@ -420,6 +376,10 @@ class Share
     $dir = opendir(Config::GetWebThemePath());
     while (($file = readdir($dir)) !== false) {
       if ($file != '.' && $file != '..') {
+        //如果是单个文件的话，则跳过
+        if (is_file(Config::GetWebThemePath() . $file)) {
+          continue;
+        }
         $themeFilePath = Config::GetWebThemePath() . $file . '/theme.json';
         if (file_exists($themeFilePath)) {
           $themeInfo = json_decode(file_get_contents($themeFilePath), true);
