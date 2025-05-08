@@ -25,6 +25,9 @@ class UserGroup extends UserGroupModel
    */
   public static function IsAdmin($token): bool
   {
+    if ($token == null || $token == '') {
+      return false;
+    }
     return self::Ability($token, 'is_admin');
   }
   /**
@@ -34,6 +37,9 @@ class UserGroup extends UserGroupModel
    */
   public static function IsAdminLogin($token): bool
   {
+    if ($token == null || $token == '') {
+      return false;
+    }
     return self::Ability($token, 'ability_admin_login');
   }
   /**
@@ -160,17 +166,33 @@ class UserGroup extends UserGroupModel
     if (!in_array($name, $ability)) {
       return false;
     }
-    // $user_id = TokenController::where('token', '=', $token)->first()->user_id;
-    $user_id = TokenController::GetUserId($token);
-    if ($user_id != null) {
-      $user_group_id = UserModel::where('user_id', '=', $user_id)->first()->user_group_id;
-      $user_group = self::where('user_group_id', '=', $user_group_id)->first();
-      if ($user_group != null) {
-        if ($user_group->$name == true) {
-          //如果
-          return true;
+    $user_id = null;
+
+    if ($token == null || $token == '') {
+      return false;
+    }
+
+    // die('token: ' . $token);//找到了token变成了1
+
+    try {
+      $user = TokenController::where('token', '=', $token)->first();
+      // $user_id = TokenController::GetUserId($token);//会死循环
+      if ($user != null) {
+        $user_id = $user->user_id;
+        $user_group_id = UserModel::where('user_id', '=', $user_id)->first()->user_group_id;
+        $user_group = self::where('user_group_id', '=', $user_group_id)->first();
+        if ($user_group != null) {
+          if ($user_group->$name == true) {
+            //如果
+            return true;
+          }
         }
       }
+    } catch (\Exception $e) {
+      //如果查询失败，返回false
+      echo $user_id;
+      echo $e->getMessage();
+      return false;
     }
     return false;
   }
