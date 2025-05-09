@@ -9,6 +9,8 @@ public/locale/json/ko_KR.json
 public/locale/json/ru_RU.json
 public/locale/json/zh_TW.json
 
+/src/ServerDataCenter
+
 /vendor
 /help
 *.zip
