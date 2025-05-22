@@ -318,7 +318,7 @@ class Article extends ArticleModel
           $article->delete_time = Share::ServerTime();
           UserController::SubArticleCount($article->user_id);
           TopicController::SubArticleCount($article->topics);
-          NotificationController::AddNotification(
+          NotificationController::AddInteractionNotification(
             $article->user_id,
             $user_id,
             'article_delete',

@@ -72,7 +72,7 @@ class Answer extends AnswerModel
         //根据问题ID获取问题
         $question = QuestionController::GetQuestion($question_id, $user_token)['question'];
         if($question != null){
-          NotificationController::AddNotification(
+          NotificationController::AddInteractionNotification(
             $question->user_id,
             $user_id,
             'question_answer',
@@ -272,7 +272,7 @@ class Answer extends AnswerModel
           $answer->delete_time = Share::ServerTime();
           UserController::SubAnswerCount($answer->user_id);
           QuestionController::SubAnswerCount($answer->question_id);
-          NotificationController::AddNotification(
+          NotificationController::AddInteractionNotification(
             $answer->user_id,
             $user_id,
             'answer_delete',

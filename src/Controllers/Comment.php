@@ -81,7 +81,7 @@ class Comment extends CommentModel
             //获取文章作者用户ID
             $article = ArticleController::GetArticle($commentable_id, $user_token)['article'];
             if($article != null){
-              NotificationController::AddNotification(
+              NotificationController::AddInteractionNotification(
                 $article->user_id,
                 $user_id,
                 'article_comment',
@@ -98,7 +98,7 @@ class Comment extends CommentModel
             //根据问题ID获取问题
             $question = QuestionController::GetQuestion($commentable_id, $user_token)['question'];
             if($question != null){
-              NotificationController::AddNotification(
+              NotificationController::AddInteractionNotification(
                 $question->user_id,
                 $user_id,
                 'question_comment',
@@ -115,7 +115,7 @@ class Comment extends CommentModel
             //根据回答ID获取回答
             $answer = AnswerController::GetAnswer($commentable_id, $user_token)['answer'];
             if($answer != null){
-              NotificationController::AddNotification(
+              NotificationController::AddInteractionNotification(
                 $answer->user_id,
                 $user_id,
                 'answer_comment',
@@ -355,7 +355,7 @@ class Comment extends CommentModel
         ) {
           $comment->delete_time = Share::ServerTime();
           UserController::SubCommentCount($comment->user_id);
-          NotificationController::AddNotification(
+          NotificationController::AddInteractionNotification(
             $comment->user_id,
             $user_id,
             'comment_delete',

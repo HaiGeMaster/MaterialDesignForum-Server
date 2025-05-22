@@ -191,6 +191,8 @@ CREATE TABLE `notification` (
   `receiver_id` int(10) UNSIGNED NOT NULL COMMENT '接收者ID',
   `sender_id` int(11) NOT NULL COMMENT '发送者ID',
   `type` varchar(40) NOT NULL COMMENT '消息类型：\r\nquestion_answered, \r\nquestion_commented, \r\nquestion_deleted, \r\narticle_commented, \r\narticle_deleted, \r\nanswer_commented, \r\nanswer_deleted, \r\ncomment_replied, \r\ncomment_deleted',
+  `content_markdown` text NOT NULL COMMENT '内容原文',
+  `content_rendered` text NOT NULL COMMENT '内容正文',
   `article_id` int(11) NOT NULL COMMENT '文章ID',
   `question_id` int(11) NOT NULL COMMENT '提问ID',
   `answer_id` int(11) NOT NULL COMMENT '回答ID',

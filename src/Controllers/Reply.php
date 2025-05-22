@@ -80,7 +80,7 @@ class Reply extends ReplyModel
             //根据回复的评论ID获取评论
             $comment = CommentController::GetComment($replyable_id, $user_token)['comment'];
             if($comment!=null){
-              NotificationController::AddNotification(
+              NotificationController::AddInteractionNotification(
                 $comment->user_id,
                 $user_id,
                 'comment_reply',
@@ -100,7 +100,7 @@ class Reply extends ReplyModel
             $reply = self::GetReply($replyable_id, $user_token)['reply'];
             $comment = CommentController::GetComment($reply->replyable_comment_id, $user_token)['comment'];
             if($comment!=null&&$reply!=null){
-              NotificationController::AddNotification(
+              NotificationController::AddInteractionNotification(
                 $reply->user_id,
                 $user_id,
                 'reply_reply',
@@ -389,7 +389,7 @@ class Reply extends ReplyModel
           UserController::SubReplyCount($reply->user_id);
           $comment = CommentController::GetComment($reply->replyable_comment_id, $user_token)['comment'];
           if($comment!=null){
-            NotificationController::AddNotification(
+            NotificationController::AddInteractionNotification(
               $reply->user_id,
               $user_id,
               'reply_delete',

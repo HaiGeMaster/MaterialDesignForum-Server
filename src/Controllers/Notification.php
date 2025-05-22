@@ -27,7 +27,7 @@ use PSpell\Config;
 class Notification extends NotificationModel
 {
     /**
-     * 添加通知 此方法不对外开放 仅供内部调用
+     * 添加互动通知 此方法不对外开放 仅供内部调用
      * @param int $receiver_id 接收者ID
      * @param int $sender_id 发送者ID 一般是系统，也可以是用户
      * @param string $type 消息类型 @type [question_answer, question_comment, question_delete, article_comment, article_delete, answer_comment, answer_delete, comment_reply, comment_delete, reply_reply, reply_delete]
@@ -38,7 +38,7 @@ class Notification extends NotificationModel
      * @param int $reply_id 被xx的回复ID
      * @return void
      */
-    public static function AddNotification(
+    public static function AddInteractionNotification(
         $receiver_id = 0,
         $sender_id = '',
         $type = '',
@@ -116,7 +116,7 @@ class Notification extends NotificationModel
      * @param int $per_page 每页数量
      * @return array
      */
-    public static function GetUserNotifications(
+    public static function GetUserInteractionNotifications(
         $user_token,
         $order,
         $page,

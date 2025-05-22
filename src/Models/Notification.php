@@ -39,6 +39,8 @@ class Notification extends Eloquent
     'receiver_id',
     'sender_id',
     'type',
+    'content_markdown',
+    'content_rendered',
     'article_id',
     'question_id',
     'answer_id',

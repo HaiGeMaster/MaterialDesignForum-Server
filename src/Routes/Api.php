@@ -395,7 +395,7 @@ class Api
     $collector->post('/api/user/notifications/get', function () {
       $data = Share::GetRequestData();
       return Share::HandleArrayToJSON(
-        \MaterialDesignForum\Controllers\Notification::GetUserNotifications(
+        \MaterialDesignForum\Controllers\Notification::GetUserInteractionNotifications(
           $data['user_token']??'',
           $data['order'],
           $data['page']??1,
