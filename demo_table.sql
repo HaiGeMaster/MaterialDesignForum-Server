@@ -1,14 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 4.9.11
+-- version 5.2.2
 -- https://www.phpmyadmin.net/
 --
 -- 主机： localhost
--- 生成日期： 2024-10-07 18:22:07
+-- 生成日期： 2025-05-23 10:11:35
 -- 服务器版本： 8.0.12
 -- PHP 版本： 7.4.3
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
@@ -19,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- 数据库： `new_demo`
+-- 数据库： `demo_table`
 --
 
 -- --------------------------------------------------------
@@ -130,6 +129,38 @@ CREATE TABLE `comment` (
   `update_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '更新时间',
   `delete_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '删除时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='回复与评论表';
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `domain_data`
+--
+
+CREATE TABLE `domain_data` (
+  `index_id` int(10) UNSIGNED NOT NULL COMMENT '排序',
+  `domain_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '域名',
+  `first_activity_time` int(11) NOT NULL COMMENT '首次活动时间',
+  `recent_activity_time` int(11) NOT NULL COMMENT '最近活动时间',
+  `number_activities` int(11) NOT NULL COMMENT '活动次数',
+  `allow_use` tinyint(1) NOT NULL COMMENT '允许使用',
+  `renewal_expiration_date` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '续费到期时间',
+  `recent_use_keys` varchar(29) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '最近使用的产品序列号'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='域名使用数据表';
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `domain_key`
+--
+
+CREATE TABLE `domain_key` (
+  `index_id` int(11) UNSIGNED NOT NULL COMMENT '排序',
+  `renewal_key` varchar(29) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '产品续费序列号',
+  `renewal_days` int(11) NOT NULL COMMENT '能续费的天数',
+  `renewal_domain` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '续费域名',
+  `renewal_email` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '续费者邮箱',
+  `use_time` int(11) NOT NULL DEFAULT '0' COMMENT '使用时间'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='域名续费续时序列号';
 
 -- --------------------------------------------------------
 
@@ -297,9 +328,9 @@ CREATE TABLE `report` (
   `reportable_type` char(10) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '举报目标类型：question、article、answer、comment、user、reply、topic',
   `user_id` int(10) UNSIGNED NOT NULL COMMENT '用户ID',
   `reason` varchar(200) NOT NULL COMMENT '举报原因',
-  `report_handle_state` int(11) NOT NULL COMMENT '处理状态:未处理0、已处理删除1、已处理对象无违规2',
-  `create_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '举报时间'
-  `delete_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '删除时间'
+  `report_handle_state` int(10) NOT NULL DEFAULT '0' COMMENT '处理状态:未处理0、已处理删除1、已处理对象无违规2',
+  `create_time` int(10) UNSIGNED NOT NULL COMMENT '举报时间',
+  `delete_time` int(10) NOT NULL DEFAULT '0' COMMENT '删除时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='举报';
 
 -- --------------------------------------------------------
@@ -400,8 +431,8 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`user_id`, `user_group_id`, `username`, `email`, `avatar`, `cover`, `password`, `create_ip`, `create_location`, `last_login_time`, `last_login_ip`, `last_login_location`, `follower_count`, `followee_count`, `following_topic_count`, `following_article_count`, `following_question_count`, `topic_count`, `article_count`, `question_count`, `answer_count`, `comment_count`, `reply_count`, `notification_unread`, `inbox_system`, `inbox_user_group`, `inbox_private_message`, `headline`, `bio`, `blog`, `company`, `location`, `language`, `create_time`, `update_time`, `disable_time`) VALUES
-(1, 1, 'Admin', '1', '{\"original\":\"\\/public\\/static\\/upload\\/user\\/avatars\\/1\\/original\\/88fe3a21d11588f63d6ba8ea20efcd71.png\",\"small\":\"\\/public\\/static\\/upload\\/user\\/avatars\\/1\\/small\\/88fe3a21d11588f63d6ba8ea20efcd71.png\",\"middle\":\"\\/public\\/static\\/upload\\/user\\/avatars\\/1\\/middle\\/88fe3a21d11588f63d6ba8ea20efcd71.png\",\"large\":\"\\/public\\/static\\/upload\\/user\\/avatars\\/1\\/large\\/88fe3a21d11588f63d6ba8ea20efcd71.png\"}', '{\"original\":\"\\/public\\/static\\/default\\/user\\/covers\\/1\\/original\\/default.png\",\"small\":\"\\/public\\/static\\/default\\/user\\/covers\\/1\\/small\\/default.png\",\"middle\":\"\\/public\\/static\\/default\\/user\\/covers\\/1\\/middle\\/default.png\",\"large\":\"\\/public\\/static\\/default\\/user\\/covers\\/1\\/large\\/default.png\"}', '81dc9bdb52d04dc20036dbd8313ed055', '127.0.0.1', '本机地址    ', 1728292687, '127.0.0.1', '本机地址    ', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'TestAdmin', 'bio', 'blog', 'company', 'location', 'zh_CN', 1702210759, 1722911537, 0),
-(2, 2, 'User', '2', '{\"original\":\"\\/public\\/static\\/upload\\/user\\/avatars\\/2\\/original\\/f54400331a048ac22268805e482e5693.png\",\"small\":\"\\/public\\/static\\/upload\\/user\\/avatars\\/2\\/small\\/f54400331a048ac22268805e482e5693.png\",\"middle\":\"\\/public\\/static\\/upload\\/user\\/avatars\\/2\\/middle\\/f54400331a048ac22268805e482e5693.png\",\"large\":\"\\/public\\/static\\/upload\\/user\\/avatars\\/2\\/large\\/f54400331a048ac22268805e482e5693.png\"}', '{\"original\":\"\\/public\\/static\\/default\\/user\\/covers\\/1\\/original\\/default.png\",\"small\":\"\\/public\\/static\\/default\\/user\\/covers\\/1\\/small\\/default.png\",\"middle\":\"\\/public\\/static\\/default\\/user\\/covers\\/1\\/middle\\/default.png\",\"large\":\"\\/public\\/static\\/default\\/user\\/covers\\/1\\/large\\/default.png\"}', '81dc9bdb52d04dc20036dbd8313ed055', '127.0.0.1', '本机地址    ', 1728292564, '127.0.0.1', '本机地址    ', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'TestUser', 'bio', '6688899', 'company', 'location', 'zh_CN', 1702210759, 1727579545, 0);
+(1, 1, 'Admin', '2652549974@qq.com', '{\"original\":\"\\/public\\/static\\/upload\\/user\\/avatars\\/1\\/original\\/88fe3a21d11588f63d6ba8ea20efcd71.png\",\"small\":\"\\/public\\/static\\/upload\\/user\\/avatars\\/1\\/small\\/88fe3a21d11588f63d6ba8ea20efcd71.png\",\"middle\":\"\\/public\\/static\\/upload\\/user\\/avatars\\/1\\/middle\\/88fe3a21d11588f63d6ba8ea20efcd71.png\",\"large\":\"\\/public\\/static\\/upload\\/user\\/avatars\\/1\\/large\\/88fe3a21d11588f63d6ba8ea20efcd71.png\"}', '{\"original\":\"\\/public\\/static\\/default\\/user\\/covers\\/1\\/original\\/default.png\",\"small\":\"\\/public\\/static\\/default\\/user\\/covers\\/1\\/small\\/default.png\",\"middle\":\"\\/public\\/static\\/default\\/user\\/covers\\/1\\/middle\\/default.png\",\"large\":\"\\/public\\/static\\/default\\/user\\/covers\\/1\\/large\\/default.png\"}', '81dc9bdb52d04dc20036dbd8313ed055', '127.0.0.1', '本机地址    ', 1747965584, '127.0.0.1', '本机地址    ', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'TestAdmin', 'bio', 'blog', 'company', 'location', 'zh_CN', 1688355914, 1688355914, 0),
+(2, 2, 'User', '2967621911@qq.com', '{\"original\":\"\\/public\\/static\\/upload\\/user\\/avatars\\/2\\/original\\/f54400331a048ac22268805e482e5693.png\",\"small\":\"\\/public\\/static\\/upload\\/user\\/avatars\\/2\\/small\\/f54400331a048ac22268805e482e5693.png\",\"middle\":\"\\/public\\/static\\/upload\\/user\\/avatars\\/2\\/middle\\/f54400331a048ac22268805e482e5693.png\",\"large\":\"\\/public\\/static\\/upload\\/user\\/avatars\\/2\\/large\\/f54400331a048ac22268805e482e5693.png\"}', '{\"original\":\"\\/public\\/static\\/default\\/user\\/covers\\/1\\/original\\/default.png\",\"small\":\"\\/public\\/static\\/default\\/user\\/covers\\/1\\/small\\/default.png\",\"middle\":\"\\/public\\/static\\/default\\/user\\/covers\\/1\\/middle\\/default.png\",\"large\":\"\\/public\\/static\\/default\\/user\\/covers\\/1\\/large\\/default.png\"}', '81dc9bdb52d04dc20036dbd8313ed055', '127.0.0.1', '本机地址    ', 1746599675, '127.0.0.1', '本机地址    ', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'TestUser', 'bio', 'blog', 'company', 'location', 'zh_CN', 1688355914, 1688355914, 0);
 
 -- --------------------------------------------------------
 
@@ -487,7 +518,7 @@ CREATE TABLE `user_group` (
 
 INSERT INTO `user_group` (`user_group_id`, `user_group_name`, `user_group_description`, `user_group_icon`, `user_group_icon_show`, `user_group_color`, `user_group_user_count`, `create_time`, `update_time`, `delete_time`, `is_admin`, `ability_normal_login`, `ability_admin_login`, `ability_admin_manage_user_group`, `ability_admin_manage_user`, `ability_admin_manage_topic`, `ability_admin_manage_question`, `ability_admin_manage_article`, `ability_admin_manage_comment`, `ability_admin_manage_answer`, `ability_admin_manage_reply`, `ability_admin_manage_report`, `ability_admin_manage_option`, `ability_create_article`, `ability_create_question`, `ability_create_answer`, `ability_create_comment`, `ability_create_reply`, `ability_create_topic`, `ability_edit_own_article`, `ability_edit_own_question`, `ability_edit_own_answer`, `ability_edit_own_comment`, `ability_edit_own_reply`, `ability_edit_own_topic`, `ability_delete_own_article`, `ability_delete_own_question`, `ability_delete_own_answer`, `ability_delete_own_comment`, `ability_delete_own_reply`, `ability_delete_own_topic`, `time_before_edit_article`, `time_before_edit_question`, `time_before_edit_answer`, `time_before_edit_comment`, `time_before_edit_reply`, `time_before_edit_topic`, `time_before_delete_article`, `time_before_delete_question`, `time_before_delete_answer`, `time_before_delete_comment`, `time_before_delete_reply`, `time_before_delete_topic`, `ability_edit_article_only_no_comment`, `ability_edit_question_only_no_answer`, `ability_edit_answer_only_no_comment`, `ability_edit_question_only_no_comment`, `ability_edit_comment_only_no_reply`, `ability_edit_reply_only_no_reply`, `ability_edit_topic_only_no_article_or_question`, `ability_delete_article_only_no_comment`, `ability_delete_question_only_no_answer`, `ability_delete_answer_only_no_comment`, `ability_delete_question_only_no_comment`, `ability_delete_comment_only_no_reply`, `ability_delete_reply_only_no_reply`, `ability_delete_topic_only_no_article_or_question`, `ability_edit_own_info`, `ability_vote`) VALUES
 (1, 'Message.Admin.UserGroups.Admin', 'Message.Admin.UserGroups.Admin', 'mdi-security', 1, 'primary', 1, 1702216648, 1725418346, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1),
-(2, 'Message.Admin.UserGroups.User', 'Message.Admin.UserGroups.User', 'mdi-account', 0, 'primary', 1, 1702216648, 1723980867, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+(2, 'Message.Admin.UserGroups.User', 'Message.Admin.UserGroups.User', 'mdi-account', 0, 'primary', 1, 1702216648, 1746597678, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 5, 5, 5, 5, 5, 5, 5, 0, 5, 5, 5, 5, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -542,6 +573,18 @@ ALTER TABLE `chat_groupable`
 --
 ALTER TABLE `comment`
   ADD PRIMARY KEY (`comment_id`);
+
+--
+-- 表的索引 `domain_data`
+--
+ALTER TABLE `domain_data`
+  ADD PRIMARY KEY (`index_id`);
+
+--
+-- 表的索引 `domain_key`
+--
+ALTER TABLE `domain_key`
+  ADD PRIMARY KEY (`index_id`);
 
 --
 -- 表的索引 `follow`
@@ -648,6 +691,18 @@ ALTER TABLE `chat_groupable`
 --
 ALTER TABLE `comment`
   MODIFY `comment_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '评论ID';
+
+--
+-- 使用表AUTO_INCREMENT `domain_data`
+--
+ALTER TABLE `domain_data`
+  MODIFY `index_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '排序';
+
+--
+-- 使用表AUTO_INCREMENT `domain_key`
+--
+ALTER TABLE `domain_key`
+  MODIFY `index_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '排序';
 
 --
 -- 使用表AUTO_INCREMENT `follow`
