@@ -413,18 +413,30 @@ class Reply extends ReplyModel
 
           //联动删除此回复的所有回复
           //删除此回复的所有回复
-          $reply_replys = self::where('replyable_id', '=', $reply->reply_id)
-            ->where('replyable_type', '=', 'reply')
-            ->get();
-          if($reply_replys!=null){
-            foreach ($reply_replys as $key => $reply_reply) {
-              $reply_reply->delete_time = Share::ServerTime();
-              $reply_reply->save();
+          // $reply_replys = self::where('replyable_id', '=', $reply->reply_id)
+          //   ->where('replyable_type', '=', 'reply')
+          //   ->get();
+          // if($reply_replys!=null){
+          //   foreach ($reply_replys as $key => $reply_reply) {
+          //     $reply_reply->delete_time = Share::ServerTime();
+          //     $reply_reply->save();
 
-              UserController::SubReplyCount($reply_reply->user_id);
-              self::SubReplyCount($reply_reply->replyable_id);
-            }
+          //     UserController::SubReplyCount($reply_reply->user_id);
+          //     self::SubReplyCount($reply_reply->replyable_id);
+          //   }
+          // }
+
+          //减少对应评论或回复的数量
+          if ($reply->replyable_type == 'comment') {
+            CommentController::SubReplyCount($reply->replyable_id);
+          } else if ($reply->replyable_type == 'reply') {
+            CommentController::SubReplyCount($reply->replyable_comment_id);
+            self::SubReplyCount($reply->replyable_id);
           }
+          //减少用户回复数量
+          UserController::SubReplyCount($reply->user_id);
+          //删除回复
+          $reply->delete_time = Share::ServerTime();
 
           $is_delete = $reply->save();
           array_push($delete_ids, $reply->reply_id);

@@ -140,11 +140,8 @@ class Article extends ArticleModel
         $article_ids = TopicAbleController::where('topic_id', '=', $specify_topic_id)
           ->where('topicable_type', '=', 'article')
           ->pluck('topicable_id'); //获取指定话题下的所有文章id
-        $data = self::where('delete_time', '=', 0)
-          ->whereIn(
-            'article_id',
-            $article_ids
-          )
+          $data = self::where('delete_time', '=', 0)
+          ->whereIn('article_id', $article_ids) // 确保传递的是数组
           ->orderBy($field, $sort)
           ->paginate($per_page, ['*'], 'page', $page);
       } else if ($search_keywords != '') {
@@ -331,32 +328,44 @@ class Article extends ArticleModel
 
           //联动删除此文章下的所有评论和回复
           //将文章下的所有评论删除
-          $comments = CommentController::where('commentable_id', '=', $article->article_id)
-            ->where('commentable_type', '=', 'article')
-            ->get();
-          if($comments!=null){
-            foreach ($comments as $key => $comment) {
+          // $comments = CommentController::where('commentable_id', '=', $article->article_id)
+          //   ->where('commentable_type', '=', 'article')
+          //   ->get();
+          // if($comments!=null){
+          //   foreach ($comments as $key => $comment) {
   
-              //将评论下的所有回复删除
-              $replys = ReplyController::where('replyable_comment_id', '=', $comment->comment_id)
-              ->get();
-              if($replys!=null){
-                foreach ($replys as $key => $reply) {
-                  $reply->delete_time = Share::ServerTime();
-                  $reply->save();
+          //     //将评论下的所有回复删除
+          //     $replys = ReplyController::where('replyable_comment_id', '=', $comment->comment_id)
+          //     ->get();
+          //     if($replys!=null){
+          //       foreach ($replys as $key => $reply) {
+          //         $reply->delete_time = Share::ServerTime();
+          //         $reply->save();
     
-                  //从用户的回复数中减去1
-                  UserController::SubReplyCount($reply->user_id);
-                }
-              }
+          //         //从用户的回复数中减去1
+          //         UserController::SubReplyCount($reply->user_id);
+          //       }
+          //     }
   
-              $comment->delete_time = Share::ServerTime();
-              $comment->save();
+          //     $comment->delete_time = Share::ServerTime();
+          //     $comment->save();
   
-              //从用户的评论数中减去1
-              UserController::SubCommentCount($comment->user_id);
+          //     //从用户的评论数中减去1
+          //     UserController::SubCommentCount($comment->user_id);
+          //   }
+          // }
+
+          //减少对应话题的文章数量
+          $topics = TopicController::GetAblesTopic($article->article_id, 'article');
+          if ($topics != null) {
+            foreach ($topics as $topic) {
+              TopicController::SubArticleCount($topic->topic_id);
             }
           }
+          //减少用户的文章数量
+          UserController::SubArticleCount($article->user_id);
+          //删除文章
+          $article->delete_time = Share::ServerTime();
 
           $is_delete = $article->save();
           array_push($delete_ids, $article->article_id);

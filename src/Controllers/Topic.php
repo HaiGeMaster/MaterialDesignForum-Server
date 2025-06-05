@@ -22,7 +22,10 @@ use MaterialDesignForum\Plugins\Share;
 class Topic extends TopicModel
 {
   /**
-   * 获取关联的话题
+   * 获取关联的话题，来自TopicAbleController
+   * @param int $topicable_id 话题关联ID
+   * @param string $topicable_type 话题关联类型
+   * @return array|null 话题列表
    */
   public static function GetAblesTopic($topicable_id, $topicable_type)
   {
@@ -294,11 +297,14 @@ class Topic extends TopicModel
           ||
           UserGroupController::IsAdmin($user_token)
         ) {
+          
           //删除话题关系
           //TopicAbleController::DeleteTopicAbles($value);
           //减少用户话题数
-          $topic->delete_time = Share::ServerTime();
           UserController::SubTopicCount($topic->user_id);
+          //删除话题
+          $topic->delete_time = Share::ServerTime();
+
           $is_delete = $topic->save();
           array_push($delete_ids, $topic->topic_id);
         }

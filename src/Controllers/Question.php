@@ -344,71 +344,83 @@ class Question extends QuestionModel
 
           //联动删除此问题下的所有回答、评论、回复
           //将该问题下的所有回答的delete_time设置为当前时间
-          $answers = AnswerController::where('question_id', '=', $question->question_id)->get();
-          if($answers != null){
-            foreach ($answers as $key => $answer) {
+          // $answers = AnswerController::where('question_id', '=', $question->question_id)->get();
+          // if($answers != null){
+          //   foreach ($answers as $key => $answer) {
   
-              //将该回答下的所有评论的delete_time设置为当前时间
-              $comments = CommentController::where('commentable_id', '=', $answer->answer_id)
-                ->where('commentable_type', '=', 'answer')
-                ->get();
-              if($comments != null){
-                foreach ($comments as $key => $comment) {
-                  //将该评论下的所有回复的delete_time设置为当前时间
-                  $replys = ReplyController::where('replyable_comment_id', '=', $comment->comment_id)
-                  ->get();
-                  if($replys != null){
-                    foreach ($replys as $key => $reply) {
-                      $reply->delete_time = Share::ServerTime();
-                      $reply->save();
+          //     //将该回答下的所有评论的delete_time设置为当前时间
+          //     $comments = CommentController::where('commentable_id', '=', $answer->answer_id)
+          //       ->where('commentable_type', '=', 'answer')
+          //       ->get();
+          //     if($comments != null){
+          //       foreach ($comments as $key => $comment) {
+          //         //将该评论下的所有回复的delete_time设置为当前时间
+          //         $replys = ReplyController::where('replyable_comment_id', '=', $comment->comment_id)
+          //         ->get();
+          //         if($replys != null){
+          //           foreach ($replys as $key => $reply) {
+          //             $reply->delete_time = Share::ServerTime();
+          //             $reply->save();
       
-                      //从用户的回复数中减去1
-                      UserController::SubReplyCount($reply->user_id);
-                    }
-                  }
+          //             //从用户的回复数中减去1
+          //             UserController::SubReplyCount($reply->user_id);
+          //           }
+          //         }
     
-                  $comment->delete_time = Share::ServerTime();
-                  $comment->save();
+          //         $comment->delete_time = Share::ServerTime();
+          //         $comment->save();
     
-                  //从用户的评论数中减去1
-                  UserController::SubCommentCount($comment->user_id);
-                }
-              }
+          //         //从用户的评论数中减去1
+          //         UserController::SubCommentCount($comment->user_id);
+          //       }
+          //     }
   
-              $answer->delete_time = Share::ServerTime();
-              $answer->save();
+          //     $answer->delete_time = Share::ServerTime();
+          //     $answer->save();
   
-              //从用户的回答数中减去1
-              UserController::SubAnswerCount($answer->user_id);
-            }
-          }
+          //     //从用户的回答数中减去1
+          //     UserController::SubAnswerCount($answer->user_id);
+          //   }
+          // }
 
           //将该问题下的所有评论的delete_time设置为当前时间
-          $comments = CommentController::where('commentable_id', '=', $question->question_id)
-            ->where('commentable_type', '=', 'question')
-            ->get();
-          if($comments != null){
-            foreach ($comments as $key => $comment) {
-              //将该评论下的所有回复的delete_time设置为当前时间
-              $replys = ReplyController::where('replyable_comment_id', '=', $comment->comment_id)
-              ->get();
-              if($replys != null){
-                foreach ($replys as $key => $reply) {
-                  $reply->delete_time = Share::ServerTime();
-                  $reply->save();
+          // $comments = CommentController::where('commentable_id', '=', $question->question_id)
+          //   ->where('commentable_type', '=', 'question')
+          //   ->get();
+          // if($comments != null){
+          //   foreach ($comments as $key => $comment) {
+          //     //将该评论下的所有回复的delete_time设置为当前时间
+          //     $replys = ReplyController::where('replyable_comment_id', '=', $comment->comment_id)
+          //     ->get();
+          //     if($replys != null){
+          //       foreach ($replys as $key => $reply) {
+          //         $reply->delete_time = Share::ServerTime();
+          //         $reply->save();
   
-                  //从用户的回复数中减去1
-                  UserController::SubReplyCount($reply->user_id);
-                }
-              }
+          //         //从用户的回复数中减去1
+          //         UserController::SubReplyCount($reply->user_id);
+          //       }
+          //     }
   
-              $comment->delete_time = Share::ServerTime();
-              $comment->save();
+          //     $comment->delete_time = Share::ServerTime();
+          //     $comment->save();
   
-              //从用户的评论数中减去1
-              UserController::SubCommentCount($comment->user_id);
+          //     //从用户的评论数中减去1
+          //     UserController::SubCommentCount($comment->user_id);
+          //   }
+          // }
+
+          //减少对应话题的文章数量
+          $topics = TopicController::GetAblesTopic($question->question_id, 'question');
+          if ($topics != null) {
+            foreach ($topics as $topic) {
+              TopicController::SubQuestionCount($topic->topic_id);
             }
           }
+          //减少用户的提问数量
+          UserController::SubQuestionCount($question->user_id);
+          //删除提问
+          $question->delete_time = Share::ServerTime();
 
           $is_delete = $question->save();
           array_push($delete_ids, $question->question_id);

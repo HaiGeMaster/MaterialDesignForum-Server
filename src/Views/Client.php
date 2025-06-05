@@ -53,10 +53,12 @@ class Client
       ];
 
       // self::$content = Seo::Render('index');
+        // window.G_USER_TOKEN = ' . $user_token . ';
+        // window.G_INDEX_TOPICS = ' . (Share::HandleArrayToJSON($topics)) . ';
 
       self::$script = '
         window.G_INDEX_TEXT_PLAYERS = ' . (Share::HandleArrayToJSON($text_players)) . ';
-        window.G_INDEX_TOPICS = ' . (Share::HandleArrayToJSON($topics)) . ';
+        
         window.G_INDEX_QUESTIONS_RECENT = ' . (Share::HandleArrayToJSON($questions_recent)) . ';
         window.G_INDEX_QUESTIONS_POPULAR = ' . (Share::HandleArrayToJSON($questions_popular)) . ';
         window.G_INDEX_ARTICLES_RECENT = ' . (Share::HandleArrayToJSON($articles_recent)) . ';

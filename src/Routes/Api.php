@@ -615,6 +615,7 @@ class Api
           $data['user_token']??'',
           $data['per_page'] ?? Config::GetMySQLMaxQuery(),
           $data['search_keywords']??'',
+          $data['search_field']??[],
           $data['specify_topic_id']??null
         )
       );

@@ -285,31 +285,38 @@ class Answer extends AnswerModel
 
           //联动删除此回答下的评论和回复
           //删除此回答下的评论
-          $comments = CommentController::where('commentable_id', '=', $answer->answer_id)
-            ->where('commentable_type', '=', 'answer')
-            ->get();
-          if($comments != null){
-            foreach ($comments as $key => $comment) {
-              //删除此评论下的回复
-              $replys = ReplyController::where('replyable_comment_id', '=', $comment->comment_id)
-                ->get();
-              if($replys != null){
-                foreach($replys as $key => $reply){
-                  $reply->delete_time = Share::ServerTime();
-                  $reply->save();
+          // $comments = CommentController::where('commentable_id', '=', $answer->answer_id)
+          //   ->where('commentable_type', '=', 'answer')
+          //   ->get();
+          // if($comments != null){
+          //   foreach ($comments as $key => $comment) {
+          //     //删除此评论下的回复
+          //     $replys = ReplyController::where('replyable_comment_id', '=', $comment->comment_id)
+          //       ->get();
+          //     if($replys != null){
+          //       foreach($replys as $key => $reply){
+          //         $reply->delete_time = Share::ServerTime();
+          //         $reply->save();
     
-                  //从用户回复数中减去
-                  UserController::SubReplyCount($reply->user_id);
-                }
-              }
+          //         //从用户回复数中减去
+          //         UserController::SubReplyCount($reply->user_id);
+          //       }
+          //     }
   
-              $comment->delete_time = Share::ServerTime();
-              $comment->save();
+          //     $comment->delete_time = Share::ServerTime();
+          //     $comment->save();
   
-              //从用户评论数中减去
-              UserController::SubCommentCount($comment->user_id);
-            }
-          }
+          //     //从用户评论数中减去
+          //     UserController::SubCommentCount($comment->user_id);
+          //   }
+          // }
+
+          //减少对应问题的回答数量
+          QuestionController::SubAnswerCount($answer->question_id);
+          //减少用户的回答数量
+          UserController::SubAnswerCount($answer->user_id);
+          //删除回答
+          $answer->delete_time = Share::ServerTime();
 
           $is_delete = $answer->save();
           array_push($delete_ids, $answer->answer_id);

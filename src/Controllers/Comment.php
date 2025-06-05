@@ -380,16 +380,33 @@ class Comment extends CommentModel
 
           //联动删除此评论下的所有回复
           //删除此评论下的所有回复 ->where('delete_time', '=', 0)//看情况决定是否加上这个条件
-          $replys = ReplyController::where('replyable_comment_id', '=', $comment->comment_id)
-            ->get();
-          if($replys != null){
-            foreach ($replys as $key => $reply) {
-              $reply->delete_time = Share::ServerTime();
-              $reply->save();
+          // $replys = ReplyController::where('replyable_comment_id', '=', $comment->comment_id)
+          //   ->get();
+          // if($replys != null){
+          //   foreach ($replys as $key => $reply) {
+          //     $reply->delete_time = Share::ServerTime();
+          //     $reply->save();
   
-              UserController::SubReplyCount($reply->user_id);
+          //     UserController::SubReplyCount($reply->user_id);
+          //   }
+          // }
+
+          //减少对应问题或文章的评论数量
+          if($comment->commentable_type == 'answer'){
+            //如果是回答评论，则减少对应问题的评论数量
+            QuestionController::SubCommentCount($comment->commentable_id);
+          }else{
+            //如果是文章或问题评论，则减少对应文章或问题的评论数量
+            if($comment->commentable_type == 'article'){
+              ArticleController::SubCommentCount($comment->commentable_id);
+            }else if($comment->commentable_type == 'question'){
+              QuestionController::SubCommentCount($comment->commentable_id);
             }
           }
+          //减少用户评论数量
+          UserController::SubCommentCount($comment->user_id);
+          //删除评论
+          $comment->delete_time = Share::ServerTime();
 
           $is_delete = $comment->save();
           array_push($delete_ids, $comment->comment_id);

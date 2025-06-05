@@ -315,7 +315,7 @@ class Share
     if (isset($_COOKIE[$name])) {
       return $_COOKIE[$name];
     } else {
-      return isset(self::GetRequestData()[$name]) ? self::GetRequestData()[$name] : Option::Get('theme') || Config::GetDefaultTheme();
+      return isset(self::GetRequestData()[$name]) ? self::GetRequestData()[$name] : '';//Option::Get('theme') || Config::GetDefaultTheme();
     }
   }
   /**
@@ -377,7 +377,11 @@ class Share
    */
   public static function GetClientUserToken()
   {
-    return self::GetCookie('user_token') || self::GetCookie('user_token');
+    $user_token = self::GetCookie('user_token') ?? self::GetCookie('user_token') ?? $_COOKIE['user_token']?? '';
+    if($user_token==1){
+      $user_token = $_COOKIE['user_token'];
+    }
+    return $user_token;
   }
   /**
    * 获取主题列表
