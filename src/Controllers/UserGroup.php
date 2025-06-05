@@ -14,12 +14,12 @@ use MaterialDesignForum\Models\UserGroup as UserGroupModel;
 use MaterialDesignForum\Models\User as UserModel;
 use MaterialDesignForum\Controllers\Token as TokenController;
 use MaterialDesignForum\Plugins\Share;
-use MaterialDesignForum\Config\Config;
+// use MaterialDesignForum\Config\Config;
 
 class UserGroup extends UserGroupModel
 {
   /**
-   * 验证token是否是管理员
+   * 验证token是否是管理员，这才是真正的管理员，可以增删改查
    * @param string $token token字符串
    * @return bool $user_group->is_admin
    */
@@ -31,7 +31,7 @@ class UserGroup extends UserGroupModel
     return self::Ability($token, 'is_admin');
   }
   /**
-   * 验证token是否是能后台管理员登录
+   * 验证token是否是能后台管理员登录，这不是真正的管理员，只是能登录后台查看用户组指定的权限数据
    * @param string $token token字符串
    * @return bool $user_group->ability_admin_login
    */
@@ -396,59 +396,6 @@ class UserGroup extends UserGroupModel
         ->where('delete_time', '=', 0)
         ->first();
       if ($user_group != null) {
-        // if (self::Ability($user_token, 'ability_admin_manage_user_group') || self::IsAdmin($user_token)) {
-        //   $user_group->user_group_name = $user_group_data['user_group_name'];
-        //   $user_group->user_group_description = $user_group_data['user_group_description'];
-        //   $user_group->user_group_icon = $user_group_data['user_group_icon'];
-        //   $user_group->user_group_icon_show = $user_group_data['user_group_icon_show'];
-        //   $user_group->user_group_color = $user_group_data['user_group_color'];
-        //   $user_group->ability_normal_login = $user_group_data['ability_normal_login'];
-        //   $user_group->ability_admin_login = $user_group_data['ability_admin_login'];
-        //   $user_group->ability_admin_manage_user_group = $user_group_data['ability_admin_manage_user_group'];
-        //   $user_group->ability_admin_manage_user = $user_group_data['ability_admin_manage_user'];
-        //   $user_group->ability_admin_manage_topic = $user_group_data['ability_admin_manage_topic'];
-        //   $user_group->ability_admin_manage_question = $user_group_data['ability_admin_manage_question'];
-        //   $user_group->ability_admin_manage_article = $user_group_data['ability_admin_manage_article'];
-        //   $user_group->ability_admin_manage_comment = $user_group_data['ability_admin_manage_comment'];
-        //   $user_group->ability_admin_manage_answer = $user_group_data['ability_admin_manage_answer'];
-        //   $user_group->ability_admin_manage_reply = $user_group_data['ability_admin_manage_reply'];
-        //   $user_group->ability_admin_manage_report = $user_group_data['ability_admin_manage_report'];
-        //   $user_group->ability_create_article = $user_group_data['ability_create_article'];
-        //   $user_group->ability_create_question = $user_group_data['ability_create_question'];
-        //   $user_group->ability_create_answer = $user_group_data['ability_create_answer'];
-        //   $user_group->ability_create_comment = $user_group_data['ability_create_comment'];
-        //   $user_group->ability_create_reply = $user_group_data['ability_create_reply'];
-        //   $user_group->ability_create_topic = $user_group_data['ability_create_topic'];
-        //   $user_group->ability_edit_own_article = $user_group_data['ability_edit_own_article'];
-        //   $user_group->ability_edit_own_question = $user_group_data['ability_edit_own_question'];
-        //   $user_group->ability_edit_own_answer = $user_group_data['ability_edit_own_answer'];
-        //   $user_group->ability_edit_own_comment = $user_group_data['ability_edit_own_comment'];
-        //   $user_group->ability_edit_own_reply = $user_group_data['ability_edit_own_reply'];
-        //   $user_group->ability_edit_own_topic = $user_group_data['ability_edit_own_topic'];
-        //   $user_group->ability_delete_own_article = $user_group_data['ability_delete_own_article'];
-        //   $user_group->ability_delete_own_question = $user_group_data['ability_delete_own_question'];
-        //   $user_group->ability_delete_own_answer = $user_group_data['ability_delete_own_answer'];
-        //   $user_group->ability_delete_own_comment = $user_group_data['ability_delete_own_comment'];
-        //   $user_group->ability_delete_own_reply = $user_group_data['ability_delete_own_reply'];
-        //   $user_group->ability_delete_own_topic = $user_group_data['ability_delete_own_topic'];
-        //   $user_group->ability_edit_article_only_no_comment = $user_group_data['ability_edit_article_only_no_comment'];
-        //   $user_group->ability_edit_question_only_no_answer = $user_group_data['ability_edit_question_only_no_answer'];
-        //   $user_group->ability_edit_answer_only_no_comment = $user_group_data['ability_edit_answer_only_no_comment'];
-        //   $user_group->ability_edit_question_only_no_comment = $user_group_data['ability_edit_question_only_no_comment'];
-        //   $user_group->ability_edit_comment_only_no_reply = $user_group_data['ability_edit_comment_only_no_reply'];
-        //   $user_group->ability_edit_topic_only_no_article_or_question = $user_group_data['ability_edit_topic_only_no_article_or_question'];
-        //   $user_group->ability_delete_article_only_no_comment = $user_group_data['ability_delete_article_only_no_comment'];
-        //   $user_group->ability_delete_question_only_no_answer = $user_group_data['ability_delete_question_only_no_answer'];
-        //   $user_group->ability_delete_answer_only_no_comment = $user_group_data['ability_delete_answer_only_no_comment'];
-        //   $user_group->ability_delete_question_only_no_comment = $user_group_data['ability_delete_question_only_no_comment'];
-        //   $user_group->ability_delete_comment_only_no_reply = $user_group_data['ability_delete_comment_only_no_reply'];
-        //   $user_group->ability_delete_topic_only_no_article_or_question = $user_group_data['ability_delete_topic_only_no_article_or_question'];
-        //   $user_group->ability_edit_own_info = $user_group_data['ability_edit_own_info'];
-        //   $user_group->ability_vote = $user_group_data['ability_vote'];
-        //   $user_group->update_time = Share::ServerTime();
-        //   $is_edit = $user_group->save();
-        // }
-
         //使用遍历的方式
         if (self::Ability($user_token, 'ability_admin_manage_user_group') || self::IsAdmin($user_token)) {
           foreach ($user_group_data as $key => $value) {

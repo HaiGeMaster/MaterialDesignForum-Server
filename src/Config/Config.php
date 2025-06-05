@@ -41,6 +41,7 @@ class Config
     $config['mysql_username'] = 'root'; //数据库用户名
     $config['mysql_password'] = 'root'; //数据库密码
     $config['mysql_database'] = 'demo'; //'root';//数据库名
+    $config['mysql_port'] = 3306; //数据库端口
     $config['mysql_prefix'] = ''; //数据库表前缀
     //以上是可以修改的配置↑
     
@@ -104,6 +105,10 @@ class Config
   {
     return self::getConfig()['mysql_database'];
   }
+  public static function GetMySqlPort(): int
+  {
+    return self::getConfig()['mysql_port'];
+  }
   public static function GetMySqlPrefix(): string
   {
     return self::getConfig()['mysql_prefix'];
@@ -116,7 +121,7 @@ class Config
   public static function GetWebTitleName($additional_content = null): string
   {
     if ($additional_content == null) {
-      return self::getConfig()['site_name'];
+      return self::getConfig()['site_name']??'';
     } else {
       return $additional_content . ' - ' . self::getConfig()['site_name'];
     }
@@ -129,7 +134,7 @@ class Config
   public static function GetWebDescription($additional_content = null): string
   {
     if ($additional_content == null) {
-      return self::GetWebTitleName() . ' - ' . Option::Get('site_description');
+      return self::GetWebTitleName() . ' - ' . Option::Get('site_description')??'';
     } else {
       return $additional_content . ' - ' . self::GetWebTitleName() . ' - ' . Option::Get('site_description');
     }
@@ -142,7 +147,7 @@ class Config
   public static function GetWebKeywords($additional_content = null): string
   {
     if ($additional_content == null) {
-      return self::GetWebTitleName() . ',' . Option::Get('site_keywords');
+      return self::GetWebTitleName() . ',' . Option::Get('site_keywords')??'';
     } else {
       return $additional_content . ',' . self::GetWebTitleName() . ',' . Option::Get('site_keywords');
     }

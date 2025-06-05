@@ -64,7 +64,7 @@ class Install
   {
     $json = null;
     try {
-      $conn = @mysqli_connect(Config::GetMySqlHostname(), Config::GetMySqlUsername(), Config::GetMySqlPassword());
+      $conn = @mysqli_connect(Config::GetMySqlHostname(), Config::GetMySqlUsername(), Config::GetMySqlPassword(),Config::GetMySqlDatabase(), Config::GetMySqlPort());
       if (!$conn) {
         self::SaveInstallJSON(false, 1);
         return false;
