@@ -1,5 +1,8 @@
 <?php
+
 namespace MaterialDesignForum\Core;
+
+use MaterialDesignForum\Controllers\UserGroup as UserGroupController;
 
 class Update
 {
@@ -13,7 +16,7 @@ class Update
         // $remoteUrl = 'http://localhost:83/composer.json', 
         $remoteUrl = 'https://mdf.xbedrock.com/composer.json', 
         $localPackageFile = 'composer.json', 
-        $downloadFolder = 'update_package'
+        $downloadFolder = 'public/update_download'
     )
     {
         self::$remoteUrl = $remoteUrl;
@@ -27,7 +30,7 @@ class Update
     {
         $packageJson = file_get_contents(self::$remoteUrl);
         if ($packageJson === false) {
-            throw new \Exception("无法获取远程 composer.json 文件。");
+            throw new \Exception("Update:getRemotePackageJson error");
         }
         return json_decode($packageJson, true);
     }
@@ -81,7 +84,7 @@ class Update
             $zip->extractTo($path);
             $zip->close();
         } else {
-            throw new \Exception("解压失败。");
+            throw new \Exception("Update:extractZip error");
         }
     }
 
@@ -104,6 +107,15 @@ class Update
      */
     public static function update($user_token = null)
     {
+        if(UserGroupController::IsAdmin($user_token) === false) {
+            return [
+                'is_update' => false,
+                'new_version' => null,
+                'current_version' => null,
+                'error_message' => '没有权限执行更新。'
+            ];
+        }
+
         try {
             self::init(); // 确保初始化静态变量
             $packageData = self::getRemotePackageJson();
@@ -115,7 +127,7 @@ class Update
 
             // 如果版本号相同，不需要更新
             if ($localVersion === $remoteVersion) {
-                echo "本地版本已是最新，版本号：$remoteVersion\n";
+                // echo "本地版本已是最新，版本号：$remoteVersion\n";
                 return [
                     'is_update' => false,
                     'new_version' => null,
@@ -170,11 +182,12 @@ class Update
                 'current_version' => $localVersion
             ];
         } catch (\Exception $e) {
-            echo '错误：' . $e->getMessage() . "\n";
+            // echo '错误：' . $e->getMessage() . "\n";
             return [
                 'is_update' => false,
                 'new_version' => $remoteVersion,
-                'current_version' => $localVersion
+                'current_version' => $localVersion,
+                'error_message' => $e->getMessage()
             ];
         }
     }
@@ -183,14 +196,24 @@ class Update
      * 检查是否有更新
      * @return array
      */
-    public static function checkUpdate()
+    public static function checkUpdate($user_token = null)
     {
+        if(UserGroupController::IsAdmin($user_token) === false) {
+            return [
+                'is_has_update' => false,
+                'new_version' => null,
+                'current_version' => null,
+                'error_message' => '没有权限执行检查更新。'
+            ];
+        }
         try {
             self::init(); // 确保初始化静态变量
             $packageData = self::getRemotePackageJson();
             $remoteVersion = $packageData['version'];
             $localPackageData = self::getLocalPackageJson();
             $localVersion = $localPackageData['version'] ?? null;
+
+            $remoteZipLink = $packageData['zip_link'] ?? null;
 
             // 如果版本号相同，不需要更新
             if ($localVersion === $remoteVersion) {
@@ -204,17 +227,19 @@ class Update
             return [
                 'is_has_update' => true,
                 'new_version' => $remoteVersion,
-                'current_version' => $localVersion
+                'current_version' => $localVersion,
+                'remote_zip_link' => $remoteZipLink
             ];
         } catch (\Exception $e) {
-            echo '错误：' . $e->getMessage() . "\n";
+            // echo '错误：' . $e->getMessage() . "\n";
             
             $localPackageData = self::getLocalPackageJson();
             $localVersion = $localPackageData['version'] ?? null;
             return [
                 'is_has_update' => false,
                 'new_version' => null,
-                'current_version' => $localVersion
+                'current_version' => $localVersion,
+                'error_message' => $e->getMessage()
             ];
         }
     }

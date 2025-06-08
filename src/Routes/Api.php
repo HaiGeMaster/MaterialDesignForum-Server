@@ -65,14 +65,16 @@ class Api
     ////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////
     
-    $collector->get('/api/core/update/check', function () {
+    $collector->post('/api/core/update/check', function () {
+      $data = Share::GetRequestData();
       return Share::HandleArrayToJSON(
-        \MaterialDesignForum\Core\Update::checkUpdate()
+        \MaterialDesignForum\Core\Update::checkUpdate($data['user_token']??null)
       );
     });
-    $collector->get('/api/core/update/start', function () {
+    $collector->post('/api/core/update/start', function () {
+      $data = Share::GetRequestData();
       return Share::HandleArrayToJSON(
-        \MaterialDesignForum\Core\Update::update()
+        \MaterialDesignForum\Core\Update::update($data['user_token']??null)
       );
     });
     $collector->get('/api/dev/DEV_AllUserAvatarReset', function () {

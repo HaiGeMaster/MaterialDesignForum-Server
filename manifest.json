@@ -1,7 +1,7 @@
 {
   "name": "MaterialDesignForum",
   "short_name": "MDF",
-  "start_url": "https://demo.xbedrock.com",
+  "start_url": "https://mdf.xbedrock.com",
   "display": "standalone",
   "background_color": "#000000",
   "description": "MaterialDesignForum For Vuetify2",

@@ -43,20 +43,20 @@ class Config
       $config['site_name'] = Option::Get('site_name');
       $config['default_language'] = Option::Get('default_language'); //默认语言
       $config['smtp_username'] = Option::Get('smtp_username'); //邮箱用户名(默认为QQ邮箱
-      $config['smtp_password'] = Option::Get('smtp_password'); //邮箱密码(默认为QQ邮箱
-      $config['smtp_send_name'] = Option::Get('smtp_send_name'); //发件人名称(默认为QQ邮箱
-      $config['smtp_host'] = Option::Get('smtp_host'); //邮箱服务器地址(默认为QQ邮箱
-      $config['smtp_port'] = Option::Get('smtp_port'); //邮箱服务器端口(默认为QQ邮箱
-      $config['smtp_secure'] = Option::Get('smtp_secure'); //邮箱服务器安全协议(默认为QQ邮箱
+      $config['smtp_password'] = Option::Get('smtp_password'); //邮箱密码(默认为QQ邮箱密码
+      $config['smtp_send_name'] = Option::Get('smtp_send_name'); //发件人名称(
+      $config['smtp_host'] = Option::Get('smtp_host'); //邮箱服务器地址(
+      $config['smtp_port'] = Option::Get('smtp_port'); //邮箱服务器端口(
+      $config['smtp_secure'] = Option::Get('smtp_secure'); //邮箱服务器安全协议(
     }else{
       $config['site_name'] = 'MaterialDesignForum'; //网站名称
       $config['default_language'] = 'zh_CN'; //默认语言
       $config['smtp_username'] = ''; //邮箱用户名(默认为QQ邮箱
-      $config['smtp_password'] = ''; //邮箱密码(默认为QQ邮箱
-      $config['smtp_send_name'] = ''; //发件人名称(默认为QQ邮箱
-      $config['smtp_host'] = ''; //邮箱服务器地址(默认为QQ邮箱
-      $config['smtp_port'] = ''; //邮箱服务器端口(默认为QQ邮箱
-      $config['smtp_secure'] = ''; //邮箱服务器安全协议(默认为QQ邮箱
+      $config['smtp_password'] = ''; //邮箱密码(默认为QQ邮箱密码
+      $config['smtp_send_name'] = ''; //发件人名称(
+      $config['smtp_host'] = ''; //邮箱服务器地址(
+      $config['smtp_port'] = ''; //邮箱服务器端口(
+      $config['smtp_secure'] = ''; //邮箱服务器安全协议(
     }
     
     $config['mysql_max_query'] = 20; //最大每次查询数据库的数量（条） 过大可能导致服务器缓慢查询
