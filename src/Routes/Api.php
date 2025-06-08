@@ -64,7 +64,17 @@ class Api
     ////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////
-
+    
+    $collector->get('/api/core/update/check', function () {
+      return Share::HandleArrayToJSON(
+        \MaterialDesignForum\Core\Update::checkUpdate()
+      );
+    });
+    $collector->get('/api/core/update/start', function () {
+      return Share::HandleArrayToJSON(
+        \MaterialDesignForum\Core\Update::update()
+      );
+    });
     $collector->get('/api/dev/DEV_AllUserAvatarReset', function () {
       if (!Config::Dev()) {
         return Share::HandleArrayToJSON(
