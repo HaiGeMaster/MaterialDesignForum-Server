@@ -60,7 +60,7 @@ class Notification extends Eloquent
   public static function IsVaildType($type): bool
   {
     $types = [
-      'question_answer',
+      'question_answer',//提问
       'question_comment',
       'question_delete',
       'article_comment',
