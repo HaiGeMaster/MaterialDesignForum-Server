@@ -298,7 +298,7 @@ class Topic extends TopicModel
           UserGroupController::IsAdmin($user_token)
         ) {
           
-          //删除话题关系
+          //删除话题关系 暂时进行伪删除
           //TopicAbleController::DeleteTopicAbles($value);
           //减少用户话题数
           UserController::SubTopicCount($topic->user_id);

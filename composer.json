@@ -1,7 +1,7 @@
 {
   "app_name": "MaterialDesignForum",
-  "version": "25.6.8",
-  "zip_link": "https://d.feiliupan.com/t/90838076061913088/MDF/20250608155800.zip",
+  "version": "25.6.9",
+  "zip_link": "https://d.feiliupan.com/t/90838076061913088/MDF/20250614134019.zip",
   "prefer-stable": true,
   "minimum-stability": "stable",
   "require": {
@@ -11,7 +11,8 @@
     "itbdw/ip-database": "^3.0",
     "lincanbin/material-design-avatars": "^1.4",
     "illuminate/pagination": "^8.83",
-    "nesbot/carbon": "^2.72"
+    "nesbot/carbon": "^2.72",
+    "intervention/image": "^3.11"
   },
   "autoload": {
     "psr-4": {

@@ -276,12 +276,21 @@ class Question extends QuestionModel
         $question->update_time = Share::ServerTime();
         $is_edit = $question->save();
         //首先从TopicAbleController中删除所有的topicable_id为$question_id的数据
-        TopicAbleController::where('topicable_id', '=', $question_id)
-          ->where('topicable_type', '=', 'question')
-          ->delete();
+        // TopicAbleController::where('topicable_id', '=', $question_id)->where('topicable_type', '=', 'question')->delete();
+
+        //首先从TopicAbleController获取所有的topicable_id为$question_id的数据的topic_id数组
+        $old_topics = TopicController::GetAblesTopic($question_id, 'question');
+        // $old_topic_ids = [];
+        if ($old_topics != null) {
+          foreach ($old_topics as $old_topic) {
+            TopicAbleController::DeleteTopicAble($old_topic->topic_id, $question_id, 'question');
+            TopicController::SubQuestionCount($old_topic->topic_id);
+          }
+        }
         //然后再添加新的数据
         foreach ($topics as $topic_id) {
           TopicAbleController::AddTopicAble($topic_id, $question->question_id, 'question');
+          TopicController::AddQuestionCount($topic_id);
         }
       }
     }

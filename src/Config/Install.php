@@ -64,6 +64,8 @@ class Install
   {
     $json = null;
     try {
+      //关闭所有错误报告
+      // @ini_set('display_errors', '0');
       $conn = @mysqli_connect(Config::GetMySqlHostname(), Config::GetMySqlUsername(), Config::GetMySqlPassword(),Config::GetMySqlDatabase(), Config::GetMySqlPort());
       if (!$conn) {
         self::SaveInstallJSON(false, 1);

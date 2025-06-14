@@ -266,7 +266,18 @@ class Article extends ArticleModel
         $article->content_rendered = $content_rendered;
         $article->update_time = Share::ServerTime();
         $is_edit = $article->save();
-        TopicAbleController::where('topicable_id', '=', $article_id)->where('topicable_type', '=', 'article')->delete();
+        // TopicAbleController::where('topicable_id', '=', $article_id)->where('topicable_type', '=', 'article')->delete();
+
+        //首先从TopicAbleController获取所有的topicable_id为$article_id的数据的topic_id数组
+        $old_topics = TopicController::GetAblesTopic($article_id, 'article');
+        // $old_topic_ids = [];
+        if ($old_topics != null) {
+          foreach ($old_topics as $old_topic) {
+            TopicAbleController::DeleteTopicAble($old_topic->topic_id, $article_id, 'article');
+            TopicController::SubQuestionCount($old_topic->topic_id);
+          }
+        }
+
         foreach ($topics as $topic_id) {
           TopicAbleController::AddTopicAble($topic_id, $article->article_id, 'article');
         }

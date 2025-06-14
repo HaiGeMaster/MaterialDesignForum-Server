@@ -916,6 +916,89 @@ class Api
         \MaterialDesignForum\Plugins\i18n::GetLocaleInfoList()
       );
     });
+
+    if(!Install::GetInstallInfoJson()["install"]){
+      $collector->post('/api/lang/get/locale/info/list', function () {
+        return Share::HandleArrayToJSON(
+          \MaterialDesignForum\Plugins\i18n::GetLocaleInfoList()
+        );
+      });
+      $collector->post('/api/option/get/theme_color_param', function () {
+        $data = Share::GetRequestData();
+        return Share::HandleArrayToJSON(
+          \MaterialDesignForum\Controllers\Option::GetThemeColorParamJson(
+            $data['user_token']??''
+          )
+        );
+      });
+      $collector->post('/api/install/get_install_info_json', function () {
+        return Share::HandleArrayToJSON(
+          Install::GetInstallInfoJson()
+        );
+      });
+      $collector->post('/api/option/get/info', function () {
+        $data = Share::GetRequestData();
+        return Share::HandleArrayToJSON(
+          \MaterialDesignForum\Controllers\Option::GetInfoData(
+            $data['user_token']??''
+          )
+        );
+      });
+      $collector->post('/api/install/set_config', function () {
+        $data = Share::GetRequestData();
+        return Share::HandleArrayToJSON(
+          Install::SetConfigPHP(
+            $data['mysql_hostname'],
+            $data['mysql_username'],
+            $data['mysql_password'],
+            $data['mysql_database'],
+            $data['mysql_prefix']
+          )
+        );
+      });
+      $collector->post('/api/install/test_mail', function () {
+        $data = Share::GetRequestData();
+        return Share::HandleArrayToJSON(
+          Install::TestMail(
+            $data['smtp_email'],
+            $data['smtp_username'],
+            $data['smtp_password'],
+            $data['smtp_send_name'],
+            $data['smtp_host'],
+            $data['smtp_port'],
+            $data['smtp_secure']
+          )
+        );
+      });
+      $collector->post('/api/install/mail/set', function () {
+        $data = Share::GetRequestData();
+        return Share::HandleArrayToJSON(
+          Install::SetSqlMail(
+            $data['smtp_username'],
+            $data['smtp_password'],
+            $data['smtp_send_name'],
+            $data['smtp_host'],
+            $data['smtp_port'],
+            $data['smtp_secure']
+          )
+        );
+      });
+      $collector->post('/api/install/set_web_info', function () {
+        $data = Share::GetRequestData();
+        return Share::HandleArrayToJSON(
+          Install::SetWebInfo(
+            $data['site_name'],
+            $data['default_language']
+          )
+        );
+      });
+      $collector->post('/api/install/set_web_change', function () {
+        return Share::HandleArrayToJSON(
+          Install::SetWebInstallChange()
+        );
+      });
+    }
+
     $dispatcher = new Dispatcher($collector->getData());
     try {
       return $dispatcher->dispatch($_SERVER['REQUEST_METHOD'], parse_url(
