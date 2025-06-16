@@ -270,9 +270,11 @@ class Article extends ArticleModel
 
         //首先从TopicAbleController获取所有的topicable_id为$article_id的数据的topic_id数组
         $old_topics = TopicController::GetAblesTopic($article_id, 'article');
+        // return $old_topics;
         // $old_topic_ids = [];
         if ($old_topics != null) {
           foreach ($old_topics as $old_topic) {
+            // return $old_topic->topic_id;
             TopicAbleController::DeleteTopicAble($old_topic->topic_id, $article_id, 'article');
             TopicController::SubQuestionCount($old_topic->topic_id);
           }

@@ -31,12 +31,12 @@ try{
 }catch(\Exception $e) {
 
   //直接进入安装页面
-  if (Api::IsApi()) {
-    header('Content-Type: application/json');
-    echo Api::HandleInstallAPI();
-  } else {
-    echo Page::HandleInstallRoute();
-  }
+  // if (Api::IsApi()) {
+  //   header('Content-Type: application/json');
+  //   echo Api::HandleInstallAPI();
+  // } else {
+  //   echo Page::HandleInstallRoute();
+  // }
 
   // 捕获异常并返回错误信息
   // header('Content-Type: application/json');
@@ -46,17 +46,17 @@ try{
   //   'code' => $e->getCode()
   // ]);
 
-  // echo '<h1>Material Design Forum 发生错误</h1>';
-  // echo '<code>发生错误：<br>';
-  // echo '<pre>';
-  // echo '错误信息：' . $e->getMessage() . '<br>';
-  // echo '错误代码：' . $e->getCode() . '<br>';
-  // echo '错误文件：' . $e->getFile() . '<br>';
-  // echo '错误行号：' . $e->getLine() . '<br>';
-  // echo '错误追踪：<br>' . nl2br($e->getTraceAsString()) . '<br>';
-  // echo '</pre>';
-  // echo '<p>请检查您的配置文件和数据库连接设置。</p>';
-  // echo '</code>';
+  echo '<h1>Material Design Forum 发生错误 errow</h1>';
+  echo '<code>发生错误：<br>';
+  echo '<pre>';
+  echo '错误信息：' . $e->getMessage() . '<br>';
+  echo '错误代码：' . $e->getCode() . '<br>';
+  echo '错误文件：' . $e->getFile() . '<br>';
+  echo '错误行号：' . $e->getLine() . '<br>';
+  echo '错误追踪：<br>' . nl2br($e->getTraceAsString()) . '<br>';
+  echo '</pre>';
+  echo '<p>请检查您的配置文件和数据库连接设置。</p>';
+  echo '</code>';
 }
 
 // echo (

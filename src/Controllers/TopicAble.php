@@ -40,12 +40,24 @@ class TopicAble extends TopicAbleModel
    */
   public static function DeleteTopicAble($topic_id, $topicable_id, $topicable_type): bool
   {
-    $topicable = self::where('topic_id', '=', $topic_id)
+    // $topicable = self::where('topic_id', '=', $topic_id)
+    //   ->where('topicable_id', '=', $topicable_id)
+    //   ->where('topicable_type', '=', $topicable_type)
+    //   ->first();
+    // if ($topicable != null) {
+    //   return $topicable->delete();
+    // } else {
+    //   return false;
+    // }
+
+    //没有id列的表直接返回删除结果
+    $result = self::where('topic_id', '=', $topic_id)
       ->where('topicable_id', '=', $topicable_id)
       ->where('topicable_type', '=', $topicable_type)
-      ->first();
-    if ($topicable != null) {
-      return $topicable->delete();
+      ->delete();
+    //如果删除成功，返回true，否则返回false
+    if ($result > 0) {
+      return true;
     } else {
       return false;
     }
