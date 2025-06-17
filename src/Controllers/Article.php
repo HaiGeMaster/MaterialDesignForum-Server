@@ -276,7 +276,7 @@ class Article extends ArticleModel
           foreach ($old_topics as $old_topic) {
             // return $old_topic->topic_id;
             TopicAbleController::DeleteTopicAble($old_topic->topic_id, $article_id, 'article');
-            TopicController::SubQuestionCount($old_topic->topic_id);
+            TopicController::SubArticleCount($old_topic->topic_id);
           }
         }
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Author HaiGeMaster
  * @package MaterialDesignForum
@@ -33,7 +34,7 @@ class Topic extends Eloquent
     'delete_time',
   ];
   // 搜索字段
-  public static $search_field = ['name','description'];
+  public static $search_field = ['name', 'description'];
   /**
    * 增加文章数量
    * @param int $topic_id 话题ID
@@ -57,12 +58,11 @@ class Topic extends Eloquent
   public static function SubArticleCount($topic_id, $count = 1): bool
   {
     $topic = self::find($topic_id);
-    if ($topic) {
-      $topic->article_count = $topic->article_count - $count;
-      return $topic->save();
-    } else {
-      return false;
+    if ($topic->article_count <= 0) {
+      return true;
     }
+    $topic->article_count -= $count;
+    return $topic->save();
   }
   /**
    * 增加问题数量
@@ -87,12 +87,11 @@ class Topic extends Eloquent
   public static function SubQuestionCount($topic_id, $count = 1): bool
   {
     $topic = self::find($topic_id);
-    if ($topic) {
-      $topic->question_count = $topic->question_count - $count;
-      return $topic->save();
-    } else {
-      return false;
+    if ($topic->question_count <= 0) {
+      return true;
     }
+    $topic->question_count -= $count;
+    return $topic->save();
   }
   /**
    * 增加关注者数量
@@ -103,6 +102,9 @@ class Topic extends Eloquent
   {
     $topic = self::find($topic_id);
     if ($topic) {
+      if ($topic->follower_count <= 0) {
+        $topic->follower_count = 0; // 如果关注者数量小于0，重置为0
+      }
       $topic->follower_count = $topic->follower_count + $count;
       return $topic->save();
     } else {
@@ -117,11 +119,10 @@ class Topic extends Eloquent
   public static function SubFollowerCount($topic_id, $count = 1): bool
   {
     $topic = self::find($topic_id);
-    if ($topic) {
-      $topic->follower_count = $topic->follower_count - $count;
-      return $topic->save();
-    } else {
-      return false;
+    if ($topic->follower_count <= 0) {
+      return true;
     }
+    $topic->follower_count -= $count;
+    return $topic->save();
   }
 }

@@ -55,20 +55,5 @@ try{
   echo '错误行号：' . $e->getLine() . '<br>';
   echo '错误追踪：<br>' . nl2br($e->getTraceAsString()) . '<br>';
   echo '</pre>';
-  echo '<p>请检查您的配置文件和数据库连接设置。</p>';
   echo '</code>';
 }
-
-// echo (
-//   Install::AsInstall()) ?
-//   (
-//     (
-//       Api::IsApi()) ?
-//     Api::HandleAPI() :
-//     Route::HandleRoute()
-//   ) : (
-//     (
-//       Api::IsApi()) ?
-//     Api::HandleInstallAPI() :
-//     Route::HandleInstallRoute()
-//   );
