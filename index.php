@@ -13,6 +13,20 @@ use MaterialDesignForum\Config\Install;
     // return;
 
 try{
+  //将请求地址和请求数据输出到/log/request.log
+  $requestIP = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+  $requestUri = $_SERVER['REQUEST_URI'];
+  $requestMethod = $_SERVER['REQUEST_METHOD'];
+  $requestData = file_get_contents('php://input');
+  $logData = [
+      'ip' => $requestIP,
+      'uri' => $requestUri,
+      'method' => $requestMethod,
+      'data' => $requestData,
+      'timestamp' => date('Y-m-d H:i:s')
+  ];
+  file_put_contents('request.json', json_encode($logData, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) . PHP_EOL, FILE_APPEND);
+  //检查是否为安装模式
   if (Install::AsInstall()) {
     if (Api::IsApi()) {
       header('Content-Type: application/json');

@@ -1,0 +1,41 @@
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- 首页 -->
+  <url>
+    <loc>https://mdf.xbedrock.com/</loc>
+    <lastmod>2025-06-18</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- 话题列表页 -->
+  <url>
+    <loc>https://mdf.xbedrock.com/topics</loc>
+    <lastmod>2025-06-18</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- 问题列表页 -->
+  <url>
+    <loc>https://mdf.xbedrock.com/questions</loc>
+    <lastmod>2025-06-18</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- 文章列表页 -->
+  <url>
+    <loc>https://mdf.xbedrock.com/articles</loc>
+    <lastmod>2025-06-18</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- 用户列表页 -->
+  <url>
+    <loc>https://mdf.xbedrock.com/users</loc>
+    <lastmod>2025-06-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+</urlset>

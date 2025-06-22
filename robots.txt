@@ -1,0 +1,7 @@
+# 允许所有搜索引擎爬虫访问整个网站
+User-agent: *
+Disallow: /admin/
+Disallow: /public/locale/
+
+# 主站点地图位置（必须）
+Sitemap: https://mdf.xbedrock.com/public/sitemaps/sitemap.xml

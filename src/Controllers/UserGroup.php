@@ -302,7 +302,8 @@ class UserGroup extends UserGroupModel
     }
     $data = Share::HandleDataAndPagination(null);
     $is_admin = self::IsAdmin($user_token);
-    if ($is_admin) {
+    $is_admin_login = self::IsAdminLogin($user_token);//允许可登录后台的用户查看
+    if ($is_admin||$is_admin_login) {
       if ($search_keywords != '') {
         // $data = self::where($search_field, 'like', '%' . $search_keywords . '%')
         //   ->where('delete_time', '=', 0)
@@ -356,7 +357,7 @@ class UserGroup extends UserGroupModel
     $is_valid_content = $user_group_data != null && $user_token != '' && $user_group_data != '' && $user_token != '';
     $is_add = false;
     if ($is_valid_content) {
-      if (self::Ability($user_token, 'ability_admin_manage_user_group') || self::IsAdmin($user_token)) {
+      if (self::Ability($user_token, 'ability_admin_manage_user_group') && self::IsAdmin($user_token)) {
         $user_group = new self;
         //使用遍历的方式
         foreach ($user_group_data as $key => $value) {
@@ -396,8 +397,9 @@ class UserGroup extends UserGroupModel
         ->where('delete_time', '=', 0)
         ->first();
       if ($user_group != null) {
-        //使用遍历的方式
-        if (self::Ability($user_token, 'ability_admin_manage_user_group') || self::IsAdmin($user_token)) {
+        //管理用户组能力 self::Ability($user_token, 'ability_admin_manage_user_group')
+        //使用遍历的方式//仅允许真正的管理员修改用户组
+        if (self::Ability($user_token, 'ability_admin_manage_user_group')&&self::IsAdmin($user_token)) {
           foreach ($user_group_data as $key => $value) {
             //如果$user_group->$key的值是整数且$value的值是布尔值，那么$value的值就是0或1，所以要转换成整数
             // if (is_int($user_group->$key) && (is_bool($value) || ($value == 'true') || ($value == 'false'))) {
@@ -430,7 +432,7 @@ class UserGroup extends UserGroupModel
     $is_delete = false;
     $user_groups = [];
     if ($is_valid_content) {
-      if (self::Ability($user_token, 'ability_admin_manage_user_group') || self::IsAdmin($user_token)) {
+      if (self::Ability($user_token, 'ability_admin_manage_user_group') && self::IsAdmin($user_token)) {
         $is_delete = self::whereIn('user_group_id', $user_group_ids)
           ->where('delete_time', '=', 0)
           ->update([
