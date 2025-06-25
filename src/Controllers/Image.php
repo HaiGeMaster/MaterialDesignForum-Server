@@ -11,7 +11,7 @@
 namespace MaterialDesignForum\Controllers;
 
 use Md\MDAvatars;
-use Intervention\Image\ImageManager;
+// use Intervention\Image\ImageManager;
 use MaterialDesignForum\Models\Image as ImageModel;
 use MaterialDesignForum\Plugins\Share;
 
@@ -88,86 +88,25 @@ class Image extends ImageModel
     ],
   ];
   /**
-   * 保存图片
+   * 旧版本-保存图片
    * @param string $type 图片类型 user_avatar、user_cover、topic_cover、other、question、article、answer
    * @param string $base64data base64 图片数据
    * @param string $user_id 用户id
    * @return array 图片路径 [original,small,middle,large] || other、question、article、answer：[original]
    */
-  // public static function SaveUploadImage(string $type, string $base64Data, string $user_id)
-  // {
-  //   ini_set('memory_limit', '300M');
-
-  //   //检查base64图片类型然后将其保存到变量
-  //   $base64Type = '';
-  //   if (strpos($base64Data, 'data:image/png;base64,') === 0) {
-  //     $base64Type = 'png';
-  //     $base64Data = str_replace('data:image/png;base64,', '', $base64Data);
-  //   } elseif (strpos($base64Data, 'data:image/jpeg;base64,') === 0) {
-  //     $base64Type = 'jpeg';
-  //     $base64Data = str_replace('data:image/jpeg;base64,', '', $base64Data);
-  //   } elseif (strpos($base64Data, 'data:image/jpg;base64,') === 0) {
-  //     $base64Type = 'jpg';
-  //     $base64Data = str_replace('data:image/jpg;base64,', '', $base64Data);
-  //   } elseif (strpos($base64Data, 'data:image/gif;base64,') === 0) {
-  //     $base64Type = 'gif';
-  //     $base64Data = str_replace('data:image/gif;base64,', '', $base64Data);
-  //   } else {
-  //     return false; // 无效的 Base64 数据
-  //   }
-
-  //   // 解码 Base64 数据
-  //   $imageData = base64_decode($base64Data);
-
-  //   $manager = new ImageManager(
-  //     new \Intervention\Image\Drivers\Gd\Driver()
-  //   );
-
-  //   // 'sizeArray' => [
-  //   //   'original' => [512, 512],
-  //   //   'small' => [64, 64],
-  //   //   'middle' => [128, 128],
-  //   //   'large' => [256, 256],
-  //   // ],
-
-  //   // 检查路径和尺寸数据是否存在
-  //   if (isset(self::$pathData[$type])) {
-  //     $path = self::$pathData[$type]['path'] . $user_id;
-  //     $sizeArray = self::$pathData[$type]['sizeArray'];
-  //   } else {
-  //     return false; // 无效的类型
-  //   }
-  //   // 检查并创建保存路径
-  //   if (!is_dir($path)) {
-  //     mkdir($path, 0777, true);
-  //   }
-  //   // 生成唯一的图片文件名
-  //   $file_name = md5(microtime(true));
-  //   // 初始化返回的数据
-  //   $avatarData = [
-  //     'original' => '',
-  //     'small' => '',
-  //     'middle' => '',
-  //     'large' => '',
-  //   ];
-    
-  //   $image = $manager->read(
-  //     $imageData,
-  //     [
-  //       'format' => $base64Type,
-  //       'driver' => 'gd',
-  //     ]
-  //   );
-
-  // }
-
-
-
-
   // public static function SaveUploadImage($type, $base64data, $user_id = 'cache')
   // {
   //   $path = '';
   //   $sizeArray = null;
+
+
+  //   // 'path' => 'public/static/upload/xxx'
+  //   // 'sizeArray' => [
+  //   //   'original' => null,
+  //   //   'small' => [360, 202],
+  //   //   'middle' => [720, 404],
+  //   //   'large' => [1080, 606],
+  //   // ],
 
   //   // 检查路径和尺寸数据是否存在
   //   if (isset(self::$pathData[$type])) {
@@ -178,15 +117,7 @@ class Image extends ImageModel
   //   }
 
   //   // 获取并解码图片的base64数据
-  //   preg_match('/data:image\/(.*?);base64,/', $base64data, $matches);
-  //   $imageType = isset($matches[1]) ? $matches[1] : null;
-
-  //   if (!$imageType) {
-  //     return false; // 无法识别图片类型
-  //   }
-
-  //   // 清理base64数据
-  //   $img = str_replace('data:image/' . $imageType . ';base64,', '', $base64data);
+  //   $img = str_replace('data:image/png;base64,', '', $base64data);
   //   $img = str_replace(' ', '+', $img);
   //   $data = base64_decode($img);
 
@@ -210,24 +141,8 @@ class Image extends ImageModel
   //     mkdir($path, 0777, true);
   //   }
 
-  //   // 根据图片类型选择适当的处理方法
-  //   switch ($imageType) {
-  //     case 'png':
-  //       $locale_img = $path . '/' . $file_name . '.png';
-  //       $image = imagecreatefrompng($data);
-  //       break;
-  //     case 'jpeg':
-  //     case 'jpg':
-  //       $locale_img = $path . '/' . $file_name . '.jpg';
-  //       $image = imagecreatefromjpeg($data);
-  //       break;
-  //     case 'gif':
-  //       $locale_img = $path . '/' . $file_name . '.gif';
-  //       $image = imagecreatefromgif($data);
-  //       break;
-  //     default:
-  //       return false; // 不支持的图片类型
-  //   }
+  //   // 本地存储图片路径
+  //   $locale_img = $path . '/' . $file_name . '.png';
 
   //   // 写入原始图片
   //   $r = file_put_contents($locale_img, $data);
@@ -239,27 +154,22 @@ class Image extends ImageModel
   //     foreach ($sizeArray as $key => $size) {
   //       error_reporting(E_ALL & ~E_WARNING);
   //       ini_set('memory_limit', '256M');
+  //       // 读取图片并生成不同大小的图片
+  //       $image = imagecreatefrompng($locale_img);
 
-  //       // 如果没有指定大小，直接保存原图
+  //       if (!$image) {
+  //         continue; // 如果读取失败，跳过
+  //       }
+
   //       if ($size == null) {
+  //         // 如果没有指定大小，直接保存原图
   //         $paths = $path . '/' . $key;
   //         if (!is_dir($paths)) {
   //           mkdir($paths, 0777, true);
   //         }
-  //         $output_img = $paths . '/' . $file_name . '.' . $imageType;
-  //         switch ($imageType) {
-  //           case 'png':
-  //             imagepng($image, $output_img);
-  //             break;
-  //           case 'jpeg':
-  //           case 'jpg':
-  //             imagejpeg($image, $output_img);
-  //             break;
-  //           case 'gif':
-  //             imagegif($image, $output_img);
-  //             break;
-  //         }
-  //         $AvatarData[$key] = '/' . $output_img;
+  //         $png = $paths . '/' . $file_name . '.png';
+  //         imagepng($image, $png);
+  //         $AvatarData[$key] = '/' . $png;
   //       } else {
   //         // 如果指定了大小，创建新的图像并调整大小
   //         $new_image = imagecreatetruecolor($size[0], $size[1]);
@@ -279,20 +189,9 @@ class Image extends ImageModel
   //           mkdir($paths, 0777, true);
   //         }
 
-  //         $output_img = $paths . '/' . $file_name . '.' . $imageType;
-  //         switch ($imageType) {
-  //           case 'png':
-  //             imagepng($new_image, $output_img);
-  //             break;
-  //           case 'jpeg':
-  //           case 'jpg':
-  //             imagejpeg($new_image, $output_img);
-  //             break;
-  //           case 'gif':
-  //             imagegif($new_image, $output_img);
-  //             break;
-  //         }
-  //         $AvatarData[$key] = '/' . $output_img;
+  //         $png = $paths . '/' . $file_name . '.png';
+  //         imagepng($new_image, $png);
+  //         $AvatarData[$key] = '/' . $png;
 
   //         // 释放内存
   //         imagedestroy($new_image);
@@ -312,11 +211,198 @@ class Image extends ImageModel
 
   //   return $AvatarData;
   // }
+  // /**
+  //  * 保存图片
+  //  * @param string $type 图片类型 user_avatar、user_cover、topic_cover、other、question、article、answer
+  //  * @param string $base64data base64 图片数据
+  //  * @param string $user_id 用户id
+  //  * @return array 图片路径 [original,small,middle,large] || other、question、article、answer：[original]
+  //  */
+  // public static function SaveUploadImage($type, $base64data, $user_id = 'cache')
+  // {
+  //   $path = '';
+  //   $sizeArray = null;
 
+  //   // 检查路径和尺寸数据是否存在
+  //   if (isset(self::$pathData[$type])) {
+  //     $path = self::$pathData[$type]['path'] . $user_id;
+  //     $sizeArray = self::$pathData[$type]['sizeArray'];
+  //   } else {
+  //     return false;
+  //   }
 
+  //   // 获取并解码图片的base64数据
+  //   $img = str_replace('data:image/png;base64,', '', $base64data);
+  //   $img = str_replace('data:image/jpeg;base64,', '', $img);
+  //   $img = str_replace('data:image/jpg;base64,', '', $img);
+  //   $img = str_replace(' ', '+', $img);
+  //   $data = base64_decode($img);
 
+  //   if (!$data) {
+  //     return false; // 如果Base64解码失败
+  //   }
 
+  //   // 生成唯一的图片文件名
+  //   $file_name = md5(microtime(true));
 
+  //   // 初始化返回的数据
+  //   $AvatarData = [
+  //     'original' => '',
+  //     'small' => '',
+  //     'middle' => '',
+  //     'large' => '',
+  //   ];
+
+  //   // 检查并创建保存路径
+  //   if (!is_dir($path)) {
+  //     mkdir($path, 0777, true);
+  //   }
+
+  //   // 检测图片类型
+  //   $imageInfo = getimagesizefromstring($data);
+  //   if ($imageInfo === false) {
+  //     return false; // 不是有效的图片数据
+  //   }
+
+  //   $mime = $imageInfo['mime'];
+  //   $extension = '';
+
+  //   switch ($mime) {
+  //     case 'image/jpeg':
+  //     case 'image/jpg':
+  //       $extension = 'jpg';
+  //       break;
+  //     case 'image/png':
+  //       $extension = 'png';
+  //       break;
+  //     default:
+  //       return false; // 不支持的图片格式
+  //   }
+
+  //   // 本地存储图片路径
+  //   $locale_img = $path . '/' . $file_name . '.' . $extension;
+
+  //   // 写入原始图片
+  //   $r = file_put_contents($locale_img, $data);
+  //   if (!$r) {
+  //     return false; // 如果写入失败
+  //   }
+
+  //   try {
+  //     foreach ($sizeArray as $key => $size) {
+  //       error_reporting(E_ALL & ~E_WARNING);
+  //       ini_set('memory_limit', '256M');
+  //       // 根据图片类型选择不同的读取函数
+  //       $image = null;
+  //       switch ($mime) {
+  //         case 'image/jpeg':
+  //         case 'image/jpg':
+  //           $image = imagecreatefromjpeg($locale_img);
+  //           break;
+  //         case 'image/png':
+  //           $image = imagecreatefrompng($locale_img);
+  //           // 启用 alpha 通道（透明度）
+  //           imagealphablending($image, false); // 关闭混合模式
+  //           imagesavealpha($image, true);      // 保存 alpha 通道
+  //           break;
+  //       }
+
+  //       if (!$image) {
+  //         continue; // 如果读取失败，跳过
+  //       }
+
+  //       if ($size == null) {
+  //         // 如果没有指定大小，直接保存原图
+  //         $paths = $path . '/' . $key;
+  //         if (!is_dir($paths)) {
+  //           mkdir($paths, 0777, true);
+  //         }
+  //         $save_img = $paths . '/' . $file_name . '.' . $extension;
+  //         switch ($mime) {
+  //           case 'image/jpeg':
+  //           case 'image/jpg':
+  //             imagejpeg($image, $save_img);
+  //             break;
+  //           case 'image/png':
+  //             // 保存 PNG 时确保 alpha 通道不丢失
+  //             imagepng($image, $save_img);
+  //             break;
+  //         }
+  //         $AvatarData[$key] = '/' . $save_img;
+  //       } else {
+  //         // 如果指定了大小，创建新的图像并调整大小
+  //         $new_image = imagecreatetruecolor($size[0], $size[1]);
+
+  //         if ($mime == 'image/png') {
+  //           // 对于 PNG 图片，启用 alpha 通道
+  //           imagealphablending($new_image, false); // 关闭混合模式
+  //           imagesavealpha($new_image, true);      // 保存 alpha 通道
+  //           $transparent = imagecolorallocatealpha($new_image, 0, 0, 0, 127);
+  //           imagefill($new_image, 0, 0, $transparent);
+  //         } else {
+  //           // 对于 JPEG 图片，填充白色背景（因为 JPEG 不支持透明）
+  //           $white = imagecolorallocate($new_image, 255, 255, 255);
+  //           imagefill($new_image, 0, 0, $white);
+  //         }
+
+  //         $source_width = imagesx($image);
+  //         $source_height = imagesy($image);
+  //         // 修正了图像缩放计算（原代码有误）
+  //         imagecopyresampled(
+  //           $new_image,
+  //           $image,
+  //           0,
+  //           0,
+  //           0,
+  //           0,
+  //           $size[0],
+  //           $size[1],
+  //           $source_width,
+  //           $source_height
+  //         );
+
+  //         $paths = $path . '/' . $key;
+  //         if (!is_dir($paths)) {
+  //           mkdir($paths, 0777, true);
+  //         }
+
+  //         $save_img = $paths . '/' . $file_name . '.' . $extension;
+  //         switch ($mime) {
+  //           case 'image/jpeg':
+  //           case 'image/jpg':
+  //             imagejpeg($new_image, $save_img);
+  //             break;
+  //           case 'image/png':
+  //             imagepng($new_image, $save_img);
+  //             break;
+  //         }
+  //         $AvatarData[$key] = '/' . $save_img;
+
+  //         // 释放内存
+  //         imagedestroy($new_image);
+  //       }
+
+  //       // 释放内存
+  //       imagedestroy($image);
+  //     }
+  //   } catch (\Exception $e) {
+  //     // 捕获异常并记录错误
+  //     error_log($e->getMessage());
+  //     return false;
+  //   }
+
+  //   // 删除临时文件
+  //   unlink($locale_img);
+
+  //   return $AvatarData;
+  // }
+  /**
+   * 保存图片
+   * @param string $type 图片类型 user_avatar、user_cover、topic_cover、other、question、article、answer
+   * @param string $base64data base64 图片数据
+   * @param string $user_id 用户id
+   * @return array 图片路径 [original,small,middle,large] || other、question、article、answer：[original]
+   */
   public static function SaveUploadImage($type, $base64data, $user_id = 'cache')
   {
     $path = '';
@@ -332,6 +418,9 @@ class Image extends ImageModel
 
     // 获取并解码图片的base64数据
     $img = str_replace('data:image/png;base64,', '', $base64data);
+    $img = str_replace('data:image/jpeg;base64,', '', $img);
+    $img = str_replace('data:image/jpg;base64,', '', $img);
+    $img = str_replace('data:image/gif;base64,', '', $img); // 添加GIF的base64前缀处理
     $img = str_replace(' ', '+', $img);
     $data = base64_decode($img);
 
@@ -355,8 +444,32 @@ class Image extends ImageModel
       mkdir($path, 0777, true);
     }
 
+    // 检测图片类型
+    $imageInfo = getimagesizefromstring($data);
+    if ($imageInfo === false) {
+      return false; // 不是有效的图片数据
+    }
+
+    $mime = $imageInfo['mime'];
+    $extension = '';
+
+    switch ($mime) {
+      case 'image/jpeg':
+      case 'image/jpg':
+        $extension = 'jpg';
+        break;
+      case 'image/png':
+        $extension = 'png';
+        break;
+      case 'image/gif':
+        $extension = 'gif';
+        break;
+      default:
+        return false; // 不支持的图片格式
+    }
+
     // 本地存储图片路径
-    $locale_img = $path . '/' . $file_name . '.png';
+    $locale_img = $path . '/' . $file_name . '.' . $extension;
 
     // 写入原始图片
     $r = file_put_contents($locale_img, $data);
@@ -368,8 +481,29 @@ class Image extends ImageModel
       foreach ($sizeArray as $key => $size) {
         error_reporting(E_ALL & ~E_WARNING);
         ini_set('memory_limit', '256M');
-        // 读取图片并生成不同大小的图片
-        $image = imagecreatefrompng($locale_img);
+        // 根据图片类型选择不同的读取函数
+        $image = null;
+        switch ($mime) {
+          case 'image/jpeg':
+          case 'image/jpg':
+            $image = imagecreatefromjpeg($locale_img);
+            break;
+          case 'image/png':
+            $image = imagecreatefrompng($locale_img);
+            // 启用 alpha 通道（透明度）
+            imagealphablending($image, false); // 关闭混合模式
+            imagesavealpha($image, true);      // 保存 alpha 通道
+            break;
+          case 'image/gif':
+            $image = imagecreatefromgif($locale_img);
+            // GIF可能包含透明通道，需要保留
+            if ($image && imagecolortransparent($image) != -1) {
+              // 如果有透明色，保留透明通道
+              imagealphablending($image, false);
+              imagesavealpha($image, true);
+            }
+            break;
+        }
 
         if (!$image) {
           continue; // 如果读取失败，跳过
@@ -381,31 +515,72 @@ class Image extends ImageModel
           if (!is_dir($paths)) {
             mkdir($paths, 0777, true);
           }
-          $png = $paths . '/' . $file_name . '.png';
-          imagepng($image, $png);
-          $AvatarData[$key] = '/' . $png;
+          $save_img = $paths . '/' . $file_name . '.' . $extension;
+          switch ($mime) {
+            case 'image/jpeg':
+            case 'image/jpg':
+              imagejpeg($image, $save_img);
+              break;
+            case 'image/png':
+              // 保存 PNG 时确保 alpha 通道不丢失
+              imagepng($image, $save_img);
+              break;
+            case 'image/gif':
+              imagegif($image, $save_img);
+              break;
+          }
+          $AvatarData[$key] = '/' . $save_img;
         } else {
           // 如果指定了大小，创建新的图像并调整大小
           $new_image = imagecreatetruecolor($size[0], $size[1]);
 
-          // 保证透明背景
-          imagealphablending($new_image, false);
-          imagesavealpha($new_image, true);
-          $transparent = imagecolorallocatealpha($new_image, 0, 0, 0, 127);
-          imagefill($new_image, 0, 0, $transparent);
+          if ($mime == 'image/png' || $mime == 'image/gif') {
+            // 对于 PNG 和 GIF 图片，启用 alpha 通道
+            imagealphablending($new_image, false); // 关闭混合模式
+            imagesavealpha($new_image, true);      // 保存 alpha 通道
+            $transparent = imagecolorallocatealpha($new_image, 0, 0, 0, 127);
+            imagefill($new_image, 0, 0, $transparent);
+          } else {
+            // 对于 JPEG 图片，填充白色背景（因为 JPEG 不支持透明）
+            $white = imagecolorallocate($new_image, 255, 255, 255);
+            imagefill($new_image, 0, 0, $white);
+          }
 
           $source_width = imagesx($image);
           $source_height = imagesy($image);
-          imagecopyresampled($new_image, $image, 0, 0, 0, 0, $size[0], $size[1], $source_width - 4, $source_height);
+          // 修正了图像缩放计算（原代码有误）
+          imagecopyresampled(
+            $new_image,
+            $image,
+            0,
+            0,
+            0,
+            0,
+            $size[0],
+            $size[1],
+            $source_width,
+            $source_height
+          );
 
           $paths = $path . '/' . $key;
           if (!is_dir($paths)) {
             mkdir($paths, 0777, true);
           }
 
-          $png = $paths . '/' . $file_name . '.png';
-          imagepng($new_image, $png);
-          $AvatarData[$key] = '/' . $png;
+          $save_img = $paths . '/' . $file_name . '.' . $extension;
+          switch ($mime) {
+            case 'image/jpeg':
+            case 'image/jpg':
+              imagejpeg($new_image, $save_img);
+              break;
+            case 'image/png':
+              imagepng($new_image, $save_img);
+              break;
+            case 'image/gif':
+              imagegif($new_image, $save_img);
+              break;
+          }
+          $AvatarData[$key] = '/' . $save_img;
 
           // 释放内存
           imagedestroy($new_image);
@@ -425,276 +600,6 @@ class Image extends ImageModel
 
     return $AvatarData;
   }
-
-
-
-
-  // public static function SaveUploadImage($type, $base64data, $user_id = 'cache')
-  // {
-  //   $path = '';
-  //   $sizeArray = null;
-
-  //   if (isset(self::$pathData[$type])) {
-  //     $path = self::$pathData[$type]['path'] . $user_id;
-  //     $sizeArray = self::$pathData[$type]['sizeArray'];
-  //   } else {
-  //     return false;
-  //   }
-
-  //   $img = $base64data; // 获取base64
-  //   $img = str_replace('data:image/png;base64,', '', $img); //获取base64中图片数据
-  //   $img = str_replace(' ', '+', $img);
-  //   $data = base64_decode($img);
-
-  //   $file_name = md5(microtime(true)); // 图片名称
-
-  //   $AvatarData = [
-  //     'original' => '',
-  //     'small' => '',
-  //     'middle' => '',
-  //     'large' => '',
-  //   ];
-  //   if (!file_exists($path)) {
-  //     mkdir($path, 0777, true);
-  //   }
-
-  //   $locale_img = $path . '/' . $file_name . '.png';
-
-  //   $r = file_put_contents($locale_img, $data); // 先写出图片
-  //   // 也可以使用 -1 来达到相同的效果 不显示任何错误
-  //   // error_reporting(-1);
-
-  //   try{
-
-  //     if ($r) {
-  //       // foreach ($sizeArray as $key => $size) {
-  //       //   //读取图片，并生成不同分辨率的图片，不使用MDAvatars
-  //       //   // 屏蔽警告
-  //       //   error_reporting(E_ERROR | E_PARSE);
-  //       //   $image = imagecreatefrompng($locale_img);
-  //       //   // 恢复默认错误报告级别
-  //       //   error_reporting(E_ALL);
-  //       //   if ($size == null) {
-  //       //     //直接保存
-  //       //     $paths = $path . '/' . $key;
-  //       //     if (!file_exists($paths)) {
-  //       //       mkdir($paths, 0777, true);
-  //       //     }
-  //       //     $png = $path . '/' . $key . '/' . $file_name . '.png'; //public/static/upload/user/avatars/user_id/key/xxx.png
-  //       //     imagepng($image, $png);
-  //       //     //$AvatarData[$key] = $png;
-  //       //     $AvatarData[$key] = '/' . $png;
-  //       //   } else {
-  //       //     $new_image = imagecreatetruecolor($size[0], $size[1]);
-  //       //     $source_width = imagesx($image); // 获取原始图像的宽度
-  //       //     $source_height = imagesy($image); // 获取原始图像的高度
-  //       //     imagecopyresampled($new_image, $image, 0, 0, 0, 0, $size[0], $size[1], $source_width, $source_height);
-  //       //     $paths = $path . '/' . $key;
-  //       //     if (!file_exists($paths)) {
-  //       //       mkdir($paths, 0777, true);
-  //       //     }
-  //       //     $png = $path . '/' . $key . '/' . $file_name . '.png'; //public/static/upload/user/avatars/user_id/key/xxx.png
-  //       //     imagepng($new_image, $png);
-  //       //     //$AvatarData[$key] = $png;
-  //       //     $AvatarData[$key] = '/' . $png;
-  //       //   }
-  //       //   if($type=='question'||$type=='article'||$type=='answer'){
-
-  //       //   }
-  //       // }
-  //       foreach ($sizeArray as $key => $size) {
-  //         // 读取图片，并生成不同分辨率的图片，不使用MDAvatars
-  //         // 屏蔽警告
-  //         error_reporting(E_ERROR | E_PARSE);
-  //         $image = imagecreatefrompng($locale_img);
-  //         // 恢复默认错误报告级别
-  //         error_reporting(E_ALL);
-
-  //         if ($size == null) {
-  //             // 直接保存
-  //             $paths = $path . '/' . $key;
-  //             if (!file_exists($paths)) {
-  //                 mkdir($paths, 0777, true);
-  //             }
-  //             $png = $path . '/' . $key . '/' . $file_name . '.png'; // public/static/upload/user/avatars/user_id/key/xxx.png
-  //             imagepng($image, $png);
-  //             $AvatarData[$key] = '/' . $png;
-  //         } else {
-  //             $new_image = imagecreatetruecolor($size[0], $size[1]);//创建一个真彩色图像
-
-  //             // 确保新图像的背景透明
-  //             imagealphablending($new_image, false);//关闭混色模式
-  //             imagesavealpha($new_image, true);//设置保存PNG时保留透明通道信息
-  //             $transparent = imagecolorallocatealpha($new_image, 0, 0, 0, 127);//为一幅图像分配颜色
-  //             imagefill($new_image, 0, 0, $transparent);//填充
-
-  //             $source_width = imagesx($image); // 获取原始图像的宽度
-  //             $source_height = imagesy($image); // 获取原始图像的高度
-  //             imagecopyresampled($new_image, $image, 0, 0, 0, 0, $size[0], $size[1], $source_width-4, $source_height);//重采样拷贝部分图像并调整大小
-
-  //             //如果原始大小和目标大小一样，那么直接拷贝
-  //             // if($source_width==$size[0]&&$source_height==$size[1]){
-  //             //   imagecopy($new_image, $image, 0, 0, 0, 0, $size[0], $size[1]);
-  //             // }else{
-  //             //   imagecopyresampled($new_image, $image, 0, 0, 0, 0, $size[0], $size[1], $source_width-2, $source_height-2);//重采样拷贝部分图像并调整大小
-  //             // }
-
-  //             // //检查是否存在透明色
-  //             // $color = imagecolorat($new_image, 0, 0);
-  //             // $colors = imagecolorsforindex($new_image, $color);
-  //             // if ($colors['alpha'] == 127) {
-  //             //     //如果存在透明色，那么将透明色设置为白色
-  //             //     $white = imagecolorallocate($new_image, 255, 255, 255);
-  //             //     imagecolortransparent($new_image, $white);
-  //             // }
-
-  //             $paths = $path . '/' . $key;
-  //             if (!file_exists($paths)) {
-  //                 mkdir($paths, 0777, true);
-  //             }
-  //             $png = $path . '/' . $key . '/' . $file_name . '.png'; // public/static/upload/user/avatars/user_id/key/xxx.png
-  //             imagepng($new_image, $png);
-  //             $AvatarData[$key] = '/' . $png;
-
-  //             // 释放内存
-  //             imagedestroy($new_image);
-  //         }
-  //         // 释放内存
-  //         imagedestroy($image);
-  //       }
-  //     }
-  //   }catch(\Exception $e){
-  //     //删除$locale_img
-  //     // unlink($locale_img);
-  //     // return false;
-
-  //     //不显示错误
-  //     // return false;
-  //       // 也可以使用 -1 来达到相同的效果 不显示任何错误
-  //     // error_reporting(-1);
-  //   }
-
-  //   //删除$locale_img
-  //   unlink($locale_img);
-
-  //   return $AvatarData;
-  // }
-  // public static function SaveUploadImage($type, $base64data, $user_id = 'cache')
-  // {
-  //   $path = '';
-  //   $sizeArray = null;
-
-  //   if (isset(self::$pathData[$type])) {
-  //     $path = self::$pathData[$type]['path'] . $user_id;
-  //     $sizeArray = self::$pathData[$type]['sizeArray'];
-  //   } else {
-  //     return false;
-  //   }
-
-  //   // Determine image format from base64 data
-  //   $img_data = explode(',', $base64data);
-  //   $img_header = $img_data[0]; // Example: data:image/png;base64
-  //   $img_format = strtolower(str_replace('data:image/', '', $img_header)); // Extract image format
-
-  //   // Validate image format (for security)
-  //   $allowed_formats = ['png', 'jpeg', 'jpg', 'gif'];
-  //   if (!in_array($img_format, $allowed_formats)) {
-  //     return false; // Invalid format
-  //   }
-
-  //   // Extract base64 image data
-  //   $img_data = base64_decode($img_data[1]);
-
-  //   $file_name = md5(microtime(true)) . '.' . $img_format; // Generate unique filename with correct extension
-
-  //   $AvatarData = [
-  //     'original' => '',
-  //     'small' => '',
-  //     'middle' => '',
-  //     'large' => '',
-  //   ];
-
-  //   if (!file_exists($path)) {
-  //     mkdir($path, 0777, true);
-  //   }
-
-  //   $locale_img = $path . '/' . $file_name;
-
-  //   $r = file_put_contents($locale_img, $img_data); // Write image data to file
-
-  //   try {
-  //     if ($r) {
-  //       // 屏蔽警告
-  //       error_reporting(E_ERROR | E_PARSE);
-  //       foreach ($sizeArray as $key => $size) {
-  //         // Initialize image resource based on format
-  //         switch ($img_format) {
-  //           case 'png':
-  //             $image = imagecreatefrompng($locale_img);
-  //             break;
-  //           case 'jpeg':
-  //           case 'jpg':
-  //             $image = imagecreatefromjpeg($locale_img);
-  //             break;
-  //           case 'gif':
-  //             $image = imagecreatefromgif($locale_img);
-  //             break;
-  //           default:
-  //             continue 2; // Invalid format, skip processing
-  //         }
-
-  //         if ($size == null) {
-  //           // Directly save original size
-  //           $paths = $path . '/' . $key;
-  //           if (!file_exists($paths)) {
-  //             mkdir($paths, 0777, true);
-  //           }
-  //           $img_path = $paths . '/' . $file_name;
-  //           imagepng($image, $img_path); // Save image
-  //           $AvatarData[$key] = '/' . $img_path; // Store path
-  //         } else {
-  //           // Resize image
-  //           $new_image = imagecreatetruecolor($size[0], $size[1]);
-  //           $source_width = imagesx($image);
-  //           $source_height = imagesy($image);
-  //           imagecopyresampled($new_image, $image, 0, 0, 0, 0, $size[0], $size[1], $source_width, $source_height);
-
-  //           $paths = $path . '/' . $key;
-  //           if (!file_exists($paths)) {
-  //             mkdir($paths, 0777, true);
-  //           }
-  //           $img_path = $paths . '/' . $file_name;
-  //           switch ($img_format) {
-  //             case 'png':
-  //               imagepng($new_image, $img_path);
-  //               break;
-  //             case 'jpeg':
-  //             case 'jpg':
-  //               imagejpeg($new_image, $img_path);
-  //               break;
-  //             case 'gif':
-  //               imagegif($new_image, $img_path);
-  //               break;
-  //           }
-  //           $AvatarData[$key] = '/' . $img_path; // Store path
-  //         }
-  //       }
-  //       // 恢复默认错误报告级别
-  //       error_reporting(E_ALL);
-  //     }
-  //   } catch (\Exception $e) {
-  //     // Handle exceptions here
-  //     // Example: Log error, delete temporary files, return false
-  //     // unlink($locale_img);
-  //     // return false;
-  //   }
-
-  //   // Delete temporary uploaded image
-  //   unlink($locale_img);
-
-  //   return $AvatarData;
-  // }
-
   /**
    * 创建用户默认头像
    * @param string $name 用户名
