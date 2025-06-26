@@ -83,7 +83,8 @@ class Report extends ReportModel
     if($search_field == []){
       $search_field = self::$search_field;
     }
-    if (!UserGroupController::IsAdmin($user_token)) {
+    if (!UserGroupController::IsAdminLogin($user_token)&&!UserGroupController::Ability($user_token,'ability_admin_manage_report')
+    ) {
       return Share::HandleDataAndPagination(null);
     }
     // where('report_handle_state', '=', 0)

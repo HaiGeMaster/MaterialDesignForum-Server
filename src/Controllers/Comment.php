@@ -304,7 +304,8 @@ class Comment extends CommentModel
           UserGroupController::BeforeTime($user_token, 'time_before_edit_comment', $comment->create_time)
         )
         ||
-        UserGroupController::IsAdmin($user_token)
+        (UserGroupController::IsAdmin($user_token)&&UserGroupController::Ability($user_token,'ability_admin_manage_comment'))
+         // UserGroupController::IsAdmin($user_token)
       ) {
         $comment->content = $content;
         $comment->update_time = Share::ServerTime();
@@ -351,7 +352,8 @@ class Comment extends CommentModel
             UserGroupController::BeforeTime($user_token, 'time_before_delete_comment', $comment->create_time)
           )
           ||
-          UserGroupController::IsAdmin($user_token)
+          (UserGroupController::IsAdmin($user_token)&&UserGroupController::Ability($user_token,'ability_admin_manage_comment'))
+           // UserGroupController::IsAdmin($user_token)
         ) {
           $comment->delete_time = Share::ServerTime();
           UserController::SubCommentCount($comment->user_id);

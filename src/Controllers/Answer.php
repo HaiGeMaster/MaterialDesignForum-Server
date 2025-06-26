@@ -219,7 +219,8 @@ class Answer extends AnswerModel
           UserGroupController::BeforeTime($user_token, 'time_before_edit_answer', $answer->create_time)
         )
         ||
-        UserGroupController::IsAdmin($user_token)
+        (UserGroupController::IsAdmin($user_token)&&UserGroupController::Ability($user_token,'ability_admin_manage_answer'))
+         // UserGroupController::IsAdmin($user_token)
       ) {
         $content_markdown = preg_replace('/\s+/', '', $content_markdown);//去除回车和空格
         
@@ -267,7 +268,8 @@ class Answer extends AnswerModel
             UserGroupController::BeforeTime($user_token, 'time_before_delete_answer', $answer->create_time)
           )
           ||
-          UserGroupController::IsAdmin($user_token)
+          (UserGroupController::IsAdmin($user_token)&&UserGroupController::Ability($user_token,'ability_admin_manage_answer'))
+           // UserGroupController::IsAdmin($user_token)
         ) {
           $answer->delete_time = Share::ServerTime();
           UserController::SubAnswerCount($answer->user_id);

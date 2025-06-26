@@ -242,7 +242,8 @@ class Topic extends TopicModel
           UserGroupController::BeforeTime($user_token, 'time_before_edit_topic', $topic->create_time)
         )
         ||
-        UserGroupController::IsAdmin($user_token)
+        (UserGroupController::IsAdmin($user_token)&&UserGroupController::Ability($user_token,'ability_admin_manage_topic'))
+         // UserGroupController::IsAdmin($user_token)
       ) {
         $topic->name = $name;
         if ($cover != '') {
@@ -295,7 +296,8 @@ class Topic extends TopicModel
             UserGroupController::BeforeTime($user_token, 'time_before_delete_topic', $topic->create_time)
           )
           ||
-          UserGroupController::IsAdmin($user_token)
+          (UserGroupController::IsAdmin($user_token)&&UserGroupController::Ability($user_token,'ability_admin_manage_topic'))
+           // UserGroupController::IsAdmin($user_token)
         ) {
           
           //删除话题关系 暂时进行伪删除

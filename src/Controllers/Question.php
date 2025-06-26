@@ -266,7 +266,8 @@ class Question extends QuestionModel
           UserGroupController::BeforeTime($user_token, 'time_before_edit_question', $question->create_time)
         )
         ||
-        UserGroupController::IsAdmin($user_token)
+        (UserGroupController::IsAdmin($user_token)&&UserGroupController::Ability($user_token,'ability_admin_manage_question'))
+         // UserGroupController::IsAdmin($user_token)
       ) {
         $content_markdown = preg_replace('/\s+/', '', $content_markdown);//去除回车和空格
         
@@ -335,7 +336,8 @@ class Question extends QuestionModel
             UserGroupController::BeforeTime($user_token, 'time_before_delete_question', $question->create_time)
           )
           ||
-          UserGroupController::IsAdmin($user_token)
+          (UserGroupController::IsAdmin($user_token)&&UserGroupController::Ability($user_token,'ability_admin_manage_question'))
+           // UserGroupController::IsAdmin($user_token)
         ) {
           $question->delete_time = Share::ServerTime();
           UserController::SubQuestionCount($question->user_id);

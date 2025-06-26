@@ -119,8 +119,10 @@ class User extends UserModel
     try {
       if ($user_data != null) {
         if (
-          $user_data->user_id == $user_id &&
-          UserGroupController::Ability($user_token, 'ability_edit_own_info') || UserGroupController::IsAdmin($user_token)
+          ($user_data->user_id == $user_id &&
+          UserGroupController::Ability($user_token, 'ability_edit_own_info')) || 
+          (UserGroupController::IsAdmin($user_token)&&UserGroupController::Ability($user_token,'ability_admin_manage_user'))
+           // UserGroupController::IsAdmin($user_token)
         ) {
           $user_data->username = $username;
           $user_data->email = $email;
@@ -969,7 +971,7 @@ class User extends UserModel
       $upload_url = ImageController::SaveUploadImage($type, $file, $user_id);
       //上传成功,保存一份记录到数据库
       if ($upload_url != null) {
-        ImageController::AddImageRecord($type, 0, $user_id, $upload_url['original']);
+        ImageController::AddImageRecord($type, 0, $user_id, $upload_url['original'],0,0);
       }
       $is_upload = $upload_url != null;
       $data['is_upload'] = $is_upload;
@@ -1024,7 +1026,8 @@ class User extends UserModel
   {
     $is_set = false;
     $disable_time != 0 ? Share::ServerTime() : 0;
-    $is_admin = UserGroupController::IsAdmin($user_token);
+    $is_admin =  (UserGroupController::IsAdmin($user_token)&&UserGroupController::Ability($user_token,'ability_admin_manage_user'));
+     // UserGroupController::IsAdmin($user_token)//UserGroupController::IsAdmin($user_token);
     if ($is_admin) {
       $is_set = self::whereIn('user_id', $user_ids)->update([
         'disable_time' => $disable_time,

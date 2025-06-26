@@ -518,4 +518,37 @@ class Share
 
   //   }
   // }
+
+  /**
+   * 将请求地址和请求数据输出到/log/request.json
+   * @param array $request_data 请求数据
+   * @return void
+   */
+  public static function SaveRequest($request_data){
+    return; //暂时不记录请求日志
+    if(!Config::Dev()){
+      //如果是开发环境，则不记录请求日志
+      return;
+    }
+    
+    //将请求地址和请求数据输出到/log/request.json
+    $requestIP = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+    $requestUri = $_SERVER['REQUEST_URI'];
+    $requestMethod = $_SERVER['REQUEST_METHOD'];
+    $requestData = file_get_contents('php://input');
+    $logData = [
+        'ip' => $requestIP,
+        'uri' => $requestUri,
+        'method' => $requestMethod,
+        'data' => $requestData,
+        'return' => $request_data,
+        'timestamp' => date('Y-m-d H:i:s'),
+    ];
+    $date = date('Y-m-d');
+    //检查是否创建目录
+    if (!is_dir('log/'.$date)) {
+        mkdir('log/'.$date, 0777, true);
+    }
+    file_put_contents('log/'.$date.'/request.json', json_encode($logData, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) . PHP_EOL, FILE_APPEND);
+  }
 }

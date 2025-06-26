@@ -151,7 +151,7 @@ class Vote extends VoteModel
    * @param int $votable_id 投票对象ID
    * @param string $votable_type 投票对象类型 question、answer、article、comment、reply
    * @param string $user_token 用户Token
-   * @return
+   * @return array is_get:是否获取 vote:投票信息[]
    */
   public static function GetVote($votable_id, $votable_type, $user_token)
   {

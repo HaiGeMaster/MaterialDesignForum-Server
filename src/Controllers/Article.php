@@ -257,7 +257,8 @@ class Article extends ArticleModel
           UserGroupController::BeforeTime($user_token, 'time_before_edit_article', $article->create_time)
         )
         ||
-        UserGroupController::IsAdmin($user_token)
+        (UserGroupController::IsAdmin($user_token)&&UserGroupController::Ability($user_token,'ability_admin_manage_article'))
+         // UserGroupController::IsAdmin($user_token)
       ) {
         $content_markdown = preg_replace('/\s+/', '', $content_markdown);//去除回车和空格
         
@@ -323,7 +324,8 @@ class Article extends ArticleModel
             UserGroupController::BeforeTime($user_token, 'time_before_delete_article', $article->create_time)
           )
           ||
-          UserGroupController::IsAdmin($user_token)
+          (UserGroupController::IsAdmin($user_token)&&UserGroupController::Ability($user_token,'ability_admin_manage_article'))
+           // UserGroupController::IsAdmin($user_token)
         ) {
           $article->delete_time = Share::ServerTime();
           UserController::SubArticleCount($article->user_id);

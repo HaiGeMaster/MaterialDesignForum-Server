@@ -342,7 +342,8 @@ class Reply extends ReplyModel
           UserGroupController::BeforeTime($user_token, 'time_before_edit_reply', $reply->create_time)
         )
         ||
-        UserGroupController::IsAdmin($user_token)
+        (UserGroupController::IsAdmin($user_token)&&UserGroupController::Ability($user_token,'ability_admin_manage_reply'))
+         // UserGroupController::IsAdmin($user_token)
       ) {
         $reply->content = $content;
         $reply->update_time = Share::ServerTime();
@@ -383,7 +384,8 @@ class Reply extends ReplyModel
             UserGroupController::BeforeTime($user_token, 'time_before_delete_reply', $reply->create_time)
           )
           ||
-          UserGroupController::IsAdmin($user_token)
+          (UserGroupController::IsAdmin($user_token)&&UserGroupController::Ability($user_token,'ability_admin_manage_reply'))
+           // UserGroupController::IsAdmin($user_token)
         ) {
           $reply->delete_time = Share::ServerTime();
           UserController::SubReplyCount($reply->user_id);

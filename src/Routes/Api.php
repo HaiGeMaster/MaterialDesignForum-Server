@@ -1001,10 +1001,12 @@ class Api
 
     $dispatcher = new Dispatcher($collector->getData());
     try {
-      return $dispatcher->dispatch($_SERVER['REQUEST_METHOD'], parse_url(
+      $request_data =  $dispatcher->dispatch($_SERVER['REQUEST_METHOD'], parse_url(
         $_SERVER['REQUEST_URI'] == '' ? '/' : $_SERVER['REQUEST_URI'],
         PHP_URL_PATH
       ));
+      Share::SaveRequest($request_data);
+      return $request_data; 
     } catch (HttpRouteNotFoundException $e) {
       //header("Location: /");
       // echo 'Api Is Not Found,PHP_EOL:' . PHP_EOL . ',$e:' . $e;
@@ -1115,10 +1117,12 @@ class Api
     });
     $dispatcher = new Dispatcher($collector->getData());
     try {
-      return $dispatcher->dispatch($_SERVER['REQUEST_METHOD'], parse_url(
+      $request_data = $dispatcher->dispatch($_SERVER['REQUEST_METHOD'], parse_url(
         $_SERVER['REQUEST_URI'] == '' ? '/' : $_SERVER['REQUEST_URI'],
         PHP_URL_PATH
       ));
+      Share::SaveRequest($request_data);
+      return $request_data; 
     } catch (HttpRouteNotFoundException $e) {
       header("Location: /install");
       exit;
