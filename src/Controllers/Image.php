@@ -17,9 +17,10 @@ use MaterialDesignForum\Plugins\Share;
 
 class Image extends ImageModel
 {
+  //以前都是 'path' => 'publi c/stati c/upload/xxx
   public static $pathData = [
     'user_avatar' => [
-      'path' => 'public/static/upload/user/avatars/',
+      'path' => 'user/avatars',
       'needDeleteOld' => true,
       'sizeArray' => [
         'original' => [512, 512],
@@ -29,7 +30,7 @@ class Image extends ImageModel
       ],
     ],
     'user_cover' => [
-      'path' => 'public/static/upload/user/covers/',
+      'path' => 'user/covers',
       'needDeleteOld' => true,
       'sizeArray' => [
         'original' => null,
@@ -39,7 +40,7 @@ class Image extends ImageModel
       ],
     ],
     'user_avatar_default' => [
-      'path' => 'public/static/upload/user/avatars/default/',
+      'path' => 'user/avatars/default',
       'needDeleteOld' => false,
       'sizeArray' => [
         'original' => [512, 512],
@@ -49,7 +50,7 @@ class Image extends ImageModel
       ],
     ],
     'topic_cover' => [
-      'path' => 'public/static/upload/topic/covers/',
+      'path' => 'topic/covers',
       'needDeleteOld' => true,
       'sizeArray' => [
         'original' => null,
@@ -59,28 +60,28 @@ class Image extends ImageModel
       ],
     ],
     'other' => [
-      'path' => 'public/static/upload/other/',
+      'path' => 'other',
       'needDeleteOld' => true,
       'sizeArray' => [
         'original' => null,
       ],
     ],
     'question' => [
-      'path' => 'public/static/upload/question/',
+      'path' => 'question',
       'needDeleteOld' => true,
       'sizeArray' => [
         'original' => null,
       ],
     ],
     'article' => [
-      'path' => 'public/static/upload/article/',
+      'path' => 'article',
       'needDeleteOld' => true,
       'sizeArray' => [
         'original' => null,
       ],
     ],
     'answer' => [
-      'path' => 'public/static/upload/answer/',
+      'path' => 'answer',
       'needDeleteOld' => true,
       'sizeArray' => [
         'original' => null,
@@ -101,7 +102,11 @@ class Image extends ImageModel
 
     // 检查路径和尺寸数据是否存在
     if (isset(self::$pathData[$type])) {
-      $path = self::$pathData[$type]['path'] . $user_id;
+      // $path = self::$pathData[$type]['path'] . $user_id;
+      // $path = $user_id.'/'.self::$pathData[$type]['path'];
+      
+      //路径修改为 公共上传/用户ID/细分类
+      $path = 'public/static/upload/'.$user_id.'/'.self::$pathData[$type]['path'];
       $sizeArray = self::$pathData[$type]['sizeArray'];
     } else {
       return false;
