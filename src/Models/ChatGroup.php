@@ -16,6 +16,18 @@ class ChatGroup extends Eloquent
   protected $table = 'chat_group';
   public $timestamps = false;
   protected $primaryKey = 'chat_group_id';
+  /**
+   * @typedef ChatGroupModel 聊天组
+   * @property int $chat_group_id 聊天组ID
+   * @property string $chat_group_name 聊天组名称
+   * @property string $chat_group_avatar 聊天组头像
+   * @property int $chat_group_user_count 聊天组用户数量
+   * @property string $chat_group_info 聊天组信息
+   * @property int $chat_group_owner_user_id 聊天组所有者用户ID
+   * @property int $create_time 创建时间
+   * @property int $update_time 更新时间
+   * @property int $delete_time 删除时间
+   */
   protected $fillable = [
     'chat_group_id',
     'chat_group_name',

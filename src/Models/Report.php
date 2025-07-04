@@ -16,6 +16,16 @@ class Report extends Eloquent
   protected $table = 'report';
   public $timestamps = false;
   protected $primaryKey = 'report_id';
+  /**
+   * @typedef ReportModel 举报
+   * @property int $report_id 举报ID
+   * @property int $reportable_id 举报对象ID
+   * @property string $reportable_type 举报对象类型
+   * @property int $user_id 用户ID
+   * @property string $reason 举报理由
+   * @property int $report_handle_state 举报处理状态
+   * @property int $create_time 创建时间
+   */
   protected $fillable = [
     'report_id',
     'reportable_id',

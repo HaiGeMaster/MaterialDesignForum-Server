@@ -16,6 +16,23 @@ class Reply extends Eloquent
   protected $table = 'reply';
   public $timestamps = false;
   protected $primaryKey = 'reply_id';
+  /**
+   * @typedef ReplyModel 回复
+   * @property int $reply_id 回复ID
+   * @property int $replyable_id 回复对象ID
+   * @property string $replyable_type 回复对象类型
+   * @property int $replyable_user_id 回复对象用户ID
+   * @property int $replyable_comment_id 回复对象评论ID
+   * @property int $user_id 用户ID
+   * @property string $content 内容
+   * @property int $reply_count 回复数量
+   * @property int $vote_count 投票数量
+   * @property int $vote_up_count 赞成投票数量
+   * @property int $vote_down_count 反对投票数量
+   * @property int $create_time 创建时间
+   * @property int $update_time 更新时间
+   * @property int $delete_time 删除时间
+   */
   protected $fillable = [
     'reply_id', // 这个字段不需要
     'replyable_id',

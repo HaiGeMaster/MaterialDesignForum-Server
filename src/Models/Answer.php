@@ -16,6 +16,21 @@ class Answer extends Eloquent
   protected $table = 'answer';
   public $timestamps = false;
   protected $primaryKey = 'answer_id';
+  /**
+   * @typedef AnswerModel 回答
+   * @property int $answer_id 回答ID
+   * @property int $question_id 问题ID
+   * @property int $user_id 用户ID
+   * @property string $content_markdown 回答内容Markdown
+   * @property string $content_rendered 回答内容渲染
+   * @property int $comment_count 评论数量
+   * @property int $vote_count 投票数量
+   * @property int $vote_up_count 赞成票数量
+   * @property int $vote_down_count 反对票数量
+   * @property int $create_time 创建时间
+   * @property int $update_time 更新时间
+   * @property int $delete_time 删除时间
+   */
   protected $fillable = [
     'answer_id', // 这个字段不需要
     'question_id',

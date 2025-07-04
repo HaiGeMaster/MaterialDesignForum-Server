@@ -20,6 +20,45 @@ class User extends Eloquent
     'avatar' => 'array', //这个字段的值将会被自动转换为 PHP 数组：
     'cover' => 'array',
   ];
+  /**
+   * @typedef UserModel 用户
+   * @property int $user_id 用户ID
+   * @property int $user_group_id 用户组ID
+   * @property string $username 用户名
+   * @property string $email 邮箱
+   * @property array $avatar 头像
+   * @property array $cover 封面
+   * @property string $password 密码
+   * @property string $create_ip 创建IP
+   * @property string $create_location 创建位置
+   * @property int $last_login_time 最后登录时间
+   * @property string $last_login_ip 最后登录IP
+   * @property string $last_login_location 最后登录位置
+   * @property int $follower_count 粉丝数
+   * @property int $followee_count 关注数
+   * @property int $following_topic_count 关注的话题数
+   * @property int $following_article_count 关注的文章数
+   * @property int $following_question_count 关注的问题数
+   * @property int $topic_count 话题数
+   * @property int $article_count 文章数
+   * @property int $question_count 问题数
+   * @property int $answer_count 回答数
+   * @property int $comment_count 评论数
+   * @property int $reply_count 回复数
+   * @property int $notification_unread 未读通知数
+   * @property int $inbox_system 系统消息数
+   * @property int $inbox_user_group 用户组消息数
+   * @property int $inbox_private_message 私信数
+   * @property string $headline 个人简介
+   * @property string $bio 个人介绍
+   * @property string $blog 博客链接
+   * @property string $company 公司
+   * @property string $location 地址
+   * @property string $language 语言
+   * @property string $create_time 创建时间
+   * @property string $update_time 更新时间
+   * @property string $disable_time 禁用时间
+   */
   protected $fillable = [
     'user_id', // 用户ID// 这个字段不需要
     'user_group_id', // 用户组ID

@@ -16,6 +16,15 @@ class Follow extends Eloquent
   protected $table = 'follow';
   public $timestamps = false;
   protected $primaryKey = 'follow_id';
+  /**
+   * @typedef FollowModel 关注
+   * @property int $follow_id 关注ID
+   * @property int $user_id 用户ID
+   * @property string $followable_type 关注关联类型
+   * @property int $followable_id 关注关联ID
+   * @property int $create_time 创建时间
+   * @property int $delete_time 删除时间
+   */
   protected $fillable = [
     'follow_id', // 这个字段不需要
     'user_id',

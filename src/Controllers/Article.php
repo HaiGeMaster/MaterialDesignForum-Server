@@ -33,7 +33,7 @@ class Article extends ArticleModel
    * @param string $content_markdown 纯文本
    * @param string $content_rendered 渲染后的HTML
    * @param string $user_token 用户Token
-   * @return
+   * @return array 
    */
   public static function AddArticle($title, $topics, $content_markdown, $content_rendered, $user_token)
   {

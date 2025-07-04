@@ -47,7 +47,7 @@ class User extends UserModel
 
     //不使用base64的原因是为了防止用户输入的用户名中包含base64编码的字符，导致解码失败
     // $client_username = $username == "" ? "User" . Share::ServerTime() : base64_decode($username);
-    $client_username = $username == "" ? "User" . Share::ServerTime() : base64_decode($username);
+    $client_username = $username == "" ? "User" . Share::ServerTime() : $username;
     if ($client_username == "") {
       $client_username = $client_email;
     }
@@ -983,6 +983,7 @@ class User extends UserModel
    * 设置用户语言
    * @param string $user_token token字符串
    * @param string $lang 语言
+   * @return json {is_set:是否设置成功,user:用户信息}
    */
   public static function SetUserLanguage($user_token, $lang)
   {

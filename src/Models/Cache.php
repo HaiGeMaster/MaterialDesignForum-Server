@@ -15,6 +15,13 @@ class Cache extends Eloquent
 {
   protected $table = 'cache';
   public $timestamps = false;
+  /**
+   * @typedef CacheModel 缓存
+   * @property string $name 缓存名称
+   * @property string $value 缓存值
+   * @property int $create_time 创建时间
+   * @property int $life_time 缓存时间
+   */
   protected $fillable = [
     'name',
     'value',

@@ -16,6 +16,24 @@ class Question extends Eloquent
   protected $table = 'question';
   public $timestamps = false;
   protected $primaryKey = 'question_id';
+  /**
+   * @typedef QuestionModel 问题
+   * @property int $question_id 问题ID
+   * @property int $user_id 用户ID
+   * @property string $title 标题
+   * @property string $content_markdown 内容Markdown
+   * @property string $content_rendered 内容渲染
+   * @property int $comment_count 评论数
+   * @property int $answer_count 回答数
+   * @property int $follower_count 关注数
+   * @property int $vote_count 投票数
+   * @property int $vote_up_count 赞成投票数
+   * @property int $vote_down_count 反对投票数
+   * @property int $last_answer_time 最后回答时间
+   * @property int $create_time 创建时间
+   * @property int $update_time 更新时间
+   * @property int $delete_time 删除时间
+   */
   protected $fillable = [
     'question_id', // 这个字段不需要
     'user_id',

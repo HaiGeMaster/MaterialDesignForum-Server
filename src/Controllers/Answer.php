@@ -20,8 +20,9 @@ use MaterialDesignForum\Controllers\Reply as ReplyController;
 use MaterialDesignForum\Plugins\Share;
 use MaterialDesignForum\Controllers\Notification as NotificationController;
 // use MaterialDesignForum\Models\Notification;
-
 // use MaterialDesignForum\Config\Config;
+
+
 
 class Answer extends AnswerModel
 {
@@ -94,7 +95,7 @@ class Answer extends AnswerModel
    * 获取回答
    * @param int $answer_id 回答ID
    * @param string $user_token 用户Token
-   * @return
+   * @return array is_get:bool 是否获取到回答 answer:AnswerModel 回答
    */
   public static function GetAnswer($answer_id, $user_token)
   {

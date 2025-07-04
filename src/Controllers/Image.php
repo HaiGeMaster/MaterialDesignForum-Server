@@ -322,7 +322,9 @@ class Image extends ImageModel
     $AvatarData = [];
 
     foreach (self::$pathData['user_avatar_default']['sizeArray'] as $key => $size) {
-      $path = self::$pathData['user_avatar_default']['path'] . $user_id . '/' . $key;
+      // $path = self::$pathData['user_avatar_default']['path'] . $user_id . '/' . $key;
+      //路径修改为 公共上传/用户ID/细分类
+      $path = 'public/static/upload/' . $user_id . '/' . self::$pathData['user_avatar_default']['path'] . '/' . $key;
 
       // 创建路径
       if (!file_exists($path)) {

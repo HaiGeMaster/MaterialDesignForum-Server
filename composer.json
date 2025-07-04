@@ -1,7 +1,7 @@
 {
   "app_name": "MaterialDesignForum",
-  "version": "25.7.0",
-  "zip_link": "https://d.feiliupan.com/t/90838076061913088/MDF/20250701103216.zip",
+  "version": "25.7.4",
+  "zip_link": "https://d.feiliupan.com/t/90838076061913088/MDF/20250703101156.zip",
   "prefer-stable": true,
   "minimum-stability": "stable",
   "require": {

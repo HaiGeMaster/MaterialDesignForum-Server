@@ -16,6 +16,17 @@ class Image extends Eloquent
   protected $table = 'image';
   protected $primaryKey = 'key';
   public $timestamps = false;
+  /**
+   * @typedef ImageModel 图片
+   * @property string $key 图片ID
+   * @property string $filename 文件名
+   * @property int $width 宽度
+   * @property int $height 高度
+   * @property int $create_time 创建时间
+   * @property string $item_type 项目类型
+   * @property int $item_id 项目ID
+   * @property int $user_id 用户ID
+   */
   protected $fillable = [
     'key', // 这个字段不需要
     'filename',

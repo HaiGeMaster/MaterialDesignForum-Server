@@ -34,7 +34,7 @@ class Comment extends CommentModel
    * @param string $commentable_type 评论目标类型：article、question、answer、文章、提问、回答
    * @param string $content 原始正文内容
    * @param string $user_token 用户Token
-   * @return
+   * @return array 返回评论信息
    */
   public static function AddComment(
     $commentable_id,

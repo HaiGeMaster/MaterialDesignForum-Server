@@ -15,6 +15,11 @@ class Option extends Eloquent
 {
   protected $table = 'option';
   protected $primaryKey = 'name';
+  /**
+   * @typedef OptionModel 配置项
+   * @property string $name 配置项名称
+   * @property string $value 配置项值
+   */
   protected $fillable = [
     'name', // 这个字段不需要
     'value',

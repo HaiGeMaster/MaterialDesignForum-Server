@@ -50,7 +50,7 @@ class Topic extends TopicModel
    * 增加话题
    * @param int $user_token 用户token
    * @param int $topic_id 话题ID
-   * @return bool 是否成功
+   * @return array is_add:是否增加成功 topic:话题 json
    */
   public static function AddTopic($name, $description, $cover, $user_token)
   {

@@ -20,6 +20,20 @@ class Topic extends Eloquent
   protected $casts = [
     'cover' => 'array',
   ];
+  /**
+   * @typedef TopicModel 话题
+   * @property int $topic_id 话题ID
+   * @property int $user_id 用户ID
+   * @property string $name 话题名称
+   * @property array $cover 话题封面
+   * @property string $description 话题描述
+   * @property int $article_count 文章数量
+   * @property int $question_count 问题数量
+   * @property int $follower_count 关注者数量
+   * @property int $create_time 创建时间
+   * @property int $update_time 更新时间
+   * @property int $delete_time 删除时间
+   */
   protected $fillable = [
     'topic_id', // 这个字段不需要
     'user_id',

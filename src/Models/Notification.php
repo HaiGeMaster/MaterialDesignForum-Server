@@ -34,6 +34,24 @@ class Notification extends Eloquent
   protected $table = 'notification';
   public $timestamps = false;
   protected $primaryKey = 'notification_id';
+  /**
+   * @typedef NotificationModel 通知
+   * @property int $notification_id 通知ID
+   * @property int $receiver_id 接收者ID
+   * @property int $sender_id 发送者ID
+   * @property string $type 消息类型
+   * @property string $content_markdown 内容Markdown
+   * @property string $content_rendered 内容渲染
+   * @property int $article_id 文章ID
+   * @property int $question_id 提问ID
+   * @property int $answer_id 回答ID
+   * @property int $comment_id 评论ID
+   * @property int $reply_id 回复ID
+   * @property int $reply_to_reply_id 回复回复ID
+   * @property int $create_time 创建时间
+   * @property int $read_time 阅读时间
+   * @property int $delete_time 删除时间
+   */
   protected $fillable = [
     'notification_id',
     'receiver_id',

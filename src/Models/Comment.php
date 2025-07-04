@@ -16,6 +16,21 @@ class Comment extends Eloquent
   protected $table = 'comment';
   public $timestamps = false;
   protected $primaryKey = 'comment_id';
+  /**
+   * @typedef CommentModel 评论
+   * @property int $comment_id 评论ID
+   * @property int $commentable_id 评论关联ID
+   * @property string $commentable_type 评论关联类型
+   * @property int $user_id 用户ID
+   * @property string $content 评论内容
+   * @property int $reply_count 评论回复数量
+   * @property int $vote_count 评论投票数量
+   * @property int $vote_up_count 评论赞成票数量
+   * @property int $vote_down_count 评论反对票数量
+   * @property int $create_time 创建时间
+   * @property int $update_time 更新时间
+   * @property int $delete_time 删除时间
+   */
   protected $fillable = [
     'comment_id', // 这个字段不需要
     'commentable_id',
