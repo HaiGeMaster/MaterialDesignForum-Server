@@ -22,7 +22,7 @@ class Report extends ReportModel
   /**
    * 添加举报
    * @param int $reportable_id 举报目标ID
-   * @param string $reportable_type 举报目标类型
+   * @param string $reportable_type 举报目标类型 用户举报类型：user-用户、topic-话题、question-问题、article-文章、answer-答案、comment-评论、reply-回复
    * @param int $user_token 用户ID
    * @param string $reason 举报原因
    * @return array is_add:是否添加 report:举报

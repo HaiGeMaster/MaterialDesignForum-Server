@@ -127,7 +127,7 @@ class Server
 
     $data = null;
 
-    switch ($model_type) {
+    switch ($model_type) {//user、user_group、report、topic、question、answer、article、comment、reply
       case 'user':
         $model = UserModel::class;
         break;

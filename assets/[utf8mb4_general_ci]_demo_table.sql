@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主机： localhost
--- 生成日期： 2025-06-11 11:28:33
+-- 生成日期： 2025-07-05 23:57:49
 -- 服务器版本： 8.0.12
 -- PHP 版本： 7.4.3
 
@@ -40,7 +40,7 @@ CREATE TABLE `answer` (
   `create_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '创建时间',
   `update_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '更新时间',
   `delete_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '删除时间'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='回答表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='回答表';
 
 -- --------------------------------------------------------
 
@@ -62,7 +62,7 @@ CREATE TABLE `article` (
   `create_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '创建时间',
   `update_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '更新时间',
   `delete_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '删除时间'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='文章表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文章表';
 
 -- --------------------------------------------------------
 
@@ -75,7 +75,7 @@ CREATE TABLE `cache` (
   `value` text NOT NULL,
   `create_time` int(10) UNSIGNED DEFAULT NULL COMMENT '创建时间',
   `life_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '有效时间'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='缓存表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='缓存表';
 
 -- --------------------------------------------------------
 
@@ -85,15 +85,15 @@ CREATE TABLE `cache` (
 
 CREATE TABLE `chat_group` (
   `chat_group_id` int(10) UNSIGNED NOT NULL COMMENT '聊天组ID',
-  `chat_group_name` varchar(10) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '聊天组名称',
-  `chat_group_avatar` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '聊天组头像',
+  `chat_group_name` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '聊天组名称',
+  `chat_group_avatar` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '聊天组头像',
   `chat_group_user_count` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '聊天组人数',
-  `chat_group_info` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '聊天组简介',
+  `chat_group_info` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '聊天组简介',
   `chat_group_owner_user_id` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '聊天组创建者用户ID',
   `create_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '创建时间',
   `update_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '更新时间',
   `delete_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '删除时间'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='聊天组表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='聊天组表';
 
 -- --------------------------------------------------------
 
@@ -107,7 +107,7 @@ CREATE TABLE `chat_groupable` (
   `chat_group_id` int(10) UNSIGNED NOT NULL COMMENT '加入的聊天组ID',
   `create_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '创建时间',
   `delete_time` int(10) NOT NULL COMMENT '删除时间'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='聊天组加入关系表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='聊天组加入关系表';
 
 -- --------------------------------------------------------
 
@@ -118,7 +118,7 @@ CREATE TABLE `chat_groupable` (
 CREATE TABLE `comment` (
   `comment_id` int(10) UNSIGNED NOT NULL COMMENT '评论ID',
   `commentable_id` int(10) UNSIGNED NOT NULL COMMENT '评论目标的ID',
-  `commentable_type` char(10) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '评论目标类型：article、question、answer、文章、提问、回答',
+  `commentable_type` char(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '评论目标类型：article、question、answer、文章、提问、回答',
   `user_id` int(10) UNSIGNED NOT NULL COMMENT '用户ID',
   `content` text NOT NULL COMMENT '原始正文内容',
   `reply_count` int(10) NOT NULL DEFAULT '0' COMMENT '回复数量',
@@ -128,39 +128,7 @@ CREATE TABLE `comment` (
   `create_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '创建时间',
   `update_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '更新时间',
   `delete_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '删除时间'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='回复与评论表';
-
--- --------------------------------------------------------
-
---
--- 表的结构 `domain_data`
---
-
-CREATE TABLE `domain_data` (
-  `index_id` int(10) UNSIGNED NOT NULL COMMENT '排序',
-  `domain_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '域名',
-  `first_activity_time` int(10) NOT NULL COMMENT '首次活动时间',
-  `recent_activity_time` int(10) NOT NULL COMMENT '最近活动时间',
-  `number_activities` int(10) NOT NULL COMMENT '活动次数',
-  `allow_use` tinyint(1) NOT NULL COMMENT '允许使用',
-  `renewal_expiration_date` int(10) NOT NULL COMMENT '续费到期时间',
-  `recent_use_keys` varchar(29) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '最近使用的产品序列号'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='域名使用数据表';
-
--- --------------------------------------------------------
-
---
--- 表的结构 `domain_key`
---
-
-CREATE TABLE `domain_key` (
-  `index_id` int(10) UNSIGNED NOT NULL COMMENT '排序',
-  `renewal_key` varchar(29) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '产品续费序列号',
-  `renewal_days` int(10) NOT NULL COMMENT '能续费的天数',
-  `renewal_domain` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '续费域名',
-  `renewal_email` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '续费者邮箱',
-  `use_time` int(10) NOT NULL DEFAULT '0' COMMENT '使用时间'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='域名续费续时序列号';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='回复与评论表';
 
 -- --------------------------------------------------------
 
@@ -174,7 +142,7 @@ CREATE TABLE `follow` (
   `followable_type` char(10) NOT NULL COMMENT '关注目标类型 user、question、article、topic 用户、提问、文章、话题',
   `followable_id` int(10) UNSIGNED NOT NULL COMMENT '关注目标的ID',
   `create_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '关注时间'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='文章关注关系表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文章关注关系表';
 
 -- --------------------------------------------------------
 
@@ -191,7 +159,7 @@ CREATE TABLE `image` (
   `item_type` char(10) DEFAULT NULL COMMENT '关联类型：question、answer、article',
   `item_id` int(10) NOT NULL DEFAULT '0' COMMENT '关联ID',
   `user_id` int(10) NOT NULL COMMENT '用户ID'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -201,15 +169,15 @@ CREATE TABLE `image` (
 
 CREATE TABLE `inbox` (
   `inbox_id` int(10) UNSIGNED NOT NULL COMMENT '私信ID',
-  `sender_id` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '发送者ID：system、user_id',
-  `sender_type` varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '发送者类型 user_to_user、user_to_chat_group、system_to_user、system_to_user_group',
+  `sender_id` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '发送者ID：system、user_id',
+  `sender_type` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '发送者类型 user_to_user、user_to_chat_group、system_to_user、system_to_user_group',
   `receiver_id` int(10) UNSIGNED NOT NULL COMMENT '接收者ID：user_id、chat_group_id',
   `content_markdown` text NOT NULL COMMENT '原始的私信内容',
   `content_rendered` text NOT NULL COMMENT '过滤渲染后的私信内容',
   `create_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '发送时间',
   `read_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '阅读时间',
   `delete_time` int(10) NOT NULL COMMENT '删除时间'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='私信表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='私信表';
 
 -- --------------------------------------------------------
 
@@ -233,7 +201,7 @@ CREATE TABLE `notification` (
   `create_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '发送时间',
   `read_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '阅读时间',
   `delete_time` int(10) NOT NULL COMMENT '删除时间'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='通知表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='通知表';
 
 -- --------------------------------------------------------
 
@@ -244,7 +212,7 @@ CREATE TABLE `notification` (
 CREATE TABLE `option` (
   `name` varchar(40) NOT NULL DEFAULT '' COMMENT '字段名',
   `value` text NOT NULL COMMENT '字段值'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='设置表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='设置表';
 
 --
 -- 转存表中的数据 `option`
@@ -291,7 +259,7 @@ CREATE TABLE `question` (
   `create_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '创建时间',
   `update_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '更新时间',
   `delete_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '删除时间'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='问题表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='问题表';
 
 -- --------------------------------------------------------
 
@@ -302,7 +270,7 @@ CREATE TABLE `question` (
 CREATE TABLE `reply` (
   `reply_id` int(10) UNSIGNED NOT NULL COMMENT '回复ID',
   `replyable_id` int(10) UNSIGNED NOT NULL COMMENT '回复目标的ID:comment_id、reply_id',
-  `replyable_type` char(10) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '回复目标类型：comment、reply、评论、回复',
+  `replyable_type` char(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '回复目标类型：comment、reply、评论、回复',
   `replyable_comment_id` int(10) NOT NULL COMMENT '回复目标的父项：评论ID',
   `replyable_user_id` int(10) NOT NULL DEFAULT '0' COMMENT '回复目标用户id',
   `user_id` int(10) UNSIGNED NOT NULL COMMENT '用户ID',
@@ -314,7 +282,7 @@ CREATE TABLE `reply` (
   `create_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '创建时间',
   `update_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '更新时间',
   `delete_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '删除时间'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='回复与评论表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='回复与评论表';
 
 -- --------------------------------------------------------
 
@@ -325,13 +293,13 @@ CREATE TABLE `reply` (
 CREATE TABLE `report` (
   `report_id` int(10) UNSIGNED NOT NULL,
   `reportable_id` int(10) UNSIGNED NOT NULL COMMENT '举报目标ID',
-  `reportable_type` char(10) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '举报目标类型：question、article、answer、comment、user、reply、topic',
+  `reportable_type` char(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '举报目标类型：question、article、answer、comment、user、reply、topic',
   `user_id` int(10) UNSIGNED NOT NULL COMMENT '用户ID',
   `reason` varchar(200) NOT NULL COMMENT '举报原因',
   `report_handle_state` int(10) NOT NULL DEFAULT '0' COMMENT '处理状态:未处理0、已处理删除1、已处理对象无违规2',
   `create_time` int(10) UNSIGNED NOT NULL COMMENT '举报时间',
   `delete_time` int(10) NOT NULL DEFAULT '0' COMMENT '删除时间'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='举报';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='举报';
 
 -- --------------------------------------------------------
 
@@ -346,7 +314,7 @@ CREATE TABLE `token` (
   `create_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '创建时间',
   `update_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '更新时间',
   `expire_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '过期时间'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户TOKEN';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户TOKEN';
 
 -- --------------------------------------------------------
 
@@ -358,7 +326,7 @@ CREATE TABLE `topic` (
   `topic_id` int(10) UNSIGNED NOT NULL COMMENT '话题ID',
   `user_id` int(10) NOT NULL COMMENT '话题创建者用户id',
   `name` varchar(20) NOT NULL DEFAULT '' COMMENT '话题名称',
-  `cover` varchar(2000) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '封面图片token',
+  `cover` varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '封面图片token',
   `description` varchar(1000) NOT NULL DEFAULT '' COMMENT '话题描述',
   `article_count` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '文章数量',
   `question_count` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '问题数量',
@@ -366,7 +334,7 @@ CREATE TABLE `topic` (
   `create_time` int(10) UNSIGNED NOT NULL COMMENT '创建时间',
   `update_time` int(10) UNSIGNED NOT NULL COMMENT '更新时间',
   `delete_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '删除时间'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='话题表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='话题表';
 
 -- --------------------------------------------------------
 
@@ -379,7 +347,7 @@ CREATE TABLE `topicable` (
   `topicable_id` int(10) UNSIGNED NOT NULL COMMENT '话题关系对应的ID',
   `topicable_type` char(10) NOT NULL COMMENT '话题关系对应的类型 question、article',
   `create_time` int(10) UNSIGNED NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -390,16 +358,16 @@ CREATE TABLE `topicable` (
 CREATE TABLE `user` (
   `user_id` int(10) UNSIGNED NOT NULL COMMENT '用户ID',
   `user_group_id` int(10) UNSIGNED NOT NULL DEFAULT '2' COMMENT '用户组ID',
-  `username` varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '用户名',
+  `username` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户名',
   `email` varchar(320) NOT NULL COMMENT '邮箱',
-  `avatar` varchar(2000) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '头像token',
-  `cover` varchar(2000) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '封面图片token',
+  `avatar` varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '头像token',
+  `cover` varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '封面图片token',
   `password` varchar(255) NOT NULL COMMENT '密码',
   `create_ip` varchar(80) DEFAULT NULL COMMENT '注册IP',
-  `create_location` varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '注册地址',
+  `create_location` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '注册地址',
   `last_login_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '最后登录时间',
   `last_login_ip` varchar(80) DEFAULT NULL COMMENT '最后登陆IP',
-  `last_login_location` varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '最后登录地址',
+  `last_login_location` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '最后登录地址',
   `follower_count` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '关注我的人数',
   `followee_count` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '我关注的人数',
   `following_topic_count` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '我关注的话题数量',
@@ -424,7 +392,7 @@ CREATE TABLE `user` (
   `create_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '注册时间',
   `update_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '更新时间',
   `disable_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '禁用时间'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
 
 --
 -- 转存表中的数据 `user`
@@ -442,11 +410,11 @@ INSERT INTO `user` (`user_id`, `user_group_id`, `username`, `email`, `avatar`, `
 
 CREATE TABLE `user_group` (
   `user_group_id` int(10) UNSIGNED NOT NULL COMMENT '用户组ID',
-  `user_group_name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'User' COMMENT '用户组名称',
-  `user_group_description` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'User' COMMENT '用户组描述',
-  `user_group_icon` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'mdi-account' COMMENT '用户组图标',
+  `user_group_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'User' COMMENT '用户组名称',
+  `user_group_description` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'User' COMMENT '用户组描述',
+  `user_group_icon` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT 'mdi-account' COMMENT '用户组图标',
   `user_group_icon_show` tinyint(1) NOT NULL DEFAULT '0' COMMENT '显示用户组标识',
-  `user_group_color` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '用户组颜色',
+  `user_group_color` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '用户组颜色',
   `user_group_user_count` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '用户组人数',
   `create_time` int(10) NOT NULL COMMENT '创建时间',
   `update_time` int(10) NOT NULL COMMENT '更新时间',
@@ -510,7 +478,7 @@ CREATE TABLE `user_group` (
   `ability_delete_topic_only_no_article_or_question` tinyint(1) NOT NULL DEFAULT '1' COMMENT '仅限话题没有文章或问题的情况下才能删除',
   `ability_edit_own_info` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否可编辑自己的个人信息',
   `ability_vote` tinyint(1) DEFAULT '1' COMMENT '能否投票'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户组表' ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户组表' ROW_FORMAT=COMPACT;
 
 --
 -- 转存表中的数据 `user_group`
@@ -529,9 +497,9 @@ INSERT INTO `user_group` (`user_group_id`, `user_group_name`, `user_group_descri
 CREATE TABLE `user_mixed` (
   `index_id` int(10) UNSIGNED NOT NULL COMMENT '索引',
   `user_id` int(10) NOT NULL COMMENT '归属用户ID',
-  `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '名称',
-  `value` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '值'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='用户杂项键值表';
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '名称',
+  `value` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '值'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户杂项键值表';
 
 -- --------------------------------------------------------
 
@@ -542,10 +510,10 @@ CREATE TABLE `user_mixed` (
 CREATE TABLE `vote` (
   `user_id` int(10) UNSIGNED NOT NULL COMMENT '用户ID',
   `votable_id` int(10) UNSIGNED NOT NULL COMMENT '投票目标ID',
-  `votable_type` char(10) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '投票目标类型 question、answer、article、comment、reply',
+  `votable_type` char(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '投票目标类型 question、answer、article、comment、reply',
   `type` char(10) NOT NULL COMMENT '投票类型 up、down',
   `create_time` int(10) UNSIGNED NOT NULL COMMENT '投票时间'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- 转储表的索引
@@ -586,18 +554,6 @@ ALTER TABLE `chat_groupable`
 --
 ALTER TABLE `comment`
   ADD PRIMARY KEY (`comment_id`);
-
---
--- 表的索引 `domain_data`
---
-ALTER TABLE `domain_data`
-  ADD PRIMARY KEY (`index_id`);
-
---
--- 表的索引 `domain_key`
---
-ALTER TABLE `domain_key`
-  ADD PRIMARY KEY (`index_id`);
 
 --
 -- 表的索引 `follow`
@@ -710,18 +666,6 @@ ALTER TABLE `chat_groupable`
 --
 ALTER TABLE `comment`
   MODIFY `comment_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '评论ID';
-
---
--- 使用表AUTO_INCREMENT `domain_data`
---
-ALTER TABLE `domain_data`
-  MODIFY `index_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '排序';
-
---
--- 使用表AUTO_INCREMENT `domain_key`
---
-ALTER TABLE `domain_key`
-  MODIFY `index_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '排序';
 
 --
 -- 使用表AUTO_INCREMENT `follow`

@@ -212,13 +212,16 @@ class Option extends OptionModel
   {
     $form_data = null;
     //$form_data = Share::GetThemesInfo();
-    if (UserGroupController::IsAdmin($user_token)) {
+
+    // if (UserGroupController::IsAdmin($user_token)) {
+
       // $option = self::find('theme');
       // if ($option) {
       //   $form_data['theme'] = $option->value;
       // }
       $form_data = Share::GetThemesInfo();
-    }
+
+    // }
     return [
       'is_get' => $form_data != null,
       'form_data' => $form_data,
