@@ -92,6 +92,8 @@ class Api
       if ($time == null) {
         $time = Share::ServerTime();
       }
+      //响应头为图片
+      header('Content-Type: image/png');
       return Share::HandleArrayToJSON(
         \MaterialDesignForum\Controllers\User::GetImageCaptcha($time)
       );
@@ -918,30 +920,9 @@ class Api
     });
 
     if(!Install::GetInstallInfoJson()["install"]){
-      $collector->post('/api/lang/get/locale/info/list', function () {
-        return Share::HandleArrayToJSON(
-          \MaterialDesignForum\Plugins\i18n::GetLocaleInfoList()
-        );
-      });
-      $collector->post('/api/option/get/theme_color_param', function () {
-        $data = Share::GetRequestData();
-        return Share::HandleArrayToJSON(
-          \MaterialDesignForum\Controllers\Option::GetThemeColorParamJson(
-            $data['user_token']??''
-          )
-        );
-      });
       $collector->post('/api/install/get_install_info_json', function () {
         return Share::HandleArrayToJSON(
           Install::GetInstallInfoJson()
-        );
-      });
-      $collector->post('/api/option/get/info', function () {
-        $data = Share::GetRequestData();
-        return Share::HandleArrayToJSON(
-          \MaterialDesignForum\Controllers\Option::GetInfoData(
-            $data['user_token']??''
-          )
         );
       });
       $collector->post('/api/install/set_config', function () {
