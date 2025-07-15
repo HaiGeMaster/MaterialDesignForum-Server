@@ -426,9 +426,9 @@ class Server
       }
     }
 
-    // 格式化剩余硬盘空间和数据库大小
-    $disk_free_space = $disk_free_space !== null ? formatSize($disk_free_space) : '/error';
-    $db_size = $db_size !== null ? formatSize($db_size) : '/error';
+    // 格式化剩余硬盘空间和数据库大小，磁盘格式为:已用空间/总磁盘空间
+    $disk_free_space = $disk_free_space !== null ? formatSize($disk_free_space) . '/' . formatSize(disk_total_space("/")) : '/error';
+    $db_size = ($db_size !== null ? formatSize($db_size) : '/error');
 
     // 返回服务器信息
     return [
