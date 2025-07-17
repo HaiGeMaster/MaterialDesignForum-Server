@@ -23,6 +23,100 @@ use MaterialDesignForum\Plugins\Share;
 // },
 class Option extends OptionModel
 {
+  private $sensitive_options = [
+    'site_activation_key',
+    'smtp_host',
+    'smtp_password',
+    'smtp_port',
+    'smtp_reply_to',
+    'smtp_secure',
+    'smtp_send_name',
+    'smtp_username',
+    'microsoft_client_id',
+    'microsoft_client_secret',
+    'github_client_id',
+    'github_client_secret'
+  ];
+  /**
+   * 获取Oauth所有的选项
+   * @param string $user_token 用户token
+   * @return array [is_get, options]
+   */
+  public static function GetOauthOptions($user_token)
+  {
+    $form_data = [];
+    if (UserGroupController::IsAdmin($user_token)) {
+      $option = self::find('microsoft_client_id');
+      if ($option) {
+        $form_data['microsoft_client_id'] = $option->value;
+      }
+      $option = self::find('microsoft_client_secret');
+      if ($option) {
+        $form_data['microsoft_client_secret'] = $option->value;
+      }
+      $option = self::find('github_client_id');
+      if ($option) {
+        $form_data['github_client_id'] = $option->value;
+      }
+      $option = self::find('github_client_secret');
+      if ($option) {
+        $form_data['github_client_secret'] = $option->value;
+      }
+    }
+    return [
+      'is_get' => !empty($form_data),
+      'form_data' => $form_data,
+    ];
+  }
+  public static function SetOauthOptions($form_data, $user_token)
+  {
+    $is_set = false;
+    if (UserGroupController::IsAdmin($user_token)) {
+      $option = self::find('microsoft_client_id');
+      if ($option) {
+        $option->value = $form_data['microsoft_client_id'];
+        $option->save();
+      }
+      $option = self::find('microsoft_client_secret');
+      if ($option) {
+        $option->value = $form_data['microsoft_client_secret'];
+        $option->save();
+      }
+      $option = self::find('github_client_id');
+      if ($option) {
+        $option->value = $form_data['github_client_id'];
+        $option->save();
+      }
+      $option = self::find('github_client_secret');
+      if ($option) {
+        $option->value = $form_data['github_client_secret'];
+        $option->save();
+      }
+      $is_set = true;
+    }
+    return [
+      'is_set' => $is_set,
+    ];
+  }
+  /**
+   * 获取指定第三方平台的Client ID
+   * @param string $oauthName 第三方平台标识符
+   * @return string|null 返回Client ID或null
+   */
+  public static function GetOauthClientId($oauthName)
+  {
+    $option = self::find($oauthName . '_client_id');
+    if ($option) {
+      return [
+        'is_get' => true,
+        'client_id' => $option->value,
+      ];
+    }
+    return [
+      'is_get' => false,
+      'client_id' => null,
+    ];
+  }
   /**
    * 获取网站信息
    * @return array [is_get, form_data]
@@ -215,11 +309,11 @@ class Option extends OptionModel
 
     // if (UserGroupController::IsAdmin($user_token)) {
 
-      // $option = self::find('theme');
-      // if ($option) {
-      //   $form_data['theme'] = $option->value;
-      // }
-      $form_data = Share::GetThemesInfo();
+    // $option = self::find('theme');
+    // if ($option) {
+    //   $form_data['theme'] = $option->value;
+    // }
+    $form_data = Share::GetThemesInfo();
 
     // }
     return [
@@ -399,15 +493,9 @@ class Option extends OptionModel
       $options_array[$option->name] = $option->value;
     }
 
-    //去除site_activation_key、smtp_host、smtp_password、smtp_port、smtp_reply_to、smtp_secure、smtp_send_name、smtp_username
-    unset($options_array['site_activation_key']);
-    unset($options_array['smtp_host']);
-    unset($options_array['smtp_password']);
-    unset($options_array['smtp_port']);
-    unset($options_array['smtp_reply_to']);
-    unset($options_array['smtp_secure']);
-    unset($options_array['smtp_send_name']);
-    unset($options_array['smtp_username']);
+    foreach(self::$sensitive_options as $sensitive_option) {
+      unset($options_array[$sensitive_option]);// 移除敏感选项
+    }
 
     return $options_array;
   }
@@ -420,9 +508,7 @@ class Option extends OptionModel
   public static function GetOption($name, $user_token)
   {
     $option = self::find($name);
-    //如果是site_activation_key、smtp_host、smtp_password、smtp_port、smtp_reply_to、smtp_secure、smtp_send_name、smtp_username其中之一，需要管理员权限
-    $arr = ['site_activation_key', 'smtp_host', 'smtp_password', 'smtp_port', 'smtp_reply_to', 'smtp_secure', 'smtp_send_name', 'smtp_username'];
-    if (in_array($name, $arr)) {
+    if (in_array($name, self::$sensitive_options)) {//检查是否敏感字段
       if (!UserGroupController::IsAdmin($user_token)) {
         return [
           'is_get' => false,
@@ -454,7 +540,7 @@ class Option extends OptionModel
     if ($option) {
       $option->value = $value;
       $is_set = $option->save();
-    }else{
+    } else {
       $option = new OptionModel();
       $option->name = $name;
       $option->value = $value;

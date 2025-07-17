@@ -57,11 +57,11 @@ class Topic extends TopicModel
     $is_valid_content =
       $name != null &&
       $description != null &&
-      $cover != null &&
+      // $cover != null &&
       $user_token != '' &&
       $name != '' &&
       $description != '' &&
-      $cover != '' &&
+      // $cover != '' &&
       $user_token != '';
     $is_add = false;
     $topic_id = null;
@@ -74,7 +74,17 @@ class Topic extends TopicModel
       $topic = new self();
       $topic->user_id = TokenController::GetUserId($user_token);
       $topic->name = $name;
-      $topic->cover = ImageController::SaveUploadImage('topic_cover', $cover, Share::ServerTime());
+      // $topic->cover = ImageController::SaveUploadImage('topic_cover', $cover, Share::ServerTime());
+      if ($cover != '') {
+        $topic->cover = ImageController::SaveUploadImage('topic_cover', $cover, Share::ServerTime());
+      } else {
+        $topic->cover = [
+          'original' => null,
+          'small' => null,
+          'middle' => null,
+          'large' => null,
+        ];
+      }
       $topic->description = $description;
       $topic->article_count = 0;
       $topic->question_count = 0;
@@ -246,7 +256,7 @@ class Topic extends TopicModel
          // UserGroupController::IsAdmin($user_token)
       ) {
         $topic->name = $name;
-        if ($cover != '') {
+        if ($cover != ''&&$cover != null) {
           //先将$topic->cover删除
           if (ImageController::DeleteUploadImage($topic->cover)) {
             $topic->cover = ImageController::SaveUploadImage('topic_cover', $cover, Share::ServerTime());

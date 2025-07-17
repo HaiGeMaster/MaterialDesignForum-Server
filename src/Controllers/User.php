@@ -25,9 +25,97 @@ use MaterialDesignForum\Plugins\Share;
 use MaterialDesignForum\Controllers\Question as QuestionController;
 use MaterialDesignForum\Controllers\Article as ArticleController;
 use MaterialDesignForum\Controllers\Answer as AnswerController;
+use MaterialDesignForum\Controllers\Oauth as OauthController;
 
 class User extends UserModel
 {
+  /**
+   * 通过第三方平台登录或注册用户
+   * @param string $oauthName 第三方平台标识符 如 github, microsoft 等
+   * @param string $oauthUserId 第三方平台用户ID
+   * @param string $oauthUserName 第三方平台用户名
+   * @param string $oauthUserMail 第三方平台用户邮箱 用来查找数据库中是否有对应的用户
+   * @param string $user_token 对应的用户token。可以为空
+   * @return OauthModel|null 返回添加或更新后的Oauth模型实例或null
+   */
+  public static function OauthLoginOrRegister($oauthName, $oauthUserId, $oauthUserName, $oauthUserMail, $user_token):array
+  {
+    $is_login = false;
+    $token = '';
+    //首先根据oauthUserId和oauthName查找是否存在对应的Oauth记录
+    $oauthUser = OauthController::GetOauthUser($oauthName, $oauthUserId);
+    if ($oauthUser) {//如果有绑定第三方平台记录，则直接查找对应用户去让其登录账号
+      $user_id = $oauthUser->user_id;
+      $local_user = self::where('user_id', '=', $user_id)
+        ->where('disable_time', '=', 0)
+        ->first();
+        if($local_user){
+          //顺便更新oauth记录的用户名
+          $update_oauth = OauthController::where('oauth_id', '=', $oauthUser->oauth_id)
+            ->update([
+              'oauth_user_name' => $oauthUserName,
+            ]);
+          $is_login = true;
+          $token = TokenController::SpawnUserToken($local_user);
+        }
+    }else if ($user_token) { //如果没有绑定第三方平台记录，且传入用户token，则根据token查找用户
+      $user_id = TokenController::GetUserId($user_token);
+      if ($user_id) {
+        $local_user = self::where('user_id', '=', $user_id)
+          ->where('disable_time', '=', 0)
+          ->first();
+        if ($local_user) {
+          $oauthUser = OauthController::AddOauthUser($oauthName, $oauthUserId, $oauthUserName, $local_user->user_id);
+          if ($oauthUser) {
+            $is_login = true;
+            $token = TokenController::SpawnUserToken($local_user);
+          }
+        }
+      }
+    }else{//如果没有绑定第三方平台记录，则根据 oauthUserMail 查找是否有对应的用户
+      $local_user = self::where('email', '=', $oauthUserMail)
+        ->where('disable_time', '=', 0)
+        ->first();
+      if ($local_user) { //如果有对应的用户，则添加或更新Oauth记录
+        $oauthUser = OauthController::AddOauthUser($oauthName, $oauthUserId, $oauthUserName, $local_user->user_id);
+        if ($oauthUser) {// 如果添加或更新成功，则登录用户
+          $is_login = true;
+          $token = TokenController::SpawnUserToken($local_user);
+        }
+      } else { //如果没有对应的用户，则注册新用户
+        $new_user = self::create([
+          'email' => $oauthUserMail,
+          'username' => $oauthUserName,
+          'password' => self::HandlePassword(Share::ServerTime()), //使用时间戳作为默认密码
+          'create_ip' => self::GetClientIP(),
+          'create_location' => self::GetClientLocation(),
+          'last_login_time' => Share::ServerTime(),
+          'last_login_ip' => self::GetClientIP(),
+          'last_login_location' => self::GetClientLocation(),
+          'location' => self::GetClientLocation(),
+          'language' => Config::GetWebDefaultLanguage(),
+          'create_time' => Share::ServerTime(),
+          'update_time' => Share::ServerTime(),
+          'avatar' => self::CreateDefaultAvatar($oauthUserName),
+          'cover' => self::CreateDefaultCover()
+        ]);
+        if ($new_user) {//如果新用户注册成功，则添加或更新Oauth记录
+          $new_user_model = self::where('email', '=', $oauthUserMail)->first();
+          if ($new_user_model) {
+            $oauthUser = OauthController::AddOauthUser($oauthName, $oauthUserId, $oauthUserName, $new_user_model->user_id);
+            if ($oauthUser) {
+              $is_login = true;
+              $token = TokenController::SpawnUserToken($new_user_model);
+            }
+          }
+        }
+      }
+    }
+    return [
+      'is_login' => $is_login,
+      'token' => $token,
+    ];
+  }
   /**
    * 请求注册用户
    * @param string $email 邮箱
@@ -120,9 +208,9 @@ class User extends UserModel
       if ($user_data != null) {
         if (
           ($user_data->user_id == $user_id &&
-          UserGroupController::Ability($user_token, 'ability_edit_own_info')) || 
-          (UserGroupController::IsAdmin($user_token)&&UserGroupController::Ability($user_token,'ability_admin_manage_user'))
-           // UserGroupController::IsAdmin($user_token)
+            UserGroupController::Ability($user_token, 'ability_edit_own_info')) ||
+          (UserGroupController::IsAdmin($user_token) && UserGroupController::Ability($user_token, 'ability_admin_manage_user'))
+          // UserGroupController::IsAdmin($user_token)
         ) {
           $user_data->username = $username;
           $user_data->email = $email;
@@ -313,11 +401,12 @@ class User extends UserModel
       }
       return [
         'is_login' => $is_login,
-        //'token' => $is_login ? $token : '',
         'token' => $token,
       ];
     } catch (\Exception $e) {
       return [
+        'is_login' => false,
+        'token' => '',
         'message' => $e->getMessage(),
       ];
     }
@@ -589,13 +678,13 @@ class User extends UserModel
             ->orderBy($field, $order)
             ->paginate($per_page, ['*'], 'page', $page);
         }
-      }else if($is_admin&&(UserGroupController::IsAdmin($user_token)||UserGroupController::IsAdminLogin($user_token))){
+      } else if ($is_admin && (UserGroupController::IsAdmin($user_token) || UserGroupController::IsAdminLogin($user_token))) {
         if ($search_keywords != '') {
           $data = self::where(function ($query) use ($search_field, $search_keywords) {
-              foreach ($search_field as $key => $value) {
-                $query->orWhere($value, 'like', '%' . $search_keywords . '%');
-              }
-            })
+            foreach ($search_field as $key => $value) {
+              $query->orWhere($value, 'like', '%' . $search_keywords . '%');
+            }
+          })
             ->orderBy($field, $order)
             ->paginate($per_page, ['*'], 'page', $page);
         } else {
@@ -618,7 +707,7 @@ class User extends UserModel
       }
     }
 
-    if ($data['data'] != null && !UserGroupController::IsAdmin($user_token)){
+    if ($data['data'] != null && !UserGroupController::IsAdmin($user_token)) {
       foreach ($data['data'] as $key => $value) {
         $data['data'][$key]['email'] = null; //不返回邮箱
         $data['data'][$key]['password'] = null; //不返回密码
@@ -971,7 +1060,7 @@ class User extends UserModel
       $upload_url = ImageController::SaveUploadImage($type, $file, $user_id);
       //上传成功,保存一份记录到数据库
       if ($upload_url != null) {
-        ImageController::AddImageRecord($type, 0, $user_id, $upload_url['original'],0,0);
+        ImageController::AddImageRecord($type, 0, $user_id, $upload_url['original'], 0, 0);
       }
       $is_upload = $upload_url != null;
       $data['is_upload'] = $is_upload;
@@ -1027,8 +1116,8 @@ class User extends UserModel
   {
     $is_set = false;
     $disable_time != 0 ? Share::ServerTime() : 0;
-    $is_admin =  (UserGroupController::IsAdmin($user_token)&&UserGroupController::Ability($user_token,'ability_admin_manage_user'));
-     // UserGroupController::IsAdmin($user_token)//UserGroupController::IsAdmin($user_token);
+    $is_admin =  (UserGroupController::IsAdmin($user_token) && UserGroupController::Ability($user_token, 'ability_admin_manage_user'));
+    // UserGroupController::IsAdmin($user_token)//UserGroupController::IsAdmin($user_token);
     if ($is_admin) {
       $is_set = self::whereIn('user_id', $user_ids)->update([
         'disable_time' => $disable_time,

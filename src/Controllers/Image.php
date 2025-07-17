@@ -376,6 +376,16 @@ class Image extends ImageModel
     $small = $pathArr['small'];
     $middle = $pathArr['middle'];
     $large = $pathArr['large'];
+
+    if($original== null && $small == null && $middle == null && $large == null){
+      return true; //如果所有路径都为空，直接返回true
+    }
+
+    //如果所有路径有包含http或https，那么直接返回true。因为可能是网络路径图片
+    if (strpos($original, 'http') === 0 || strpos($small, 'http') === 0 || strpos($middle, 'http') === 0 || strpos($large, 'http') === 0) {
+      return true;
+    }
+
     //将$original中的/public替换成public
     $original = str_replace('/public', 'public', $original);
     $small = str_replace('/public', 'public', $small);

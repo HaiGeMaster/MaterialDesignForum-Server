@@ -93,15 +93,15 @@ class Page
       Client::$lang = i18n::i18n()->locale;
       return Client::Users();
     });
-    $collector->get('/notifications', function () {
-      return Share::HandleThemePage(
-        i18n::i18n()->locale,
-        Config::GetWebTitleName(i18n::t('Message.Client.Notifications.WebSubTitle')),
-        //i18n::t('Message.Client.Notifications.WebSubTitle') . ' - ' . Config::getConfig()['site_name'],
-        i18n::t('Message.Client.Notifications.WebSubTitle'),
-        i18n::t('Message.Client.Notifications.WebSubTitle')
-      );
-    });
+    // $collector->get('/notifications', function () {
+    //   return Share::HandleThemePage(
+    //     i18n::i18n()->locale,
+    //     Config::GetWebTitleName(i18n::t('Message.Client.Notifications.WebSubTitle')),
+    //     //i18n::t('Message.Client.Notifications.WebSubTitle') . ' - ' . Config::getConfig()['site_name'],
+    //     i18n::t('Message.Client.Notifications.WebSubTitle'),
+    //     i18n::t('Message.Client.Notifications.WebSubTitle')
+    //   );
+    // });
     $collector->get('/admin/{value}?', function ($value = null) {
       Admin::$lang = i18n::i18n()->locale;
       return Admin::Index();
@@ -155,15 +155,15 @@ class Page
       Client::$lang = $lang;
       return Client::Users();
     });
-    $collector->get('/{lang:[a-z]{2}_[A-Z]{2}}/notifications', function ($lang) {
-      return Share::HandleThemePage(
-        $lang,
-        Config::GetWebTitleName(i18n::t('Message.Client.Notifications.WebSubTitle')),
-        //i18n::t('Message.Client.Notifications.WebSubTitle') . ' - ' . Config::getConfig()['site_name'],
-        i18n::t('Message.Client.Notifications.WebSubTitle'),
-        i18n::t('Message.Client.Notifications.WebSubTitle')
-      );
-    });
+    // $collector->get('/{lang:[a-z]{2}_[A-Z]{2}}/notifications', function ($lang) {
+    //   return Share::HandleThemePage(
+    //     $lang,
+    //     Config::GetWebTitleName(i18n::t('Message.Client.Notifications.WebSubTitle')),
+    //     //i18n::t('Message.Client.Notifications.WebSubTitle') . ' - ' . Config::getConfig()['site_name'],
+    //     i18n::t('Message.Client.Notifications.WebSubTitle'),
+    //     i18n::t('Message.Client.Notifications.WebSubTitle')
+    //   );
+    // });
     $collector->get('/{lang:[a-z]{2}_[A-Z]{2}}/admin/{value}?', function ($lang, $value = null) {
       Admin::$lang = $lang;
       return Admin::Index();

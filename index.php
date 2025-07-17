@@ -8,11 +8,11 @@ use MaterialDesignForum\Routes\Api;
 use MaterialDesignForum\Routes\Page;
 use MaterialDesignForum\Config\Install;
 
-    // //输出从请求标头中获取的内容
-    // echo json_encode(getallheaders());
-    // return;
+// //输出从请求标头中获取的内容
+// echo json_encode(getallheaders());
+// return;
 
-try{
+try {
   //检查是否为安装模式
   if (Install::AsInstall()) {
     if (Api::IsApi()) {
@@ -29,7 +29,7 @@ try{
       echo Page::HandleInstallRoute();
     }
   }
-}catch(\Exception $e) {
+} catch (\Exception $e) {
 
   //直接进入安装页面
   // if (Api::IsApi()) {
@@ -47,7 +47,17 @@ try{
   //   'code' => $e->getCode()
   // ]);
 
-  echo '<h1>Material Design Forum 发生错误 errow</h1>';
+  header('Content-Type: text/html; charset=utf-8');
+  echo '<!DOCTYPE html>';
+  echo '<html lang="zh-CN">';
+  echo '<head>';
+  echo '<meta charset="UTF-8">';
+  echo '<meta name="viewport" content="width=device-width, initial-scale=1.0">';
+  echo '<title>Material Design Forum 错误</title>';
+  echo '</head>';
+  echo '<body>';
+
+  echo '<h1 style="color:red;">Material Design Forum 发生错误 error</h1>';
   echo '<code>发生错误：<br>';
   echo '<pre>';
   echo '错误信息：' . $e->getMessage() . '<br>';
@@ -57,4 +67,12 @@ try{
   echo '错误追踪：<br>' . nl2br($e->getTraceAsString()) . '<br>';
   echo '</pre>';
   echo '</code>';
+  echo '<p>请检查服务器日志以获取更多详细信息。</p>';
+  echo '<p>如果您是开发者，请检查代码并修复错误。</p>';
+  echo '<p>如果您是用户，请联系网站管理员。</p>';
+  echo '<p>感谢您的理解和支持！</p>';
+
+  echo '</body>';
+  echo '</html>';
+  exit;
 }

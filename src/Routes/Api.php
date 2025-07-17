@@ -189,6 +189,31 @@ class Api
         )
       );
     });
+    $collector->post('/api/options/get/oauth', function () {
+      $data = Share::GetRequestData();
+      return Share::HandleArrayToJSON(
+        \MaterialDesignForum\Controllers\Option::GetOauthOptions(
+          $data['user_token']??''
+        )
+      );
+    });
+    $collector->post('/api/options/set/oauth', function () {
+      $data = Share::GetRequestData();
+      return Share::HandleArrayToJSON(
+        \MaterialDesignForum\Controllers\Option::SetOauthOptions(
+          $data['form_data'],
+          $data['user_token']??''
+        )
+      );
+    });
+    $collector->post('/api/option/get/oauth/client_id', function () {
+      $data = Share::GetRequestData();
+      return Share::HandleArrayToJSON(
+        \MaterialDesignForum\Controllers\Option::GetOauthClientId(
+          $data['oauth_name']
+        )
+      );
+    });
     $collector->post('/api/option/set', function () {
       $data = Share::GetRequestData();
       return Share::HandleArrayToJSON(
@@ -478,7 +503,7 @@ class Api
         \MaterialDesignForum\Controllers\Topic::AddTopic(
           $data['title'],
           $data['description'],
-          $data['cover'],
+          $data['cover']??'',
           $data['user_token']??''
         )
       );
@@ -919,6 +944,40 @@ class Api
       );
     });
 
+    
+    $collector->get('/api/oauth/redirect/{oauth_name}', function ($oauth_name) {
+
+      //获取当前路径?后面的字符
+      $str = parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY);
+      //将其转换为变量
+      parse_str($str, $params);//获得一个数组$params
+      $code = $params['code'] ?? null;//成功获取到github的code
+      return Share::HandleArrayToJSON(
+       \MaterialDesignForum\Plugins\Oauth::ExecuteOAuthFlow(
+        $oauth_name,
+        $code,
+      ));
+    });
+
+    $collector->post('/api/oauths/get', function () {
+      $data = Share::GetRequestData();
+      return Share::HandleArrayToJSON(
+        \MaterialDesignForum\Controllers\Oauth::GetOauths(
+          $data['user_token']??''
+        )
+      );
+    });
+
+    $collector->post('/api/oauth/delete', function () {
+      $data = Share::GetRequestData();
+      return Share::HandleArrayToJSON(
+        \MaterialDesignForum\Controllers\Oauth::DeleteOauth(
+          $data['user_token']??'',
+          $data['oauth_id']??null
+        )
+      );
+    });
+
     if(!Install::GetInstallInfoJson()["install"]){
       $collector->post('/api/install/get_install_info_json', function () {
         return Share::HandleArrayToJSON(
@@ -992,7 +1051,7 @@ class Api
       //header("Location: /");
       // echo 'Api Is Not Found,PHP_EOL:' . PHP_EOL . ',$e:' . $e;
       $error = [
-        'error' => 'The route or interface is undefined',
+        'error' => 'HandleAPI The route or interface is undefined',
         'PHP_EOL' => PHP_EOL,
         'request_uri' => $_SERVER['REQUEST_URI'],
         '$e' => $e
