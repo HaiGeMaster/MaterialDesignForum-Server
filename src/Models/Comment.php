@@ -94,7 +94,12 @@ class Comment extends Eloquent
   public static function SubReplyCount($comment_id, $count = 1): bool
   {
     $comment = self::find($comment_id);
+    if($comment->reply_count <= 0){
+      $comment->reply_count = 0;
+      return $comment->save();
+    }
     $comment->reply_count -= $count;
+
     return $comment->save();
   }
   /**

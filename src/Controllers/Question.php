@@ -341,7 +341,7 @@ class Question extends QuestionModel
         ) {
           $question->delete_time = Share::ServerTime();
           UserController::SubQuestionCount($question->user_id);
-          TopicController::SubQuestionCount($question->topics);
+          // TopicController::SubQuestionCount($question->topics);
           NotificationController::AddInteractionNotification(
             $question->user_id,
             $user_id,

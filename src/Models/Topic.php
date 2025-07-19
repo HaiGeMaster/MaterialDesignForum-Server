@@ -65,20 +65,6 @@ class Topic extends Eloquent
     }
   }
   /**
-   * 减少文章数量
-   * @param int $topic_id 话题ID
-   * @return bool 是否成功
-   */
-  public static function SubArticleCount($topic_id, $count = 1): bool
-  {
-    $topic = self::find($topic_id);
-    if ($topic->article_count <= 0) {
-      return true;
-    }
-    $topic->article_count -= $count;
-    return $topic->save();
-  }
-  /**
    * 增加问题数量
    * @param int $topic_id 话题ID
    * @return bool 是否成功
@@ -92,20 +78,6 @@ class Topic extends Eloquent
     } else {
       return false;
     }
-  }
-  /**
-   * 减少问题数量
-   * @param int $topic_id 话题ID
-   * @return bool 是否成功
-   */
-  public static function SubQuestionCount($topic_id, $count = 1): bool
-  {
-    $topic = self::find($topic_id);
-    if ($topic->question_count <= 0) {
-      return true;
-    }
-    $topic->question_count -= $count;
-    return $topic->save();
   }
   /**
    * 增加关注者数量
@@ -126,6 +98,36 @@ class Topic extends Eloquent
     }
   }
   /**
+   * 减少文章数量
+   * @param int $topic_id 话题ID
+   * @return bool 是否成功
+   */
+  public static function SubArticleCount($topic_id, $count = 1): bool
+  {
+    $topic = self::find($topic_id);
+    if ($topic->article_count <= 0) {
+      $topic->article_count = 0;
+      return $topic->save();
+    }
+    $topic->article_count -= $count;
+    return $topic->save();
+  }
+  /**
+   * 减少问题数量
+   * @param int $topic_id 话题ID
+   * @return bool 是否成功
+   */
+  public static function SubQuestionCount($topic_id, $count = 1): bool
+  {
+    $topic = self::find($topic_id);
+    if ($topic->question_count <= 0) {
+      $topic->question_count = 0;
+      return $topic->save();
+    }
+    $topic->question_count -= $count;
+    return $topic->save();
+  }
+  /**
    * 减少关注者数量
    * @param int $topic_id 话题ID
    * @return bool 是否成功
@@ -134,7 +136,8 @@ class Topic extends Eloquent
   {
     $topic = self::find($topic_id);
     if ($topic->follower_count <= 0) {
-      return true;
+      $topic->follower_count = 0;
+      return $topic->save();
     }
     $topic->follower_count -= $count;
     return $topic->save();

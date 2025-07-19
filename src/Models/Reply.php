@@ -98,6 +98,10 @@ class Reply extends Eloquent
   public static function SubReplyCount($reply_id, $count = 1): bool
   {
     $reply = self::find($reply_id);
+    if($reply->reply_count <= 0){
+      $reply->reply_count = 0;
+      return $reply->save();
+    }
     $reply->reply_count -= $count;
     return $reply->save();
   }

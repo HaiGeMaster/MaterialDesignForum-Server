@@ -2,6 +2,15 @@
 
 更新日志
 
+某些更新版本为开发时发布版本，所以这些版本不提供更新包
+
+20250718130930 更新
+新增：Vuetify2、MDUI2主题客户端OAuth第三方平台登录：Github，Microsoft
+新增：Vuetify2、MDUI2主题客户端设置页新增第三方平台绑定入口：Github，Microsoft
+新增：Vuetify2、MDUI2主题客户端登录、注册对话框新增第三方平台绑定入口：Github，Microsoft
+新增：PHP后端OAuth模型、控制器等服务文件
+新增：.sql文件结构新增表。请手动迁移数据。
+
 20250715193236 更新
 修复：MDUI2主题客户端回复item不显示自己昵称问题。
 优化：Vuetify2、MDUI2主题客户端富文本编辑器样式排布

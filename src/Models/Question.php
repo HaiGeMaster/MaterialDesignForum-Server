@@ -124,6 +124,10 @@ class Question extends Eloquent
   public static function SubCommentCount($question_id, $count = 1): bool
   {
     $question = self::find($question_id);
+    if($question->comment_count <= 0){
+      $question->comment_count = 0;
+      return $question->save();
+    }
     $question->comment_count -= $count;
     return $question->save();
   }
@@ -136,6 +140,10 @@ class Question extends Eloquent
   public static function SubAnswerCount($question_id, $count = 1): bool
   {
     $question = self::find($question_id);
+    if($question->answer_count <= 0){
+      $question->answer_count = 0;
+      return $question->save();
+    }
     $question->answer_count -= $count;
     return $question->save();
   }
@@ -148,6 +156,10 @@ class Question extends Eloquent
   public static function SubFollowerCount($question_id, $count = 1): bool
   {
     $question = self::find($question_id);
+    if($question->follower_count <= 0){
+      $question->follower_count = 0;
+      return $question->save();
+    }
     $question->follower_count -= $count;
     return $question->save();
   }

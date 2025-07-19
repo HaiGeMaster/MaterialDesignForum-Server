@@ -170,15 +170,17 @@ class Oauth
             $data['user']['id'] ?? '',
             $data['user']['login'] ?? $data['user']['displayName'] ?? '',
             $data['user']['email'] ?? '',
+            $data['user'],
             $client_user_token
           );
           break;
         case 'microsoft':
           $res = UserController::OauthLoginOrRegister(
             $oauthName,
-            $userInfo['id'] ?? '',
-            $userInfo['displayName'] ?? '',
-            $userInfo['mail'] ?? '',
+            $data['user']['id'] ?? '',
+            $data['user']['displayName'] ?? '',
+            $data['user']['mail'] ?? '',
+            $data['user'],
             $client_user_token
           );
           break;
@@ -414,12 +416,21 @@ class Oauth
     // 构造请求 URL
     $url = 'https://login.microsoftonline.com/common/oauth2/v2.0/token';
 
+    //如果路由包含localhost
+    $redirect_uri = '';
+    if(strpos($_SERVER['HTTP_HOST'], 'localhost') !== false) {
+      $redirect_uri = 'http://localhost:83/api/oauth/redirect/microsoft';
+    } else {
+      //获取当前域名
+      $redirect_uri = 'https://' . $_SERVER['HTTP_HOST'] . '/api/oauth/redirect/microsoft';
+    }
+
     // 构造请求数据
     $data = [
       'client_id' => $clientID,
       'client_secret' => $clientSecret,
       'code' => $requestToken,
-      'redirect_uri' => 'http://localhost:83/api/oauth/redirect/microsoft', // 确保与 Microsoft 应用设置的回调 URI 一致
+      'redirect_uri' => $redirect_uri, // 确保与 Microsoft 应用设置的回调 URI 一致
       'grant_type' => 'authorization_code'
     ];
 

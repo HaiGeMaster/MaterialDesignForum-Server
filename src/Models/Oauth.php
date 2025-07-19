@@ -17,6 +17,9 @@ class Oauth extends Eloquent
   protected $table = 'oauth';
   public $timestamps = false;
   protected $primaryKey = 'oauth_id';
+  protected $casts = [
+    'oauth_source_response' => 'array', //这个字段的值将会被自动转换为 PHP 数组：
+  ];
 
   /**
    * @typedef OauthModel 第三方登录模型
@@ -31,6 +34,7 @@ class Oauth extends Eloquent
     'oauth_name',
     'oauth_user_id',
     'oauth_user_name',
+    'oauth_source_response',
     'user_id'
   ];
 }

@@ -20,25 +20,29 @@ class Oauth extends OauthModel
    * @param string $oauthName 第三方平台标识符
    * @param string $oauthUserId 第三方平台用户ID
    * @param string $oauthUserName 第三方平台用户名
+   * @param string $oauthSourceResponse 第三方平台返回的用户信息
    * @param int $userId 对应用户ID
    * @return OauthModel 返回添加或更新后的Oauth模型实例
    */
-  public static function AddOauthUser($oauthName, $oauthUserId, $oauthUserName, $userId)
+  public static function AddOauthUser($oauthName, $oauthUserId, $oauthUserName, $oauthSourceResponse, $userId)
   {
     // 获取用户ID
     // $userId = TokenController::GetUserId($user_token);
     if (!$userId) {
       return null; // 如果无法获取用户ID，返回null
     }
+
+    // $oauthSourceResponse = json_encode($oauthSourceResponse);
     // 检查是否已存在相同的第三方用户
     $existingOauth = self::where('oauth_name', $oauthName)
       ->where('oauth_user_id', $oauthUserId)
       ->first();
 
     if ($existingOauth) {
-      // 如果已存在，更新用户ID
-      // $existingOauth->user_id = $userId;
-      // $existingOauth->save();
+      // 如果已存在，更新数据
+      $existingOauth->oauth_user_name = $oauthUserName;
+      $existingOauth->oauth_source_response = $oauthSourceResponse;
+      $existingOauth->save();
       return $existingOauth;
     }
 
@@ -47,6 +51,7 @@ class Oauth extends OauthModel
       'oauth_name' => $oauthName,
       'oauth_user_id' => $oauthUserId,
       'oauth_user_name' => $oauthUserName,
+      'oauth_source_response' => $oauthSourceResponse,
       'user_id' => $userId
     ]);
   }

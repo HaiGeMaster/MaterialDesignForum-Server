@@ -35,10 +35,11 @@ class User extends UserModel
    * @param string $oauthUserId 第三方平台用户ID
    * @param string $oauthUserName 第三方平台用户名
    * @param string $oauthUserMail 第三方平台用户邮箱 用来查找数据库中是否有对应的用户
+   * @param string $oauthSourceResponse 第三方平台返回的用户信息
    * @param string $user_token 对应的用户token。可以为空
    * @return OauthModel|null 返回添加或更新后的Oauth模型实例或null
    */
-  public static function OauthLoginOrRegister($oauthName, $oauthUserId, $oauthUserName, $oauthUserMail, $user_token):array
+  public static function OauthLoginOrRegister($oauthName, $oauthUserId, $oauthUserName, $oauthUserMail, $oauthSourceResponse, $user_token):array
   {
     $is_login = false;
     $token = '';
@@ -64,8 +65,8 @@ class User extends UserModel
         $local_user = self::where('user_id', '=', $user_id)
           ->where('disable_time', '=', 0)
           ->first();
-        if ($local_user) {
-          $oauthUser = OauthController::AddOauthUser($oauthName, $oauthUserId, $oauthUserName, $local_user->user_id);
+        if ($local_user) {//为其绑定Oauth记录
+          $oauthUser = OauthController::AddOauthUser($oauthName, $oauthUserId, $oauthUserName, $oauthSourceResponse, $local_user->user_id);
           if ($oauthUser) {
             $is_login = true;
             $token = TokenController::SpawnUserToken($local_user);
@@ -77,7 +78,7 @@ class User extends UserModel
         ->where('disable_time', '=', 0)
         ->first();
       if ($local_user) { //如果有对应的用户，则添加或更新Oauth记录
-        $oauthUser = OauthController::AddOauthUser($oauthName, $oauthUserId, $oauthUserName, $local_user->user_id);
+        $oauthUser = OauthController::AddOauthUser($oauthName, $oauthUserId, $oauthUserName, $oauthSourceResponse, $local_user->user_id);
         if ($oauthUser) {// 如果添加或更新成功，则登录用户
           $is_login = true;
           $token = TokenController::SpawnUserToken($local_user);
@@ -102,7 +103,7 @@ class User extends UserModel
         if ($new_user) {//如果新用户注册成功，则添加或更新Oauth记录
           $new_user_model = self::where('email', '=', $oauthUserMail)->first();
           if ($new_user_model) {
-            $oauthUser = OauthController::AddOauthUser($oauthName, $oauthUserId, $oauthUserName, $new_user_model->user_id);
+            $oauthUser = OauthController::AddOauthUser($oauthName, $oauthUserId, $oauthUserName, $oauthSourceResponse, $new_user_model->user_id);
             if ($oauthUser) {
               $is_login = true;
               $token = TokenController::SpawnUserToken($new_user_model);
