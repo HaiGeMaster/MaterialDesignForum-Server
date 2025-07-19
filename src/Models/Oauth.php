@@ -27,6 +27,7 @@ class Oauth extends Eloquent
    * @property string $oauth_name 第三方平台标识符 如 github, microsoft 等
    * @property string $oauth_user_id 第三方平台用户ID
    * @property string $oauth_user_name 第三方平台用户名
+   * @property string $oauth_user_email 第三方平台用户邮箱
    * @property int $user_id 对应用户ID
    */
   protected $fillable = [
@@ -34,6 +35,7 @@ class Oauth extends Eloquent
     'oauth_name',
     'oauth_user_id',
     'oauth_user_name',
+    'oauth_user_email',
     'oauth_source_response',
     'user_id'
   ];

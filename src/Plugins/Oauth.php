@@ -153,23 +153,20 @@ class Oauth
         'mdf_user_token' => $_COOKIE['user_token'] ?? null,
       ];
 
-      // UserController::OauthLoginOrRegister(
-      //   $oauthName,
-      //   $userInfo['id'] ?? '',
-      //   $userInfo['login'] ?? $userInfo['displayName'] ?? '',
-      //   $userInfo['email'] ?? ''
-      // );
-
       $client_user_token = $_COOKIE['user_token'] ?? null;
 
       $res = [];
       switch ($oauthName) {
         case 'github':
+          if($data['user']['email'] == null){
+            $data['user']['email'] = json_encode(self::GetGitHubUserEmails($data['access_token']));
+            $data['user']['email'] = json_decode($data['user']['email'])[0]->email;
+          }
           $res = UserController::OauthLoginOrRegister(
             $oauthName,
             $data['user']['id'] ?? '',
             $data['user']['login'] ?? $data['user']['displayName'] ?? '',
-            $data['user']['email'] ?? '',
+            $data['user']['email'],
             $data['user'],
             $client_user_token
           );
@@ -198,6 +195,7 @@ class Oauth
       echo 'localStorage.setItem("user_token", "' . $res['token'] . '");';
       echo 'window.location.href = "/";';
       echo '</script>';
+      exit;
       // return $res;
     } catch (\Exception $e) {
       // 记录错误日志(实际应用中应该使用日志系统)
@@ -221,7 +219,7 @@ class Oauth
     $url = 'https://github.com/login/oauth/access_token?' .
       'client_id=' . urlencode($clientID) .
       '&client_secret=' . urlencode($clientSecret) .
-      '&scope=' . urlencode('user') . // 可选的 scope，根据需要调整
+      // '&scope=' . urlencode('user') . // 可选的 scope，根据需要调整
       '&code=' . urlencode($requestToken);
 
     // 初始化 cURL
@@ -296,7 +294,7 @@ class Oauth
    */
   public static function GetGitHubUserEmails(string $accessToken): array
   {
-    $result = self::CallGitHubApi("/user/emails", $accessToken);
+    $result = self::CallGitHubApi("/user/emails?access_token=$accessToken", $accessToken);
 
     // 检查是否是错误响应
     if (isset($result['error'])) {
@@ -308,11 +306,17 @@ class Oauth
       throw new \Exception("GitHub API 返回了无效的数据格式");
     }
 
+    // echo $result;
+    // exit;
+
     // 过滤出已验证的邮箱
     return array_filter($result, function ($email) {
       // 确保$email是数组且包含'verified'键
       return is_array($email) && isset($email['verified']) && $email['verified'];
     });
+
+    // $url = "https://api.github.com/user/emails?access_token=$accessToken";
+    // $result = self::CallGitHubApi($url, $accessToken);
   }
 
   /**
@@ -418,7 +422,7 @@ class Oauth
 
     //如果路由包含localhost
     $redirect_uri = '';
-    if(strpos($_SERVER['HTTP_HOST'], 'localhost') !== false) {
+    if (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false) {
       $redirect_uri = 'http://localhost:83/api/oauth/redirect/microsoft';
     } else {
       //获取当前域名

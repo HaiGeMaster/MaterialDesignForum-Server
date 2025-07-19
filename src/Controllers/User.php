@@ -66,7 +66,7 @@ class User extends UserModel
           ->where('disable_time', '=', 0)
           ->first();
         if ($local_user) {//为其绑定Oauth记录
-          $oauthUser = OauthController::AddOauthUser($oauthName, $oauthUserId, $oauthUserName, $oauthSourceResponse, $local_user->user_id);
+          $oauthUser = OauthController::AddOauthUser($oauthName, $oauthUserId, $oauthUserName, $oauthUserMail, $oauthSourceResponse, $local_user->user_id);
           if ($oauthUser) {
             $is_login = true;
             $token = TokenController::SpawnUserToken($local_user);
@@ -78,7 +78,7 @@ class User extends UserModel
         ->where('disable_time', '=', 0)
         ->first();
       if ($local_user) { //如果有对应的用户，则添加或更新Oauth记录
-        $oauthUser = OauthController::AddOauthUser($oauthName, $oauthUserId, $oauthUserName, $oauthSourceResponse, $local_user->user_id);
+        $oauthUser = OauthController::AddOauthUser($oauthName, $oauthUserId, $oauthUserName, $oauthUserMail, $oauthSourceResponse, $local_user->user_id);
         if ($oauthUser) {// 如果添加或更新成功，则登录用户
           $is_login = true;
           $token = TokenController::SpawnUserToken($local_user);
@@ -103,7 +103,7 @@ class User extends UserModel
         if ($new_user) {//如果新用户注册成功，则添加或更新Oauth记录
           $new_user_model = self::where('email', '=', $oauthUserMail)->first();
           if ($new_user_model) {
-            $oauthUser = OauthController::AddOauthUser($oauthName, $oauthUserId, $oauthUserName, $oauthSourceResponse, $new_user_model->user_id);
+            $oauthUser = OauthController::AddOauthUser($oauthName, $oauthUserId, $oauthUserName, $oauthUserMail, $oauthSourceResponse, $new_user_model->user_id);
             if ($oauthUser) {
               $is_login = true;
               $token = TokenController::SpawnUserToken($new_user_model);
