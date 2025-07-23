@@ -131,6 +131,18 @@ class Oauth
           //   }
           // }
           break;
+        case 'google':
+          // Google OAuth流程
+          $clientID = OptionController::where('name', 'google_client_id')->value('value');
+          $clientSecret = OptionController::where('name', 'google_client_secret')->value('value');
+          // 1. 获取Google OAuth Access Token
+          $tokenResponse = self::GetGoogleAccessToken($clientID, $clientSecret, $requestToken);
+          $accessToken = $tokenResponse['access_token'];
+          // 2. 获取用户基本信息
+          $userInfo = self::GetGoogleUserInfo($accessToken);
+          // 3. 可以在这里获取更多用户信息(可选)
+          // $userEmails = self::GetGitHubUserEmails($accessToken);
+          break;
         default:
           throw new \Exception("不支持的OAuth名称: $oauthName");
       }
@@ -158,7 +170,7 @@ class Oauth
       $res = [];
       switch ($oauthName) {
         case 'github':
-          if($data['user']['email'] == null){
+          if ($data['user']['email'] == null) {
             $data['user']['email'] = json_encode(self::GetGitHubUserEmails($data['access_token']));
             $data['user']['email'] = json_decode($data['user']['email'])[0]->email;
           }
@@ -569,6 +581,180 @@ class Oauth
     if ($statusCode >= 400) {
       return [
         "error" => "Microsoft API Error",
+        "status_code" => $statusCode,
+        "response" => json_decode($response, true) ?: $response
+      ];
+    }
+
+    // 解析 JSON 响应
+    $data = json_decode($response, true);
+    if ($data === NULL && $response !== "") {
+      return ["error" => "Failed to decode JSON response", "raw_response" => $response];
+    }
+
+    return $data;
+  }
+  /**
+   * 获取 Google OAuth Access Token
+   *
+   * @param string $clientID Google 应用的 Client ID
+   * @param string $clientSecret Google 应用的 Client Secret
+   * @param string $requestToken 前端传递过来的授权 code
+   * @return array Google 返回的 JSON 响应(已解析为关联数组)
+   * @throws Exception 如果请求失败或解析出错则抛出异常
+   */
+  public static function GetGoogleAccessToken(string $clientID, string $clientSecret, string $requestToken): array
+  {
+    // 构造请求 URL
+    $url = 'https://oauth2.googleapis.com/token';
+
+    // 动态获取 redirect_uri（与 Microsoft 版本保持一致）
+    $redirect_uri = '';
+    if (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false) {
+      $redirect_uri = 'http://localhost:83/api/oauth/redirect/google';
+    } else {
+      // 获取当前域名
+      $redirect_uri = 'https://' . $_SERVER['HTTP_HOST'] . '/api/oauth/redirect/google';
+    }
+
+    // 构造请求数据
+    $data = [
+      'client_id' => $clientID,
+      'client_secret' => $clientSecret,
+      'code' => $requestToken,
+      'redirect_uri' => $redirect_uri, // 必须与 Google Cloud Console 中注册的一致
+      'grant_type' => 'authorization_code'
+    ];
+
+    // 初始化 cURL
+    $ch = curl_init($url);
+
+    // 设置 cURL 选项
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // 返回响应内容
+    curl_setopt($ch, CURLOPT_POST, true); // POST 请求
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+      'Accept: application/json' // 设置请求头为 JSON
+    ]);
+
+    // SSL 验证设置
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);  // 启用证书验证
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);      // 严格验证主机名
+    curl_setopt($ch, CURLOPT_CAINFO, $_SERVER['DOCUMENT_ROOT'] . '/assets/cacert-2025-07-15.pem'); // 指定 CA 证书路径
+
+    // 执行请求
+    $response = curl_exec($ch);
+
+    // 检查 cURL 是否有错误
+    if (curl_errno($ch)) {
+      $errorMsg = 'cURL 错误: ' . curl_error($ch);
+      curl_close($ch);
+      throw new \Exception($errorMsg);
+    }
+
+    // 获取 HTTP 状态码
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    if ($httpCode !== 200) {
+      $errorMsg = "Google API 返回非 200 状态码: $httpCode 。响应内容: $response";
+      curl_close($ch);
+      throw new \Exception($errorMsg);
+    }
+
+    // 关闭 cURL
+    curl_close($ch);
+
+    // 解析 JSON 响应
+    $tokenResponse = json_decode($response, true);
+
+    // 检查 JSON 解析是否成功
+    if ($tokenResponse === null) {
+      throw new \Exception('JSON 解析失败: ' . json_last_error_msg());
+    }
+
+    // 检查是否包含 access_token 字段
+    if (!isset($tokenResponse['access_token'])) {
+      throw new \Exception('Google API 响应中缺少 access_token 字段。$tokenResponse:' . $tokenResponse . '');
+    }
+
+    return $tokenResponse;
+  }
+  /**
+   * 获取 Google 用户信息
+   *
+   * @param string $accessToken Google OAuth Access Token
+   * @return array 用户信息数组
+   * @throws Exception 如果请求失败则抛出异常
+   */
+  public static function GetGoogleUserInfo(string $accessToken): array
+  {
+    return self::CallGoogleApi("/oauth2/v3/userinfo", $accessToken);
+  }
+  /**
+   * 调用 Google API(cURL 版)
+   * 
+   * @param string $endpoint Google API 端点(如 "/oauth2/v3/userinfo")
+   * @param string $accessToken Google OAuth Access Token
+   * @param string $method HTTP 方法(GET/POST/PUT/DELETE，默认 GET)
+   * @param array $postData POST 数据(仅用于 POST/PUT 请求)
+   * @param int $timeout 超时时间(秒，默认 30)
+   * @return array|string API 返回的 JSON 数据(解析为数组)或错误信息
+   */
+  public static function CallGoogleApi($endpoint, $accessToken, $method = "GET", $postData = [], $timeout = 30)
+  {
+    $url = "https://www.googleapis.com" . $endpoint;
+
+    // 初始化 cURL
+    $ch = curl_init($url);
+
+    // 设置默认请求头
+    $headers = [
+      "Authorization: Bearer $accessToken",
+      "Accept: application/json" // Google 推荐的 API 版本
+    ];
+
+    // 如果是 POST/PUT 请求，添加 Content-Type
+    if (in_array(strtoupper($method), ["POST", "PUT"])) {
+      $headers[] = "Content-Type: application/json";
+    }
+
+    // 设置 cURL 选项
+    curl_setopt_array($ch, [
+      CURLOPT_HTTPHEADER => $headers,
+      CURLOPT_RETURNTRANSFER => true, // 返回响应数据而不是直接输出
+      CURLOPT_FOLLOWLOCATION => true, // 跟随重定向
+      CURLOPT_TIMEOUT => $timeout, // 超时时间
+      CURLOPT_SSL_VERIFYPEER => true, // 验证 SSL 证书(生产环境必须开启)
+      CURLOPT_SSL_VERIFYHOST => 2, // 严格验证主机名
+      CURLOPT_CAINFO => $_SERVER['DOCUMENT_ROOT'] . '/assets/cacert-2025-07-15.pem' // 指定 CA 证书路径(如果需要)
+    ]);
+
+    // 如果是 POST/PUT 请求，添加请求体
+    if (in_array(strtoupper($method), ["POST", "PUT"]) && !empty($postData)) {
+      curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postData));
+    }
+
+    // 设置 HTTP 方法
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, strtoupper($method));
+
+    // 发送请求
+    $response = curl_exec($ch);
+
+    // 检查 cURL 错误
+    if ($response === FALSE) {
+      $curlError = curl_error($ch);
+      $curlErrno = curl_errno($ch);
+      curl_close($ch);
+      return ["error" => "cURL Error", "details" => $curlError, "errno" => $curlErrno];
+    }
+
+    // 获取 HTTP 状态码
+    $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    // 检查 Google API 错误状态码
+    if ($statusCode >= 400) {
+      return [
+        "error" => "Google API Error",
         "status_code" => $statusCode,
         "response" => json_decode($response, true) ?: $response
       ];

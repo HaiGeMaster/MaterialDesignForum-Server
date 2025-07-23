@@ -32,10 +32,12 @@ class Option extends OptionModel
     'smtp_secure',
     'smtp_send_name',
     'smtp_username',
+    'github_client_id',
+    'github_client_secret',
+    'google_client_id',
+    'google_client_secret',
     'microsoft_client_id',
     'microsoft_client_secret',
-    'github_client_id',
-    'github_client_secret'
   ];
   /**
    * 获取Oauth所有的选项
@@ -46,14 +48,6 @@ class Option extends OptionModel
   {
     $form_data = [];
     if (UserGroupController::IsAdmin($user_token)) {
-      $option = self::find('microsoft_client_id');
-      if ($option) {
-        $form_data['microsoft_client_id'] = $option->value;
-      }
-      $option = self::find('microsoft_client_secret');
-      if ($option) {
-        $form_data['microsoft_client_secret'] = $option->value;
-      }
       $option = self::find('github_client_id');
       if ($option) {
         $form_data['github_client_id'] = $option->value;
@@ -61,6 +55,22 @@ class Option extends OptionModel
       $option = self::find('github_client_secret');
       if ($option) {
         $form_data['github_client_secret'] = $option->value;
+      }
+      $option = self::find('google_client_id');
+      if ($option) {
+        $form_data['google_client_id'] = $option->value;
+      }
+      $option = self::find('google_client_secret');
+      if ($option) {
+        $form_data['google_client_secret'] = $option->value;
+      }
+      $option = self::find('microsoft_client_id');
+      if ($option) {
+        $form_data['microsoft_client_id'] = $option->value;
+      }
+      $option = self::find('microsoft_client_secret');
+      if ($option) {
+        $form_data['microsoft_client_secret'] = $option->value;
       }
     }
     return [
@@ -72,16 +82,6 @@ class Option extends OptionModel
   {
     $is_set = false;
     if (UserGroupController::IsAdmin($user_token)) {
-      $option = self::find('microsoft_client_id');
-      if ($option) {
-        $option->value = $form_data['microsoft_client_id'];
-        $option->save();
-      }
-      $option = self::find('microsoft_client_secret');
-      if ($option) {
-        $option->value = $form_data['microsoft_client_secret'];
-        $option->save();
-      }
       $option = self::find('github_client_id');
       if ($option) {
         $option->value = $form_data['github_client_id'];
@@ -90,6 +90,26 @@ class Option extends OptionModel
       $option = self::find('github_client_secret');
       if ($option) {
         $option->value = $form_data['github_client_secret'];
+        $option->save();
+      }
+      $option = self::find('google_client_id');
+      if ($option) {
+        $option->value = $form_data['google_client_id'];
+        $option->save();
+      }
+      $option = self::find('google_client_secret');
+      if ($option) {
+        $option->value = $form_data['google_client_secret'];
+        $option->save();
+      }
+      $option = self::find('microsoft_client_id');
+      if ($option) {
+        $option->value = $form_data['microsoft_client_id'];
+        $option->save();
+      }
+      $option = self::find('microsoft_client_secret');
+      if ($option) {
+        $option->value = $form_data['microsoft_client_secret'];
         $option->save();
       }
       $is_set = true;
@@ -116,6 +136,39 @@ class Option extends OptionModel
       'is_get' => false,
       'client_id' => null,
     ];
+  }
+  /**
+   * 获取指定第三方平台的Client Link
+   * @param string $oauthName 第三方平台标识符 可选值：github、microsoft
+   * @return string|null 返回Client Link或null
+   */
+  public static function GetOauthClientLink($oauthName){
+    $url = '';
+    $redirectUri = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . '/api/oauth/redirect/' . $oauthName;
+    //如果域名包含localhost
+    if(strpos($_SERVER['HTTP_HOST'], 'localhost') !== false){
+      $redirectUri = 'http://localhost:83/api/oauth/redirect/' . $oauthName;
+    }
+    switch($oauthName){
+      case 'github':
+        $client_id = self::GetOauthClientId('github');
+        $url = 'https://github.com/login/oauth/authorize?client_id=' . $client_id . '&redirect_uri=' . $redirectUri . '&scope=user';
+        break;
+      case 'microsoft':
+        $client_id = self::GetOauthClientId('microsoft');
+        $url = 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=' . $client_id . '&response_type=code&redirect_uri=' . $redirectUri . '&scope=openid%20profile%20User.Read';
+        break;
+      case 'google':
+        $client_id = self::GetOauthClientId('google');
+        $url = 'https://accounts.google.com/o/oauth2/v2/auth?client_id=' . $client_id . '&response_type=code&redirect_uri=' . $redirectUri . '&scope=openid%20profile%20email';
+        break;
+    }
+    header('Location: ' . $url);
+    exit;
+    // return [
+    //   'is_get' => !empty($url),
+    //   'url' => $url,
+    // ];
   }
   /**
    * 获取网站信息

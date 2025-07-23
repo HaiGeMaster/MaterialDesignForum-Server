@@ -103,16 +103,16 @@ class Oauth extends OauthModel
       ->where('oauth_name', 'microsoft')
       ->first();
     // 查找google的Oauth记录
-    // $google = self::where('user_id', $userId)
-    //   ->where('oauth_name', 'google')
-    //   ->first();
+    $google = self::where('user_id', $userId)
+      ->where('oauth_name', 'google')
+      ->first();
 
     return [
       'is_get' => true,
       'data' => [
         'github' => $github,
         'microsoft' => $microsoft,
-        // 'google' => $google
+        'google' => $google
       ]
     ];
   }
