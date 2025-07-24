@@ -953,7 +953,7 @@ class Api
       $str = parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY);
       //将其转换为变量
       parse_str($str, $params); //获得一个数组$params
-      $code = $params['code'] ?? null; //成功获取到github的code
+      $code = $params['code'] ?? null; //成功获取到code
       return Share::HandleArrayToJSON(
         \MaterialDesignForum\Plugins\Oauth::ExecuteOAuthFlow(
           $oauth_name,

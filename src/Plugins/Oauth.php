@@ -138,6 +138,9 @@ class Oauth
           // 1. 获取Google OAuth Access Token
           $tokenResponse = self::GetGoogleAccessToken($clientID, $clientSecret, $requestToken);
           $accessToken = $tokenResponse['access_token'];
+
+          echo $tokenResponse;
+          exit;
           // 2. 获取用户基本信息
           $userInfo = self::GetGoogleUserInfo($accessToken);
           // 3. 可以在这里获取更多用户信息(可选)
@@ -192,6 +195,16 @@ class Oauth
             $data['user'],
             $client_user_token
           );
+          break;
+        case 'google':
+          // $res = UserController::OauthLoginOrRegister(
+          //   $oauthName,
+          //   $data['user']['id'] ?? '',
+          //   $data['user']['displayName'] ?? '',
+          //   $data['user']['email'] ?? '',
+          //   $data['user'],
+          //   $client_user_token
+          // );
           break;
       }
       //设置cookie
@@ -607,6 +620,7 @@ class Oauth
   {
     // 构造请求 URL
     $url = 'https://oauth2.googleapis.com/token';
+    // $url = 'https://accounts.google.com/o/oauth2/v2/auth';
 
     // 动态获取 redirect_uri（与 Microsoft 版本保持一致）
     $redirect_uri = '';
@@ -636,6 +650,10 @@ class Oauth
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
       'Accept: application/json' // 设置请求头为 JSON
     ]);
+
+    
+    //设置超时时间
+    // curl_setopt($ch, CURLOPT_TIMEOUT, 300); // 超时时间设置为 30 秒
 
     // SSL 验证设置
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);  // 启用证书验证
