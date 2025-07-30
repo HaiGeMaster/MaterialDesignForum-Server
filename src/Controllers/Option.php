@@ -467,14 +467,12 @@ class Option extends OptionModel
     $option = self::find('theme_color_param');
     if ($option) {
       $option->value = $json_text;
-      //将json文本转换为数组
-      // $option->value = json_encode($json_text);
       $is_set = $option->save();
     }
     //{"light":{"primary":"#415f91","secondary":"#415f91","accent":"#8eace3"},"dark":{"primary":"#415f91","secondary":"#415f91","accent":"#8eace3"}}
     return [
       'is_set' => $is_set,
-      'json_text' => $json_text,
+      'json_text' => json_decode($json_text, true),//json文本转换为php数组
     ];
   }
   /**
@@ -489,9 +487,7 @@ class Option extends OptionModel
 
     return [
       'is_get' => $option != null && $option->value != null && $option->value != '',
-      'json_text' => $option->value,
-      //转换为数组
-      // 'json_text' => json_encode($option->value, true),
+      'json_text' => json_decode($option->value, true),//json文本转换为php数组
     ];
   }
   /**
@@ -517,7 +513,7 @@ class Option extends OptionModel
 
     return [
       'is_set' => $is_set,
-      'json_text' => $json_text,
+      'json_text' => json_decode($json_text, true),//json文本转换为php数组
     ];
   }
   /**
@@ -531,7 +527,51 @@ class Option extends OptionModel
     //{"header":"Message.Components.TextPlay.With","body":"Message.Components.TextPlay.MaterialDesign,Message.Components.TextPlay.VueAsTheCore,Message.Components.TextPlay.ImplementedByVuetify,Message.Components.TextPlay.MoreElegant,Message.Components.TextPlay.UnlimitedDistance,Message.Components.TextPlay.CrossPlatform,Message.Components.TextPlay.DynamicResponsive","footer_header":"Message.Components.TextPlay.TheWay","footer_tail":"Message.Components.TextPlay.EnjoyCommunication"}
     return [
       'is_get' => $option != null && $option->value != null && $option->value != '',
-      'json_text' => $option->value,
+      'json_text' => json_decode($option->value, true),//json文本转换为php数组
+    ];
+  }
+  /**
+   * 设置轮播图参数
+   * @param  string $user_token 用户token
+   * @param  string $json_text json文本
+   * @return array [is_set, json_text]
+   */
+  public static function SetThemeCarouselParamJson($user_token, $json_text)
+  {
+    $is_set = false;
+    if (!UserGroupController::IsAdmin($user_token)) {
+      return [
+        'is_set' => $is_set,
+      ];
+    }
+    $option = self::find('theme_carousel_param');
+    $json_text = json_encode($json_text);
+    if ($option) {
+      $option->value = $json_text;
+      $is_set = $option->save();
+    }else{
+      $option = new Option();
+      $option->name = 'theme_carousel_param';
+      $option->value = $json_text;
+      $is_set = $option->save();
+    }
+    return [
+      'is_set' => $is_set,
+      // 'json_text' => json_decode($json_text, true),//json文本转换为php数组
+      'json_text' => json_decode($json_text, true),//json文本转换为php数组
+    ];
+  }
+  /**
+   * 获取轮播图参数
+   * @param  string $user_token 用户token
+   * @return array [is_get, json_text]
+   */
+  public static function GetThemeCarouselParamJson($user_token)
+  {
+    $option = self::find('theme_carousel_param');
+    return [
+      'is_get' => $option != null && $option->value != null && $option->value != '',
+      'json_text' => json_decode($option->value, true),//json文本转换为php数组
     ];
   }
   /**

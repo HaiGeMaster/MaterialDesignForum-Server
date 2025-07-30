@@ -261,6 +261,23 @@ class Api
         )
       );
     });
+    $collector->post('/api/option/set/carousel_param', function () {
+      $data = Share::GetRequestData();
+      return Share::HandleArrayToJSON(
+        \MaterialDesignForum\Controllers\Option::SetThemeCarouselParamJson(
+          $data['user_token'] ?? '',
+          $data['json_text']
+        )
+      );
+    });
+    $collector->post('/api/option/get/carousel_param', function () {
+      $data = Share::GetRequestData();
+      return Share::HandleArrayToJSON(
+        \MaterialDesignForum\Controllers\Option::GetThemeCarouselParamJson(
+          $data['user_token'] ?? ''
+        )
+      );
+    });
     $collector->post('/api/user/avatar/reset', function () {
       $data = Share::GetRequestData();
       return Share::HandleArrayToJSON(
