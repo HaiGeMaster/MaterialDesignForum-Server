@@ -1,257 +1,159 @@
+# [CN] Material Design Forum - 现代化网页论坛应用
 
-### 版本更新日志
+## 产品概述
+Material Design Forum是一款基于网页的论坛应用程序，致力于为用户提供：
+- 卓越的交互体验
+- 视觉享受
+- 符合Material Design核心理念的界面设计
 
-#### 2025-7-20 版本更新
-**优化改进**
-- Vuetify2/MDUI2主题客户端优化改进：
-  - Oauth按钮在登录注册对话框的布局优化调整
-  - Oauth按钮在登录注册对话框的显示逻辑变更为未配置ClientID时不显示
-  - Oauth绑定列表显示逻辑变更为未配置ClientID时不显示
-**新增功能**
- - Vuetify2/MDUI2主题客户端新增功能（需要前空格+@或#才能触发）
-  - 富文本编辑器添加@用户功能
-  - 富文本编辑器添加#话题功能
+## UI设计与技术实现
 
----
+### 框架与主题
+- **前端框架**：Vuetify 2
+- **客户端主题**：MDUI 2.0
+- **设计规范**：严格遵循Material Design
 
-#### 2025-07-19 版本更新
-**新增功能**
-- 第三方平台登录集成：
-  - 后端设置页面全部表单优化布局
-  - 支持Vuetify2/MDUI2主题客户端通过OAuth协议接入Github和Microsoft账号登录
-  - 客户端设置页新增第三方平台账号绑定入口（支持Github/Microsoft）
-  - 登录/注册对话框集成第三方平台快捷绑定功能
-- 后端服务增强：
-  - 新增PHP后端OAuth认证模型及控制器
-  - 数据库新增`oauth`表结构（需手动迁移数据，建议操作前备份）
+### 响应式布局
+- 支持设备类型：
+  - PC（桌面端）
+  - Pad（平板设备）
+  - Mobile（移动设备）
+- 特点：
+  - 智能识别设备类型
+  - 浏览器窗口自适应
+  - 无缝布局切换
 
-**优化改进**
-- MDUI2主题移动端适配：
-  - 登录/注册/找回密码对话框调整为全屏布局
+## 核心功能
 
-**配置说明**
-- OAuth服务配置路径：后台管理 - 设置 - 授权登录
-- 开发者平台入口：
-  - Github: https://github.com/settings/developers
-  - Microsoft: https://entra.microsoft.com/#view/Microsoft_AAD_RegisteredApps/CreateApplicationBlade/quickStartType~/null/isMSAApp~/false
+### 用户功能
+- 内容发布：
+  - 发起话题
+  - 提出问题
+  - 撰写文章
+- 互动功能：
+  - 发表回答
+  - 参与评论
+  - 进行回复
 
----
+### 管理员功能
+- 内容管理：
+  - 话题/提问/文章/回答/评论/回复的CRUD操作
+- 后台工具：
+  - 实时数据仪表盘
+  - 数据管理与删除
+  - 站点数据设置
+  - 发信邮箱配置
+- 用户组管理：
+  - 精细化权限分配
+  - 多样化角色管理
 
-#### 2025-07-15 版本更新
-**问题修复**
-- 修复MDUI2主题客户端回复内容中用户昵称显示异常
+## 设计特色
 
-**优化改进**
-- 统一Vuetify2/MDUI2富文本编辑器样式排版
-- 新增详情折叠列表功能
+### 视觉体验
+- 色彩搭配：精心设计
+- 图标系统：符合Material规范
+- 动效过渡：流畅自然
+- 主题模式：
+  - 深色模式
+  - 浅色模式
 
----
+### 国际化支持
+- 内置多语言选项
+- 开放语言包翻译接口
+- 支持自定义语言文件
 
-#### 2025-07-11/11 版本更新
-**问题修复**
-- 修复后端路由重复路径问题
-- 解决图片验证码请求失败异常
+## 总结
+Material Design Forum通过以下优势成为现代化论坛平台：
+1. 精湛的设计美学
+2. 强大的功能体系
+3. 灵活的自定义选项
+4. 完善的多语言支持
 
-> 注：此版本存在重复发布记录，已合并处理
+适用于：
+- Material Design爱好者
+- 社区管理员
+- 全球化用户群体
 
----
+> 让我们共同打造更美好的线上社区环境！
 
-#### 2025-07-06 版本更新
-**新增功能**
-- 数据库文件扩充（assets目录新增3种数据库模板）
-
-**问题修复**
-- 修正MDUI2主题重置密码对话框布局异常
-- 解决Appbar标题显示异常问题
-
-**优化改进**
-- 升级设置页主题图标系统
-- 路由系统路径结构调整
-
-**功能变更**
-- 新增登录状态监听机制`ReturnGetIsLogin(val)`
-- 移除help文档目录
-
----
-
-#### 2025-07-05 版本更新
-**数据库调整**
-- demo_table.sql字符集及排序规则变更
-
----
-
-#### 2025-07-04 版本更新
-**功能新增**
-- 开放外部API接口支持
-- 文档地址：https://mdfdocx.xbedrock.com/
 
 ---
 
-#### 2025-07-02 版本更新
-**问题修复**
-- 修正用户信息编辑对话框遮罩层布局异常
-- 解决富文本编辑器代码块语言选择禁用失效问题
 
----
+# [EN] Material Design Forum - Modern Web-Based Forum Application
 
-#### 2025-07-01 版本更新
-**问题修复**
-- 修复用户封面图滚动失效问题
-- 优化MDUI2主题举报对话框移动端布局
+## Product Overview
+Material Design Forum is a web-based forum application dedicated to providing users with:
+- Exceptional interactive experience
+- Visual enjoyment
+- Interface design adhering to Material Design core principles
 
----
+## UI Design and Technical Implementation
 
-#### 2025-07-01 版本更新
-**功能优化**
-- fancybox升级为全局挂载
-- 优化富文本编辑器下拉菜单高度限制
+### Frameworks and Themes
+- **Frontend Framework**: Vuetify 2
+- **Client Theme**: MDUI 2.0
+- **Design Specification**: Strictly follows Material Design
 
----
+### Responsive Layout
+- Supported device types:
+  - PC (Desktop)
+  - Pad (Tablet devices)
+  - Mobile (Mobile devices)
+- Features:
+  - Intelligent device type recognition
+  - Browser window auto-adaptation
+  - Seamless layout switching
 
-#### 2025-06-30 版本更新
-**新增功能**
-- 集成fancybox图片预览组件
-- 富文本编辑器新增文本对齐功能
+## Core Features
 
-**优化改进**
-- 调整富文本菜单项布局
-- 修复表格选择交互异常
+### User Features
+- Content Publishing:
+  - Create topics
+  - Ask questions
+  - Write articles
+- Interaction Features:
+  - Post answers
+  - Participate in comments
+  - Reply to posts
 
-**技术变更**
-- 图片库方法路径规则更新（历史数据兼容）
+### Administrator Features
+- Content Management:
+  - CRUD operations for topics/questions/articles/answers/comments/replies
+- Backend Tools:
+  - Real-time data dashboard
+  - Data management and deletion
+  - Site data configuration
+  - Email sending settings
+- User Group Management:
+  - Granular permission allocation
+  - Diverse role management
 
----
+## Design Highlights
 
-#### 2025-06-26 版本更新
-**功能新增**
-- 富文本编辑器支持表格创建功能
+### Visual Experience
+- Color scheme: Meticulously designed
+- Icon system: Compliant with Material standards
+- Animation transitions: Smooth and natural
+- Theme modes:
+  - Dark mode
+  - Light mode
 
-**图片支持扩展**
-- 新增PNG/JPG/JPEG格式上传支持（双主题同步）
+### Internationalization Support
+- Built-in multiple language options
+- Open language pack translation interface
+- Supports custom language file creation
 
----
+## Summary
+Material Design Forum stands out as a modern forum platform with:
+1. Exquisite design aesthetics
+2. Powerful feature set
+3. Flexible customization options
+4. Comprehensive multilingual support
 
-#### 2025-06-17 版本更新
-**优化改进**
-- 富文本编辑器菜单布局优化
-- 新增设置页路由配置
+Ideal for:
+- Material Design enthusiasts
+- Community administrators
+- Global user base
 
-**功能移除**
-- 开发模式对话框下线
-
----
-
-#### 2025-06-16 版本更新
-**问题修复**
-- 解决MDUI2主题字体跨设备显示不一致问题
-
-**功能新增**
-- 富文本编辑器代码高亮支持
-- 骨架屏加载效果优化
-
----
-
-#### 2025-06-14 版本更新
-**问题修复**
-- 修复话题选择功能异常
-- 同步文章与话题关联数据
-
----
-
-#### 2025-06-08 版本更新
-**优化改进**
-- 用户组徽章显示效果优化
-
-**功能新增**
-- 远程更新系统（含版本检测/包下载）
-- 用户组徽章显示功能（双主题）
-
-**问题修复**
-- Vuetify2主题徽章颜色显示异常
-
----
-
-#### 2025-06-07 版本更新
-**问题修复**
-- 解决富文本编辑器层级遮挡问题
-
-**功能新增**
-- 自动更新系统上线
-
----
-
-#### 2025-06-06 版本更新
-**问题修复**
-- 修正搜索框浏览器自动填充异常
-- 调整评论框间距
-
----
-
-#### 2025-06-05 版本更新
-**优化改进**
-- 优化对象删除数量属性更新机制
-
-**问题修复**
-- 修复话题文章拉取参数错误
-- 解决编辑器加载动画触发异常
-- 修正数据更新残留问题
-- 避免话题选择重复提交
-
-**功能新增**
-- 富文本颜色选择器
-
----
-
-#### 2025-06-05 版本更新
-**优化改进**
-- 滚动标题显示优化
-- 管理员数据加载条目数提升至100条
-
----
-
-#### 2025-05-23 版本更新
-**优化改进**
-- 统一时间戳显示规则
-- 新增多语言支持
-
----
-
-#### 2025-05-23 版本更新
-**系统优化**
-- 日志记录器性能优化
-
----
-
-#### 2025-05-18 版本更新
-**功能优化**
-- 通知系统数据库结构调整
-- 双主题404页面优化
-
-**问题修复**
-- 用户数据同步异常
-- 对话框自动关闭问题
-
----
-
-#### 2025-05-07 版本更新
-**安全修复**
-- 彻底解决中文注册/登录问题
-- 修复中文昵称支持问题
-- 修正后台权限分配漏洞
-
-**功能新增**
-- 仪表盘数据可视化增强
-- 系统信息预览功能
-
----
-
-#### 2025-05-04 版本更新
-**功能新增**
-- 批量用户管理功能
-- 语言包翻译支持
-
-**问题修复**
-- i18n语言标识异常
-- 后端参数绑定问题
-
----
+> Let's work together to create a better online community environment!
