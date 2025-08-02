@@ -284,7 +284,7 @@ class Question extends QuestionModel
         // $old_topic_ids = [];
         if ($old_topics != null) {
           foreach ($old_topics as $old_topic) {
-            // TopicAbleController::DeleteTopicAble($old_topic->topic_id, $question_id, 'question');
+            TopicAbleController::DeleteTopicAble($old_topic->topic_id, $question_id, 'question');
             TopicController::SubQuestionCount($old_topic->topic_id);
           }
         }
