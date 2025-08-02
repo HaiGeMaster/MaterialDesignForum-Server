@@ -558,7 +558,7 @@ class Option extends OptionModel
     return [
       'is_set' => $is_set,
       // 'json_text' => json_decode($json_text, true),//json文本转换为php数组
-      'json_text' => json_decode($json_text, true),//json文本转换为php数组
+      'json_text' => json_decode($json_text, true)??[],//json文本转换为php数组
     ];
   }
   /**
@@ -571,7 +571,7 @@ class Option extends OptionModel
     $option = self::find('theme_carousel_param');
     return [
       'is_get' => $option != null && $option->value != null && $option->value != '',
-      'json_text' => json_decode($option->value, true),//json文本转换为php数组
+      'json_text' => json_decode($option->value, true)??[],//json文本转换为php数组
     ];
   }
   /**

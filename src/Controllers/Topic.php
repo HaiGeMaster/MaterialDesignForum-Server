@@ -72,11 +72,11 @@ class Topic extends TopicModel
       )
     ) {
       $topic = new self();
-      $topic->user_id = TokenController::GetUserId($user_token);
+      $user_id = TokenController::GetUserId($user_token);
+      $topic->user_id = $user_id;
       $topic->name = $name;
-      // $topic->cover = ImageController::SaveUploadImage('topic_cover', $cover, Share::ServerTime());
       if ($cover != '') {
-        $topic->cover = ImageController::SaveUploadImage('topic_cover', $cover, Share::ServerTime());
+        $topic->cover = ImageController::SaveUploadImage('topic_cover', $cover, $user_id);
       } else {
         $topic->cover = [
           'original' => null,
@@ -259,7 +259,7 @@ class Topic extends TopicModel
         if ($cover != ''&&$cover != null) {
           //先将$topic->cover删除
           if (ImageController::DeleteUploadImage($topic->cover)) {
-            $topic->cover = ImageController::SaveUploadImage('topic_cover', $cover, Share::ServerTime());
+            $topic->cover = ImageController::SaveUploadImage('topic_cover', $cover, $user_id);
           }
         }
         $topic->description = $description;

@@ -261,7 +261,7 @@ class Api
         )
       );
     });
-    $collector->post('/api/option/set/carousel_param', function () {
+    $collector->post('/api/option/set/theme_carousel_param', function () {
       $data = Share::GetRequestData();
       return Share::HandleArrayToJSON(
         \MaterialDesignForum\Controllers\Option::SetThemeCarouselParamJson(
@@ -270,7 +270,7 @@ class Api
         )
       );
     });
-    $collector->post('/api/option/get/carousel_param', function () {
+    $collector->post('/api/option/get/theme_carousel_param', function () {
       $data = Share::GetRequestData();
       return Share::HandleArrayToJSON(
         \MaterialDesignForum\Controllers\Option::GetThemeCarouselParamJson(

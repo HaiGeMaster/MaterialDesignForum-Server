@@ -19,3 +19,4 @@ assets/haige_content
 update_package
 request.json
 _variables.scss
+.env

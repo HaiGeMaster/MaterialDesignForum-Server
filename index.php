@@ -7,12 +7,16 @@ header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 use MaterialDesignForum\Routes\Api;
 use MaterialDesignForum\Routes\Page;
 use MaterialDesignForum\Config\Install;
+// use Dotenv\Dotenv as Dotenv;
 
 // //输出从请求标头中获取的内容
 // echo json_encode(getallheaders());
 // return;
 
 try {
+
+  // $dotenv = Dotenv::createImmutable('././');
+  // $dotenv->load();
   //检查是否为安装模式
   if (Install::AsInstall()) {
     if (Api::IsApi()) {
@@ -67,10 +71,17 @@ try {
   echo '错误追踪：<br>' . nl2br($e->getTraceAsString()) . '<br>';
   echo '</pre>';
   echo '</code>';
+  
   echo '<p>请检查服务器日志以获取更多详细信息。</p>';
   echo '<p>如果您是开发者，请检查代码并修复错误。</p>';
   echo '<p>如果您是用户，请联系网站管理员。</p>';
   echo '<p>感谢您的理解和支持！</p>';
+  echo '<p>Please check the server logs for more detailed information.</p>';
+  echo '<p>If you are a developer, please check the code and fix the error.</p>';
+  echo '<p>If you are a user, please contact the website administrator.</p>';
+  echo '<p>Thank you for your understanding and support!</p>';
+
+
 
   echo '</body>';
   echo '</html>';
