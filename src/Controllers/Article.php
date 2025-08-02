@@ -283,6 +283,7 @@ class Article extends ArticleModel
 
         foreach ($topics as $topic_id) {
           TopicAbleController::AddTopicAble($topic_id, $article->article_id, 'article');
+          TopicController::AddArticleCount($topic_id);
         }
       }
     }
