@@ -545,6 +545,7 @@ class Option extends OptionModel
       ];
     }
     $option = self::find('theme_carousel_param');
+    //如果json_text是json数组，需要使用json_encode转换json表现
     $json_text = json_encode($json_text);
     if ($option) {
       $option->value = $json_text;
