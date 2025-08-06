@@ -328,10 +328,6 @@ class Topic extends TopicModel
           //TopicAbleController::DeleteTopicAbles($value);
           //减少用户话题数
           UserController::SubTopicCount($topic->user_id);
-          //删除话题
-          $topic->delete_time = Share::ServerTime();
-
-          $is_delete = $topic->save();
           //删除通知
           NotificationController::AddInteractionNotification(
             $topic->user_id,
@@ -342,6 +338,10 @@ class Topic extends TopicModel
             0,
             $topic->topic_id,
           );
+          //删除话题
+          $topic->delete_time = Share::ServerTime();
+
+          $is_delete = $topic->save();
 
           array_push($delete_ids, $topic->topic_id);
         }

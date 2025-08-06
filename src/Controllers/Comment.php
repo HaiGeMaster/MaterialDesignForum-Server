@@ -381,7 +381,6 @@ class Comment extends CommentModel
           (UserGroupController::IsAdmin($user_token) && UserGroupController::Ability($user_token, 'ability_admin_manage_comment'))
           // UserGroupController::IsAdmin($user_token)
         ) {
-          $comment->delete_time = Share::ServerTime();
           UserController::SubCommentCount($comment->user_id);
           NotificationController::AddInteractionNotification(
             $comment->user_id,

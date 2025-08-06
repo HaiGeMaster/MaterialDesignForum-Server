@@ -78,6 +78,7 @@ class Vote extends VoteModel
                   0,
                   0,
                   0,
+                  AnswerController::GetAnswer($votable_id)['answer']['question_id'],
                   $votable_id,
                 );
                 break;
@@ -97,6 +98,7 @@ class Vote extends VoteModel
                 break;
               case 'comment':
                 CommentController::SubVoteUpCount($votable_id);
+                $comment = CommentController::GetComment($votable_id)['comment'];
                 NotificationController::AddInteractionNotification(
                   CommentController::GetCommentOwnerId($votable_id),
                   $user_id,
@@ -105,27 +107,32 @@ class Vote extends VoteModel
                   null,
                   0,
                   0,
-                  0,
-                  0,
-                  0,
+                  $comment->commentable_type == 'article' ? $comment->commentable_id : 0,
+                  $comment->commentable_type == 'question' ? $comment->commentable_id : 0,
+                  $comment->commentable_type == 'answer' ? $comment->commentable_id : 0,
                   $votable_id,
                 );
                 break;
               case 'reply':
                 ReplyController::SubVoteUpCount($votable_id);
+                $reply = ReplyController::GetReply($votable_id)['reply'];
+                $comment = CommentController::GetComment($reply->replyable_comment_id)['comment'];
                 NotificationController::AddInteractionNotification(
-                  ReplyController::GetReplyOwnerId($votable_id),
+                  $reply->user_id,
                   $user_id,
                   'reply_like',
                   null,
                   null,
                   0,
                   0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  $votable_id,
+                  $comment->commentable_type == 'article' ? $comment->commentable_id : 0,
+                  $comment->commentable_type == 'question' ? $comment->commentable_id : 0,
+                  $comment->commentable_type == 'answer' ? $comment->commentable_id : 0,
+                  $comment->comment_id,
+                  $reply->reply_id,
+                  $reply->replyable_type == 'reply' ? $reply->reply_id : 0,
+                  // $reply->replyable_type == 'comment' ? $reply->replyable_id : 0,
+                  // $reply->replyable_type == 'reply' ? $reply->replyable_id : 0,
                 );
                 break;
             }

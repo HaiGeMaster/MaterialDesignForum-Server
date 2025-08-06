@@ -340,7 +340,6 @@ class Article extends ArticleModel
           (UserGroupController::IsAdmin($user_token)&&UserGroupController::Ability($user_token,'ability_admin_manage_article'))
            // UserGroupController::IsAdmin($user_token)
         ) {
-          $article->delete_time = Share::ServerTime();
           UserController::SubArticleCount($article->user_id);
           TopicController::SubArticleCount($article->topics);
           NotificationController::AddInteractionNotification(

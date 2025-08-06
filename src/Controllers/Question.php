@@ -352,7 +352,6 @@ class Question extends QuestionModel
           (UserGroupController::IsAdmin($user_token)&&UserGroupController::Ability($user_token,'ability_admin_manage_question'))
            // UserGroupController::IsAdmin($user_token)
         ) {
-          $question->delete_time = Share::ServerTime();
           UserController::SubQuestionCount($question->user_id);
           // TopicController::SubQuestionCount($question->topics);
           NotificationController::AddInteractionNotification(

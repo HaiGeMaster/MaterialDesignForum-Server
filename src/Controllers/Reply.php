@@ -407,7 +407,6 @@ class Reply extends ReplyModel
           (UserGroupController::IsAdmin($user_token) && UserGroupController::Ability($user_token, 'ability_admin_manage_reply'))
           // UserGroupController::IsAdmin($user_token)
         ) {
-          $reply->delete_time = Share::ServerTime();
           UserController::SubReplyCount($reply->user_id);
           $comment = CommentController::GetComment($reply->replyable_comment_id, $user_token)['comment'];
           if ($comment != null) {

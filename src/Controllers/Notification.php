@@ -19,6 +19,8 @@ use MaterialDesignForum\Controllers\Answer as AnswerController;
 use MaterialDesignForum\Controllers\Comment as CommentController;
 use MaterialDesignForum\Controllers\Reply as ReplyController;
 use MaterialDesignForum\Controllers\UserOption as UserOptionController;
+use MaterialDesignForum\Controllers\Topic as TopicController;
+
 
 
 use MaterialDesignForum\Plugins\Share;
@@ -87,7 +89,8 @@ class Notification extends NotificationModel
     $is_add = false;
     $notification = null;
 
-    if (self::IsVaildType($type) && ($sender_id != $receiver_id)) {
+    // if (self::IsVaildType($type) && ($sender_id != $receiver_id)) {
+    if (self::IsVaildType($type)) {
       $notification = new NotificationModel;
       $notification->receiver_id = $receiver_id;
       $notification->sender_id = $sender_id;
@@ -196,15 +199,58 @@ class Notification extends NotificationModel
         $notification->sender_user = UserController::GetUser($notification->sender_id)['user'];
         $notification->receiver_user = UserController::GetUser($notification->receiver_id)['user'];
 
-        $receiver_content = '';//附加值
-        $sender_content = '';//附加值
+        $receiver_content = ''; //附加值
+        $sender_content = ''; //附加值
         switch ($notification->type) {
-          case 'question_answer':
+          //旧的类型详细
+          //question_answer 问题被回答
+          //question_comment 问题被评论
+          //question_delete 问题被删除
+          //article_comment 文章被评论
+          //article_delete 文章被删除
+          //answer_comment 回答被评论
+          //answer_delete 回答被删除
+          //comment_reply 评论被回复
+          //comment_delete 评论被删除
+          //reply_reply 回复被回复
+          //reply_delete 回复被删除
+          //类型注释定义
+          /**
+           * @typedef NotificationType 通知类型
+           * @property string user_follow 自己被关注 已做完
+           * @property string topic_follow 话题被关注 已做完
+           * @property string topic_delete 话题被删除 已做完
+           * @property string question_follow 提问被关注 已做完
+           * @property string question_comment 提问被评论 已做完
+           * @property string question_answer 提问被回答 已做完
+           * @property string question_delete 提问被删除 已做完
+           * @property string article_follow 文章被关注 已做完
+           * @property string article_comment 文章被评论 已做完
+           * @property string article_like 文章被点赞 已做完
+           * @property string article_delete 文章被删除 已做完
+           * @property string answer_comment 回答被评论 已做完
+           * @property string answer_like 回答被点赞 已做完
+           * @property string answer_delete 回答被删除 已做完
+           * @property string comment_like 评论被点赞 已做完
+           * @property string comment_reply 评论被回复 已做完
+           * @property string comment_delete 评论被删除 已做完
+           * @property string reply_like 回复被点赞 已做完
+           * @property string reply_reply 回复被回复 已做完
+           * @property string reply_delete 回复被删除 已做完
+           */
+          case 'user_follow':
+            break;
+          case 'topic_follow':
+          case 'topic_delete':
+            $notification->topic = TopicController::where('topic_id', $notification->topic_id)->first();
+            if ($notification->topic != null) {
+              $receiver_content = $notification->topic->name;
+            }
+            break;
+          case 'question_follow':
             $notification->question = QuestionController::where('question_id', $notification->question_id)->first();
-            $notification->answer = AnswerController::where('answer_id', $notification->answer_id)->first();
-            if ($notification->question != null && $notification->answer != null) {
+            if ($notification->question != null) {
               $receiver_content = $notification->question->title;
-              $sender_content = $notification->answer->content_markdown;
             }
             break;
           case 'question_comment':
@@ -215,10 +261,24 @@ class Notification extends NotificationModel
               $sender_content = $notification->comment->content;
             }
             break;
+          case 'question_answer':
+            $notification->question = QuestionController::where('question_id', $notification->question_id)->first();
+            $notification->answer = AnswerController::where('answer_id', $notification->answer_id)->first();
+            if ($notification->question != null && $notification->answer != null) {
+              $receiver_content = $notification->question->title;
+              $sender_content = $notification->answer->content_markdown;
+            }
+            break;
           case 'question_delete':
             $notification->question = QuestionController::where('question_id', $notification->question_id)->first();
             if ($notification->question != null) {
               $receiver_content = $notification->question->title;
+            }
+            break;
+          case 'article_follow':
+            $notification->article = ArticleController::where('article_id', $notification->article_id)->first();
+            if ($notification->article != null) {
+              $receiver_content = $notification->article->title;
             }
             break;
           case 'article_comment':
@@ -227,6 +287,12 @@ class Notification extends NotificationModel
             if ($notification->article != null && $notification->comment != null) {
               $receiver_content = $notification->article->title;
               $sender_content = $notification->comment->content;
+            }
+            break;
+          case 'article_like':
+            $notification->article = ArticleController::where('article_id', $notification->article_id)->first();
+            if ($notification->article != null) {
+              $receiver_content = $notification->article->title;
             }
             break;
           case 'article_delete':
@@ -243,10 +309,34 @@ class Notification extends NotificationModel
               $sender_content = $notification->comment->content;
             }
             break;
+          case 'answer_like':
+            $notification->answer = AnswerController::where('answer_id', $notification->answer_id)->first();
+            if ($notification->answer != null) {
+              $receiver_content = $notification->answer->content_markdown;
+            }
+            break;
           case 'answer_delete':
             $notification->answer = AnswerController::where('answer_id', $notification->answer_id)->first();
             if ($notification->answer != null) {
               $receiver_content = $notification->answer->content_markdown;
+            }
+            break;
+          case 'comment_like':
+            $notification->comment = CommentController::where('comment_id', $notification->comment_id)->first();
+            if ($notification->comment != null) {
+              switch ($notification->comment->commentable_type) {
+                case 'article':
+                  $notification->article = ArticleController::where('article_id', $notification->comment->commentable_id)->first();
+                  break;
+                case 'question':
+                  $notification->question = QuestionController::where('question_id', $notification->comment->commentable_id)->first();
+                  break;
+                case 'answer':
+                  $notification->answer = AnswerController::where('answer_id', $notification->comment->commentable_id)->first();
+                  break;
+              }
+
+              $receiver_content = $notification->comment->content;
             }
             break;
           case 'comment_reply':
@@ -296,6 +386,35 @@ class Notification extends NotificationModel
               }
               $receiver_content = $notification->comment->content;
             }
+            break;
+          case 'reply_like':
+            $notification->comment = CommentController::where('comment_id', $notification->comment_id)->first();
+            $notification->reply = ReplyController::where('reply_id', $notification->reply_id)->first();
+            if ($notification->comment != null) {
+              switch ($notification->comment->commentable_type) {
+                case 'article':
+                  $notification->article = ArticleController::where('article_id', $notification->comment->commentable_id)->first();
+                  break;
+                case 'question':
+                  $notification->question = QuestionController::where('question_id', $notification->comment->commentable_id)->first();
+                  break;
+                case 'answer':
+                  $notification->answer = AnswerController::where('answer_id', $notification->comment->commentable_id)->first();
+                  break;
+              }
+            }
+            // if ($notification->reply != null) {
+            //   switch ($notification->reply->replyable_type) {
+            //     case 'comment':
+            //       $notification->comment = CommentController::where('comment_id', $notification->reply->replyable_comment_id)->first();
+            //       break;
+            //     case 'reply':
+            //       $notification->reply = ReplyController::where('reply_id', $notification->reply->replyable_reply_id)->first();
+            //       break;
+            //   }
+            // }
+            $receiver_content = $notification->reply->content;
+
             break;
           case 'reply_reply': //replyable_id
             $notification->comment = CommentController::where('comment_id', $notification->comment_id)->first(); //被回复的item comment_id
@@ -368,7 +487,7 @@ class Notification extends NotificationModel
    * @param int $user_id 用户ID
    * @return array|null 通知设置 转换为 [name=>[web_message=>bool,email_message=>bool]]
    */
-  public static function GetUserOptionNotificationValue($user_id)
+  private static function GetUserOptionNotificationValue($user_id)
   {
     $data = UserOptionController::where('user_id', $user_id)->where('name', 'notifications')->first();
     if ($data != null) {

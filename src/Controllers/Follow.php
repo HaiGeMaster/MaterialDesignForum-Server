@@ -121,7 +121,9 @@ class Follow extends FollowModel
               $user_id,
               'topic_follow',
               null,
-              TopicController::GetTopic($followable_id)['topic'],
+              null,
+              0,
+              $followable_id,
             );
             break;
           case 'question':
@@ -148,6 +150,8 @@ class Follow extends FollowModel
               ArticleController::GetArticleOwnerId($followable_id),
               $user_id,
               'article_follow',
+              null,
+              null,
               0,
               0,
               $followable_id,

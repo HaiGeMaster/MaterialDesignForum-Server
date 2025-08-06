@@ -290,7 +290,6 @@ class Answer extends AnswerModel
           (UserGroupController::IsAdmin($user_token) && UserGroupController::Ability($user_token, 'ability_admin_manage_answer'))
           // UserGroupController::IsAdmin($user_token)
         ) {
-          $answer->delete_time = Share::ServerTime();
           UserController::SubAnswerCount($answer->user_id);
           QuestionController::SubAnswerCount($answer->question_id);
           NotificationController::AddInteractionNotification(

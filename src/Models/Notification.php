@@ -88,7 +88,7 @@ class Notification extends Eloquent
      * @property string article_comment 文章被评论 已做完
      * @property string article_like 文章被点赞 已做完
      * @property string article_delete 文章被删除 已做完
-     * @property string answer_comment 回答被评论
+     * @property string answer_comment 回答被评论 已做完
      * @property string answer_like 回答被点赞 已做完
      * @property string answer_delete 回答被删除 已做完
      * @property string comment_like 评论被点赞 已做完
@@ -99,7 +99,7 @@ class Notification extends Eloquent
      * @property string reply_delete 回复被删除 已做完
      */
 
-    public $types = [
+    public static $types = [
       'user_follow', //自己被关注
       'topic_follow', //话题被关注
       'topic_delete', //话题被删除
@@ -129,30 +129,6 @@ class Notification extends Eloquent
    */
   public static function IsVaildType($type): bool
   {
-    
-      // desserts: [
-      //   { name: '自己被关注', web_message: false, email_message: false },
-      //   { name: '话题被关注', web_message: false, email_message: false },
-      //   { name: '话题被删除', web_message: false, email_message: false },
-      //   { name: '文章被关注', web_message: false, email_message: false },
-      //   { name: '文章被评论', web_message: false, email_message: false },
-      //   { name: '文章被点赞', web_message: false, email_message: false },
-      //   { name: '文章被删除', web_message: false, email_message: false },
-      //   { name: '提问被关注', web_message: false, email_message: false },
-      //   { name: '提问被评论', web_message: false, email_message: false },
-      //   { name: '提问被回答', web_message: false, email_message: false },
-      //   { name: '提问被删除', web_message: false, email_message: false },
-      //   { name: '回答被评论', web_message: false, email_message: false },
-      //   { name: '回答被点赞', web_message: false, email_message: false },
-      //   { name: '回答被删除', web_message: false, email_message: false },
-      //   { name: '评论被点赞', web_message: false, email_message: false },
-      //   { name: '评论被回复', web_message: false, email_message: false },
-      //   { name: '评论被删除', web_message: false, email_message: false },
-      //   { name: '回复被点赞', web_message: false, email_message: false },
-      //   { name: '回复被回复', web_message: false, email_message: false },
-      //   { name: '回复被删除', web_message: false, email_message: false },
-      // ]
-
     return in_array($type, self::$types);
   }
   /**
