@@ -25,6 +25,19 @@ use MaterialDesignForum\Controllers\Notification as NotificationController;
 
 class Reply extends ReplyModel
 {
+   /**
+   * 获取回复所有者用户id
+   * @param int $reply_id 回复ID
+   * @return int|null 用户ID
+   */
+  public static function GetReplyOwnerId($reply_id)
+  {
+    $reply = self::find($reply_id);
+    if ($reply != null) {
+      return $reply->user_id;
+    }
+    return null;
+  }
   /**
    * 添加回复
    * @param int $replyable_id 回复目标的ID
@@ -79,11 +92,15 @@ class Reply extends ReplyModel
             //此时$replyable_id为评论ID
             //根据回复的评论ID获取评论
             $comment = CommentController::GetComment($replyable_id, $user_token)['comment'];
-            if($comment!=null){
+            if ($comment != null) {
               NotificationController::AddInteractionNotification(
                 $comment->user_id,
                 $user_id,
                 'comment_reply',
+                null,
+                null,
+                0,
+                0,
                 $comment->commentable_type == 'article' ? $comment->commentable_id : 0,
                 $comment->commentable_type == 'question' ? $comment->commentable_id : 0,
                 $comment->commentable_type == 'answer' ? $comment->commentable_id : 0,
@@ -99,11 +116,15 @@ class Reply extends ReplyModel
             //根据回复的回复ID获取回复
             $reply = self::GetReply($replyable_id, $user_token)['reply'];
             $comment = CommentController::GetComment($reply->replyable_comment_id, $user_token)['comment'];
-            if($comment!=null&&$reply!=null){
+            if ($comment != null && $reply != null) {
               NotificationController::AddInteractionNotification(
                 $reply->user_id,
                 $user_id,
                 'reply_reply',
+                null,
+                null,
+                0,
+                0,
                 $comment->commentable_type == 'article' ? $comment->commentable_id : 0,
                 $comment->commentable_type == 'question' ? $comment->commentable_id : 0,
                 $comment->commentable_type == 'answer' ? $comment->commentable_id : 0,
@@ -127,9 +148,9 @@ class Reply extends ReplyModel
    * 获取回复
    * @param int $reply_id 回复ID
    * @param string $user_token 用户Token
-   * @return Reply|null
+   * @return array is_get:是否获取 reply:回复信息
    */
-  public static function GetReply($reply_id,  $user_token)
+  public static function GetReply($reply_id,  $user_token = '')
   {
     // try {
     //   $reply = self::where('reply_id', '=', $reply_id)
@@ -299,13 +320,12 @@ class Reply extends ReplyModel
         //   }
         // }
 
-        if(!$is_admin){
+        if (!$is_admin) {
 
           $replyable_parent = self::GetReplyable($value->reply_id, $user_token);
-  
+
           $data['data'][$key]->replyable_parent_id = $replyable_parent['replyable_parent_id'];
           $data['data'][$key]->replyable_parent_type = $replyable_parent['replyable_parent_type'];
-
         }
 
         $data['data'][$key]->user = UserController::GetUserInfo($value->user_id, $user_token)['user'];
@@ -342,8 +362,8 @@ class Reply extends ReplyModel
           UserGroupController::BeforeTime($user_token, 'time_before_edit_reply', $reply->create_time)
         )
         ||
-        (UserGroupController::IsAdmin($user_token)&&UserGroupController::Ability($user_token,'ability_admin_manage_reply'))
-         // UserGroupController::IsAdmin($user_token)
+        (UserGroupController::IsAdmin($user_token) && UserGroupController::Ability($user_token, 'ability_admin_manage_reply'))
+        // UserGroupController::IsAdmin($user_token)
       ) {
         $reply->content = $content;
         $reply->update_time = Share::ServerTime();
@@ -384,17 +404,21 @@ class Reply extends ReplyModel
             UserGroupController::BeforeTime($user_token, 'time_before_delete_reply', $reply->create_time)
           )
           ||
-          (UserGroupController::IsAdmin($user_token)&&UserGroupController::Ability($user_token,'ability_admin_manage_reply'))
-           // UserGroupController::IsAdmin($user_token)
+          (UserGroupController::IsAdmin($user_token) && UserGroupController::Ability($user_token, 'ability_admin_manage_reply'))
+          // UserGroupController::IsAdmin($user_token)
         ) {
           $reply->delete_time = Share::ServerTime();
           UserController::SubReplyCount($reply->user_id);
           $comment = CommentController::GetComment($reply->replyable_comment_id, $user_token)['comment'];
-          if($comment!=null){
+          if ($comment != null) {
             NotificationController::AddInteractionNotification(
               $reply->user_id,
               $user_id,
               'reply_delete',
+              null,
+              null,
+              0,
+              0,
               $comment->commentable_type == 'article' ? $comment->commentable_id : 0,
               $comment->commentable_type == 'question' ? $comment->commentable_id : 0,
               $comment->commentable_type == 'answer' ? $comment->commentable_id : 0,
@@ -478,7 +502,7 @@ class Reply extends ReplyModel
     $replyable_data = null;
     $replyable_id = null;
     $replyable_type = null;
-    try{
+    try {
       if ($reply != null) {
         if ($reply->replyable_type == 'reply') {
           // $replyable_id = self::GetReply($reply->replyable_id, $user_token)['reply']->replyable_id;
@@ -550,7 +574,7 @@ class Reply extends ReplyModel
           }
         }
       }
-    }catch(\Exception $e){
+    } catch (\Exception $e) {
       return [
         'replyable_parent_id' => null,
         'replyable_parent_type' => null,

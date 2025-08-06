@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Author HaiGeMaster
  * @package MaterialDesignForum
@@ -9,19 +10,20 @@
 
 namespace MaterialDesignForum\Controllers;
 
+use MaterialDesignForum\Plugins\Share;
 use MaterialDesignForum\Models\Follow as FollowModel;
 use MaterialDesignForum\Controllers\User as UserController;
 use MaterialDesignForum\Controllers\Token as TokenController;
-use MaterialDesignForum\Plugins\Share;
-use MaterialDesignForum\Config\Config;
 use MaterialDesignForum\Controllers\Topic as TopicController;
 use MaterialDesignForum\Controllers\Question as QuestionController;
 use MaterialDesignForum\Controllers\Article as ArticleController;
+use MaterialDesignForum\Controllers\Notification as NotificationController;
+
 
 class Follow extends FollowModel
 {
   /**
-   * 关注
+   * 是否关注
    * @param int $user 用户ID或token
    * @param string $followable_type 关注类型
    * @param int $followable_id 关注ID
@@ -43,7 +45,7 @@ class Follow extends FollowModel
    * @param int $user_token 用户ID或token
    * @param string $followable_type 关注类型
    * @param int $followable_id 关注ID
-   * @return array [is_follow:是否关注 json]
+   * @return array [is_follow:是否关注 followable_type:关注类型 followable_id:关注ID followable_object:关注对象]
    */
   public static function Follow($user_token, $followable_type, $followable_id): array
   {
@@ -53,7 +55,7 @@ class Follow extends FollowModel
     if ($follow) {
       // $delete = self::where('user_id', $user_id)->where('followable_type', $followable_type)->where('followable_id', $followable_id);
       $followable_object = null;
-      $is_follow = $follow->delete()||false;
+      $is_follow = $follow->delete() || false;
       if ($is_follow) {
         switch ($followable_type) {
           case 'user':
@@ -78,7 +80,7 @@ class Follow extends FollowModel
             break;
         }
       }
-      if($followable_object!=null){
+      if ($followable_object != null) {
         //更正is_follow状态
         $followable_object['is_follow'] = !$is_follow;
       }
@@ -97,32 +99,63 @@ class Follow extends FollowModel
       $follow->followable_id = $followable_id;
       $follow->create_time = Share::ServerTime();
       $followable_object = null;
-      $is_follow = $follow->save()||false;
+      $is_follow = $follow->save() || false;
       if ($is_follow) {
         switch ($followable_type) {
           case 'user':
             UserController::AddFollowerCount($followable_id);
             UserController::AddFolloweeCount($user_id);
             $followable_object = UserController::GetUserInfo($followable_id)['user'];
+            NotificationController::AddInteractionNotification(
+              $followable_id,
+              $user_id,
+              'user_follow',
+            );
             break;
           case 'topic':
             TopicController::AddFollowerCount($followable_id);
             UserController::AddFollowingTopicCount($user_id);
             $followable_object = TopicController::GetTopic($followable_id, $user_token)['topic'];
+            NotificationController::AddInteractionNotification(
+              TopicController::GetTopicOwnerId($followable_id),
+              $user_id,
+              'topic_follow',
+              null,
+              TopicController::GetTopic($followable_id)['topic'],
+            );
             break;
           case 'question':
             QuestionController::AddFollowerCount($followable_id);
             UserController::AddFollowingQuestionCount($user_id);
             $followable_object = QuestionController::GetQuestion($followable_id, $user_token)['question'];
+            NotificationController::AddInteractionNotification(
+              QuestionController::GetQuestionOwnerId($followable_id),
+              $user_id,
+              'question_follow',
+              null,
+              null,
+              0,
+              0,
+              0,
+              $followable_id,
+            );
             break;
           case 'article':
             ArticleController::AddFollowerCount($followable_id);
             UserController::AddFollowingArticleCount($user_id);
             $followable_object = ArticleController::GetArticle($followable_id, $user_token)['article'];
+            NotificationController::AddInteractionNotification(
+              ArticleController::GetArticleOwnerId($followable_id),
+              $user_id,
+              'article_follow',
+              0,
+              0,
+              $followable_id,
+            );
             break;
         }
       }
-      if($followable_object!=null){
+      if ($followable_object != null) {
         //更正is_follow状态
         $followable_object['is_follow'] = $is_follow;
       }
@@ -205,14 +238,14 @@ class Follow extends FollowModel
         case 'user':
           $data = UserController::whereIn('user_id', $followable_id_list)->get();
           foreach ($data as $key => $value) {
-            $data[$key] = UserController::GetUserInfo($value['user_id'],$user_token)['user'];
+            $data[$key] = UserController::GetUserInfo($value['user_id'], $user_token)['user'];
           }
           break;
         case 'topic':
           $data = TopicController::whereIn('topic_id', $followable_id_list)->get();
           foreach ($data as $key => $value) {
             // if ($user_id_is_token && $user_token) {
-              $data[$key]['is_follow'] = self::IsFollow($user_token, 'topic', $value['topic_id'], true);
+            $data[$key]['is_follow'] = self::IsFollow($user_token, 'topic', $value['topic_id'], true);
             // }
           }
           break;
@@ -220,7 +253,7 @@ class Follow extends FollowModel
           $data = QuestionController::whereIn('question_id', $followable_id_list)->get();
           foreach ($data as $key => $value) {
             // if ($user_id_is_token && $user_token) {
-              $data[$key]['is_follow'] = self::IsFollow($user_token, 'question', $value['question_id'], true);
+            $data[$key]['is_follow'] = self::IsFollow($user_token, 'question', $value['question_id'], true);
             // }
           }
           break;
@@ -228,7 +261,7 @@ class Follow extends FollowModel
           $data = ArticleController::whereIn('article_id', $followable_id_list)->get();
           foreach ($data as $key => $value) {
             // if ($user_id_is_token && $user_token) {
-              $data[$key]['is_follow'] = self::IsFollow($user_token, 'article', $value['article_id'], true);
+            $data[$key]['is_follow'] = self::IsFollow($user_token, 'article', $value['article_id'], true);
             // }
           }
           break;
@@ -309,8 +342,8 @@ class Follow extends FollowModel
       foreach ($follow_list_data as $key => $value) {
         array_push($user_id_list, $value['user_id']); //关注者ID
       }
-      foreach($user_id_list as $key => $value){
-        $data[$key] = UserController::GetUserInfo($value,$user_token)['user'];
+      foreach ($user_id_list as $key => $value) {
+        $data[$key] = UserController::GetUserInfo($value, $user_token)['user'];
         // $data[$key]['is_follow'] = self::IsFollow($user_token, 'user', $value, true);
       }
       // $data = UserController::whereIn('user_id', $user_id_list)->get();

@@ -9,6 +9,7 @@
 
 namespace MaterialDesignForum\Controllers;
 
+use MaterialDesignForum\Plugins\Share;
 use MaterialDesignForum\Models\Topic as TopicModel;
 use MaterialDesignForum\Controllers\Image as ImageController;
 use MaterialDesignForum\Controllers\Token as TokenController;
@@ -16,11 +17,24 @@ use MaterialDesignForum\Controllers\User as UserController;
 use MaterialDesignForum\Controllers\UserGroup as UserGroupController;
 use MaterialDesignForum\Controllers\Follow as FollowController;
 use MaterialDesignForum\Controllers\TopicAble as TopicAbleController;
-use MaterialDesignForum\Plugins\Share;
-//use MaterialDesignForum\Config\Config;
+use MaterialDesignForum\Controllers\Notification as NotificationController;
 
 class Topic extends TopicModel
 {
+  /**
+   * 获取话题所有者用户id
+   * @param int $topic_id 话题ID
+   * @return int|null 用户ID
+   */
+  public static function GetTopicOwnerId($topic_id)
+  {
+    $topic = self::find($topic_id);
+    if ($topic != null) {
+      return $topic->user_id;
+    }
+    return null;
+  }
+
   /**
    * 获取关联的话题，来自TopicAbleController
    * @param int $topicable_id 话题关联ID
@@ -318,6 +332,17 @@ class Topic extends TopicModel
           $topic->delete_time = Share::ServerTime();
 
           $is_delete = $topic->save();
+          //删除通知
+          NotificationController::AddInteractionNotification(
+            $topic->user_id,
+            $user_id,
+            'topic_delete',
+            null,
+            null,
+            0,
+            $topic->topic_id,
+          );
+
           array_push($delete_ids, $topic->topic_id);
         }
       }

@@ -14,6 +14,13 @@ use MaterialDesignForum\Controllers\User as UserController;
 use MaterialDesignForum\Plugins\Share;
 
 use MaterialDesignForum\Controllers\UserGroup as UserGroupController;
+use MaterialDesignForum\Controllers\Topic as TopicController;
+use MaterialDesignForum\Controllers\Question as QuestionController;
+use MaterialDesignForum\Controllers\Article as ArticleController;
+use MaterialDesignForum\Controllers\Answer as AnswerController;
+use MaterialDesignForum\Controllers\Comment as CommentController;
+use MaterialDesignForum\Controllers\Reply as ReplyController;
+
 use MaterialDesignForum\Controllers\Token as TokenController;
 use MaterialDesignForum\Config\Config;
 
@@ -108,7 +115,34 @@ class Report extends ReportModel
         ->paginate($per_page, ['*'], 'page', $page);
     }
     foreach ($reports as $report) {
-      $report->reportable = $report->reportable;
+      // $report->reportable = $report->reportable;
+      $reportable_type = $report->reportable_type;
+      switch ($reportable_type) {
+        case 'user':
+          $report->reportable = UserController::GetUserInfo($report->reportable_id)['user'];
+          break;
+        case 'topic':
+          $report->reportable = TopicController::GetTopic($report->reportable_id)['topic'];
+          break;
+        case 'question':
+          $report->reportable = QuestionController::GetQuestion($report->reportable_id)['question'];
+          break;
+        case 'article':
+          $report->reportable = ArticleController::GetArticle($report->reportable_id)['article'];
+          break;
+        case 'answer':
+          $report->reportable = AnswerController::GetAnswer($report->reportable_id)['answer'];
+          break;
+        case 'comment':
+          $report->reportable = CommentController::GetComment($report->reportable_id)['comment'];
+          break;
+        case 'reply':
+          $report->reportable = ReplyController::GetReply($report->reportable_id)['reply'];
+          break;
+        default:
+          $report->reportable = null;
+          break;
+      }
       $report->user = UserController::GetUserInfo($report->user_id)['user'];
     }
     return Share::HandleDataAndPagination($reports);

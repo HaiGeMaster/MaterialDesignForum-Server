@@ -29,6 +29,19 @@ use MaterialDesignForum\Models\Notification;
 class Question extends QuestionModel
 {
   /**
+   * 获取问题所有者用户id
+   * @param int $question_id 问题ID
+   * @return int|null 用户ID
+   */
+  public static function GetQuestionOwnerId($question_id)
+  {
+    $question = self::find($question_id);
+    if ($question != null) {
+      return $question->user_id;
+    }
+    return null;
+  }
+  /**
    * 添加提问
    * @param string $title 标题
    * @param array $topics 话题ID数组
@@ -91,9 +104,9 @@ class Question extends QuestionModel
   /**
    * 获取提问
    * @param int $question_id 问题ID
-   * @return
+   * @return array is_get:是否获取 question:问题信息
    */
-  public static function GetQuestion($question_id, $user_token)
+  public static function GetQuestion($question_id, $user_token = '')
   {
     $question = self::where('question_id', '=', $question_id)
       ->where('delete_time', '=', 0)
@@ -346,6 +359,10 @@ class Question extends QuestionModel
             $question->user_id,
             $user_id,
             'question_delete',
+            null,
+            null,
+            0,
+            0,
             0,
             $question->question_id,
             0,

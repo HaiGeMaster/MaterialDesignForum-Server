@@ -9,15 +9,15 @@
 
 namespace MaterialDesignForum\Controllers;
 
+use MaterialDesignForum\Plugins\Share;
 use MaterialDesignForum\Models\Vote as VoteModel;
 use MaterialDesignForum\Controllers\Token as TokenController;
-use MaterialDesignForum\Controllers\UserGroup as UserGroupController;
-
+use MaterialDesignForum\Controllers\Reply as ReplyController;
 use MaterialDesignForum\Controllers\Answer as AnswerController;
 use MaterialDesignForum\Controllers\Article as ArticleController;
 use MaterialDesignForum\Controllers\Comment as CommentController;
-use MaterialDesignForum\Controllers\Reply as ReplyController;
-use MaterialDesignForum\Plugins\Share;
+use MaterialDesignForum\Controllers\UserGroup as UserGroupController;
+use MaterialDesignForum\Controllers\Notification as NotificationController;
 
 
 class Vote extends VoteModel
@@ -69,15 +69,64 @@ class Vote extends VoteModel
             switch ($votable_type) {
               case 'answer':
                 AnswerController::SubVoteUpCount($votable_id);
+                NotificationController::AddInteractionNotification(
+                  AnswerController::GetAnswerOwnerId($votable_id),
+                  $user_id,
+                  'answer_like',
+                  null,
+                  null,
+                  0,
+                  0,
+                  0,
+                  $votable_id,
+                );
                 break;
               case 'article':
                 ArticleController::SubVoteUpCount($votable_id);
+                NotificationController::AddInteractionNotification(
+                  ArticleController::GetArticleOwnerId($votable_id),
+                  $user_id,
+                  'article_like',
+                  null,
+                  null,
+                  0,
+                  0,
+                  $votable_id,
+                );
+
                 break;
               case 'comment':
                 CommentController::SubVoteUpCount($votable_id);
+                NotificationController::AddInteractionNotification(
+                  CommentController::GetCommentOwnerId($votable_id),
+                  $user_id,
+                  'comment_like',
+                  null,
+                  null,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  $votable_id,
+                );
                 break;
               case 'reply':
                 ReplyController::SubVoteUpCount($votable_id);
+                NotificationController::AddInteractionNotification(
+                  ReplyController::GetReplyOwnerId($votable_id),
+                  $user_id,
+                  'reply_like',
+                  null,
+                  null,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  $votable_id,
+                );
                 break;
             }
           } else if ($type == 'down') {

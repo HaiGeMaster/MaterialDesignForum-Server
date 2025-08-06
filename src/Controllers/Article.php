@@ -27,6 +27,19 @@ use MaterialDesignForum\Controllers\User as UserController;
 class Article extends ArticleModel
 {
   /**
+   * 获取文章所有者用户id
+   * @param int $article_id 文章ID
+   * @return int|null 用户ID
+   */
+  public static function GetArticleOwnerId($article_id)
+  {
+    $article = self::find($article_id);
+    if ($article != null) {
+      return $article->user_id;
+    }
+    return null;
+  }
+  /**
    * 添加文章
    * @param string $title 标题
    * @param array $topics 话题ID数组
@@ -88,9 +101,9 @@ class Article extends ArticleModel
   /**
    * 获取文章
    * @param int $question_id 问题ID
-   * @return
+   * @return array is_get:是否获取 article:文章信息
    */
-  public static function GetArticle($article_id, $user_token)
+  public static function GetArticle($article_id, $user_token = '')
   {
     $article = self::where('article_id', '=', $article_id)->where('delete_time', '=', 0)->first();
     if ($article) {
@@ -334,6 +347,10 @@ class Article extends ArticleModel
             $article->user_id,
             $user_id,
             'article_delete',
+            null,
+            null,
+            0,
+            0,
             $article->article_id,
             0,
             0,

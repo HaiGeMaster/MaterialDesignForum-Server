@@ -24,13 +24,16 @@ class Api
   {
     $collector = new RouteCollector();
     //Test API↓
-    $collector->get('/api/test/GetUserOptionNotificationValue', function () {
-      $a = \MaterialDesignForum\Controllers\Notification::GetUserOptionNotificationValue(1);
-      print_r($a);
-      return;
+    $collector->get('/api/test/Client_AddInbox', function () {
       $data = Share::GetRequestData();
       return Share::HandleArrayToJSON(
-        \MaterialDesignForum\Controllers\Notification::GetUserOptionNotificationValue(1)
+        \MaterialDesignForum\Controllers\Inbox::Client_AddInbox(
+          'dc6db7e87bfb32206b7af2b782ad51fa',
+          'user_to_user',
+          2,
+          '测试内容' . Share::ServerTime(),
+          '测试内容' . Share::ServerTime()
+        )
       );
     });
     $collector->get('/api/test/GetServerInfo', function () {
@@ -989,40 +992,13 @@ class Api
         )
       );
     });
+
     $collector->post('/api/oauth/delete', function () {
       $data = Share::GetRequestData();
       return Share::HandleArrayToJSON(
         \MaterialDesignForum\Controllers\Oauth::DeleteOauth(
           $data['user_token'] ?? '',
           $data['oauth_id'] ?? null
-        )
-      );
-    });
-    $collector->post('/api/user/option/get', function () {
-      $data = Share::GetRequestData();
-      return Share::HandleArrayToJSON(
-        \MaterialDesignForum\Controllers\UserOption::GetUserOption(
-          $data['user_token'] ?? '',
-          $data['name'],
-        )
-      );
-    });
-    $collector->post('/api/user/option/set', function () {
-      $data = Share::GetRequestData();
-      return Share::HandleArrayToJSON(
-        \MaterialDesignForum\Controllers\UserOption::SetUserOption(
-          $data['user_token'] ?? '',
-          $data['name'],
-          $data['value'],
-        )
-      );
-    });
-    $collector->post('/api/user/option/delete', function () {
-      $data = Share::GetRequestData();
-      return Share::HandleArrayToJSON(
-        \MaterialDesignForum\Controllers\UserOption::DeleteUserOption(
-          $data['user_token'] ?? '',
-          $data['name'],
         )
       );
     });

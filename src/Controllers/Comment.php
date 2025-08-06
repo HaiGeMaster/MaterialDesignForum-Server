@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Author HaiGeMaster
  * @package MaterialDesignForum
@@ -28,6 +29,19 @@ use MaterialDesignForum\Models\Notification;
 
 class Comment extends CommentModel
 {
+   /**
+   * 获取评论所有者用户id
+   * @param int $comment_id 评论ID
+   * @return int|null 用户ID
+   */
+  public static function GetCommentOwnerId($comment_id)
+  {
+    $comment = self::find($comment_id);
+    if ($comment != null) {
+      return $comment->user_id;
+    }
+    return null;
+  }
   /**
    * 添加评论
    * @param int $commentable_id 评论目标的ID
@@ -80,11 +94,15 @@ class Comment extends CommentModel
             ArticleController::AddCommentCount($commentable_id);
             //获取文章作者用户ID
             $article = ArticleController::GetArticle($commentable_id, $user_token)['article'];
-            if($article != null){
+            if ($article != null) {
               NotificationController::AddInteractionNotification(
                 $article->user_id,
                 $user_id,
                 'article_comment',
+                null,
+                null,
+                0,
+                0,
                 $article->article_id,
                 0,
                 0,
@@ -97,11 +115,15 @@ class Comment extends CommentModel
             QuestionController::AddCommentCount($commentable_id);
             //根据问题ID获取问题
             $question = QuestionController::GetQuestion($commentable_id, $user_token)['question'];
-            if($question != null){
+            if ($question != null) {
               NotificationController::AddInteractionNotification(
                 $question->user_id,
                 $user_id,
                 'question_comment',
+                null,
+                null,
+                0,
+                0,
                 0,
                 $question->question_id,
                 0,
@@ -114,11 +136,15 @@ class Comment extends CommentModel
             AnswerController::AddCommentCount($commentable_id);
             //根据回答ID获取回答
             $answer = AnswerController::GetAnswer($commentable_id, $user_token)['answer'];
-            if($answer != null){
+            if ($answer != null) {
               NotificationController::AddInteractionNotification(
                 $answer->user_id,
                 $user_id,
                 'answer_comment',
+                null,
+                null,
+                0,
+                0,
                 0,
                 0,
                 $answer->answer_id,
@@ -139,9 +165,9 @@ class Comment extends CommentModel
    * 获取评论
    * @param int $comment_id 评论ID
    * @param string $user_token 用户Token
-   * @return CommentModel|null
+   * @return array is_get:是否获取 comment:评论信息
    */
-  public static function GetComment($comment_id, $user_token)
+  public static function GetComment($comment_id, $user_token = '')
   {
     $comment = self::where('comment_id', '=', $comment_id)
       ->where('delete_time', '=', 0)
@@ -177,7 +203,7 @@ class Comment extends CommentModel
     $search_keywords = '',
     $search_field = []
   ) {
-    if($search_field == []){
+    if ($search_field == []) {
       $search_field = self::$search_field;
     }
 
@@ -304,8 +330,8 @@ class Comment extends CommentModel
           UserGroupController::BeforeTime($user_token, 'time_before_edit_comment', $comment->create_time)
         )
         ||
-        (UserGroupController::IsAdmin($user_token)&&UserGroupController::Ability($user_token,'ability_admin_manage_comment'))
-         // UserGroupController::IsAdmin($user_token)
+        (UserGroupController::IsAdmin($user_token) && UserGroupController::Ability($user_token, 'ability_admin_manage_comment'))
+        // UserGroupController::IsAdmin($user_token)
       ) {
         $comment->content = $content;
         $comment->update_time = Share::ServerTime();
@@ -352,8 +378,8 @@ class Comment extends CommentModel
             UserGroupController::BeforeTime($user_token, 'time_before_delete_comment', $comment->create_time)
           )
           ||
-          (UserGroupController::IsAdmin($user_token)&&UserGroupController::Ability($user_token,'ability_admin_manage_comment'))
-           // UserGroupController::IsAdmin($user_token)
+          (UserGroupController::IsAdmin($user_token) && UserGroupController::Ability($user_token, 'ability_admin_manage_comment'))
+          // UserGroupController::IsAdmin($user_token)
         ) {
           $comment->delete_time = Share::ServerTime();
           UserController::SubCommentCount($comment->user_id);
@@ -361,6 +387,10 @@ class Comment extends CommentModel
             $comment->user_id,
             $user_id,
             'comment_delete',
+            null,
+            null,
+            0,
+            0,
             0,
             0,
             0,
@@ -368,7 +398,7 @@ class Comment extends CommentModel
             0
           );
 
-          switch($comment->commentable_type){
+          switch ($comment->commentable_type) {
             case 'article':
               ArticleController::SubCommentCount($comment->commentable_id);
               break;
@@ -388,20 +418,20 @@ class Comment extends CommentModel
           //   foreach ($replys as $key => $reply) {
           //     $reply->delete_time = Share::ServerTime();
           //     $reply->save();
-  
+
           //     UserController::SubReplyCount($reply->user_id);
           //   }
           // }
 
           //减少对应问题或文章的评论数量
-          if($comment->commentable_type == 'answer'){
+          if ($comment->commentable_type == 'answer') {
             //如果是回答评论，则减少对应问题的评论数量
             QuestionController::SubCommentCount($comment->commentable_id);
-          }else{
+          } else {
             //如果是文章或问题评论，则减少对应文章或问题的评论数量
-            if($comment->commentable_type == 'article'){
+            if ($comment->commentable_type == 'article') {
               ArticleController::SubCommentCount($comment->commentable_id);
-            }else if($comment->commentable_type == 'question'){
+            } else if ($comment->commentable_type == 'question') {
               QuestionController::SubCommentCount($comment->commentable_id);
             }
           }

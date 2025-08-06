@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Author HaiGeMaster
  * @package MaterialDesignForum
@@ -26,6 +27,19 @@ use MaterialDesignForum\Controllers\Notification as NotificationController;
 
 class Answer extends AnswerModel
 {
+  /**
+   * 获取回答所有者用户id
+   * @param int $answer_id 回答ID
+   * @return int|null 用户ID
+   */
+  public static function GetAnswerOwnerId($answer_id)
+  {
+    $answer = self::find($answer_id);
+    if ($answer != null) {
+      return $answer->user_id;
+    }
+    return null;
+  }
   /**
    * 添加回答
    * @param int $question_id 问题ID
@@ -55,7 +69,7 @@ class Answer extends AnswerModel
         UserGroupController::IsAdmin($user_token)
       )
     ) {
-      $content_markdown = preg_replace('/\s+/', '', $content_markdown);//去除回车和空格
+      $content_markdown = preg_replace('/\s+/', '', $content_markdown); //去除回车和空格
 
       $answer = new AnswerModel;
       $answer->question_id = $question_id;
@@ -68,15 +82,19 @@ class Answer extends AnswerModel
       $is_add = $answer->save();
       if ($is_add) {
         // UserController::AddAnswerCount($user_id)['user'];
-        UserController::AddAnswerCount($user_id);//['user'];
+        UserController::AddAnswerCount($user_id); //['user'];
         QuestionController::AddAnswerCount($question_id);
         //根据问题ID获取问题
         $question = QuestionController::GetQuestion($question_id, $user_token)['question'];
-        if($question != null){
+        if ($question != null) {
           NotificationController::AddInteractionNotification(
             $question->user_id,
             $user_id,
             'question_answer',
+            null,
+            null,
+            0,
+            0,
             0,
             $question->question_id,
             $answer->answer_id,
@@ -97,7 +115,7 @@ class Answer extends AnswerModel
    * @param string $user_token 用户Token
    * @return array is_get:bool 是否获取到回答 answer:AnswerModel 回答
    */
-  public static function GetAnswer($answer_id, $user_token)
+  public static function GetAnswer($answer_id, $user_token = '')
   {
     $answer = AnswerModel::where('answer_id', $answer_id)
       ->where('delete_time', '=', 0)
@@ -131,7 +149,7 @@ class Answer extends AnswerModel
     $search_keywords = '',
     $search_field = []
   ) {
-    if($search_field == []){
+    if ($search_field == []) {
       $search_field = self::$search_field;
     }
     $data = Share::HandleDataAndPagination(null);
@@ -220,11 +238,11 @@ class Answer extends AnswerModel
           UserGroupController::BeforeTime($user_token, 'time_before_edit_answer', $answer->create_time)
         )
         ||
-        (UserGroupController::IsAdmin($user_token)&&UserGroupController::Ability($user_token,'ability_admin_manage_answer'))
-         // UserGroupController::IsAdmin($user_token)
+        (UserGroupController::IsAdmin($user_token) && UserGroupController::Ability($user_token, 'ability_admin_manage_answer'))
+        // UserGroupController::IsAdmin($user_token)
       ) {
-        $content_markdown = preg_replace('/\s+/', '', $content_markdown);//去除回车和空格
-        
+        $content_markdown = preg_replace('/\s+/', '', $content_markdown); //去除回车和空格
+
         $answer->content_markdown = $content_markdown;
         $answer->content_rendered = $content_rendered;
         $answer->update_time = Share::ServerTime();
@@ -269,8 +287,8 @@ class Answer extends AnswerModel
             UserGroupController::BeforeTime($user_token, 'time_before_delete_answer', $answer->create_time)
           )
           ||
-          (UserGroupController::IsAdmin($user_token)&&UserGroupController::Ability($user_token,'ability_admin_manage_answer'))
-           // UserGroupController::IsAdmin($user_token)
+          (UserGroupController::IsAdmin($user_token) && UserGroupController::Ability($user_token, 'ability_admin_manage_answer'))
+          // UserGroupController::IsAdmin($user_token)
         ) {
           $answer->delete_time = Share::ServerTime();
           UserController::SubAnswerCount($answer->user_id);
@@ -279,6 +297,10 @@ class Answer extends AnswerModel
             $answer->user_id,
             $user_id,
             'answer_delete',
+            null,
+            null,
+            0,
+            0,
             0,
             $answer->question_id,
             $answer->answer_id,
@@ -300,15 +322,15 @@ class Answer extends AnswerModel
           //       foreach($replys as $key => $reply){
           //         $reply->delete_time = Share::ServerTime();
           //         $reply->save();
-    
+
           //         //从用户回复数中减去
           //         UserController::SubReplyCount($reply->user_id);
           //       }
           //     }
-  
+
           //     $comment->delete_time = Share::ServerTime();
           //     $comment->save();
-  
+
           //     //从用户评论数中减去
           //     UserController::SubCommentCount($comment->user_id);
           //   }
