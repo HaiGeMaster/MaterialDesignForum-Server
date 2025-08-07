@@ -9,6 +9,7 @@
  - ​后端​​完善通知系统的底层功能逻辑，支持全量通知类型处理。
 ​ - ​通知类型定义
  - 你可以在通知-右上角设置-通知设置中查看和管理所有通知类型。
+ - 默认情况下邮件通知为关闭状态，仅默认开启站内通知
  - 明确定义所有通知类型及其当前开发状态（已全部完成）：
      ```javascript
      /**
@@ -33,6 +34,10 @@
       * @property string reply_like 回复被点赞
       * @property string reply_reply 回复被回复
       * @property string reply_delete 回复被删除
+      * @property string follow_user_update 关注的用户更新(文章、提问时)
+      * @property string follow_topic_update 关注的话题更新(文章、提问时)
+      * @property string follow_question_update 关注的提问更新
+      * @property string follow_article_update 关注的文章更新
       */
      ```
 

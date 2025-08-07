@@ -97,10 +97,10 @@ class Notification extends Eloquent
      * @property string reply_like 回复被点赞 已做完
      * @property string reply_reply 回复被回复 已做完
      * @property string reply_delete 回复被删除 已做完
-     * @property string follow_user_update 关注的用户更新
-     * @property string follow_topic_update 关注的话题更新
-     * @property string follow_question_update 关注的提问更新
-     * @property string follow_article_update 关注的文章更新
+     * @property string follow_user_update 关注的用户更新 已做完
+     * @property string follow_topic_update 关注的话题更新 已做完
+     * @property string follow_question_update 关注的提问更新 已做完
+     * @property string follow_article_update 关注的文章更新 已做完
      */
 
     public static $types = [
