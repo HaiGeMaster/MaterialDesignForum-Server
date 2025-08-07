@@ -87,12 +87,50 @@ class Question extends QuestionModel
       $is_add = $question->save();
       if ($is_add) {
         UserController::AddQuestionCount($user_id);
+        $following_id_array = FollowController::GetFollowingObjectUserIds('user', $user_id);
+        if ($following_id_array != null) {
+          //遍历$following_id_array数组，为每个用户添加关注的提问更新通知
+          foreach ($following_id_array as $key => $value) {
+            NotificationController::AddInteractionNotification(
+              $value,
+              $user_id,
+              'follow_user_update',
+              null,
+              null,
+              0,
+              0,
+              0,
+              $question->question_id
+            );
+          }
+        }
       }
       foreach ($topics as $topic_id) {
         if (TopicAbleController::AddTopicAble($topic_id, $question->question_id, 'question')) {
           TopicController::AddQuestionCount($topic_id);
         }
       }
+      //根据$topics查询话题的关注者
+      $follower_id_array = FollowController::where('followable_type', '=', 'topic')
+      ->whereIn('followable_id', $topics)
+      ->get()->pluck('user_id')->toArray();
+      if($follower_id_array != null){
+        //遍历$follower_id_array数组，为每个用户添加关注的提问更新通知
+        foreach ($follower_id_array as $key => $value) {
+          NotificationController::AddInteractionNotification(
+            $value,
+            $user_id,
+            'follow_topic_update',
+            null,
+            null,
+            0,
+            $topic_id,
+            0,
+            $question->question_id,
+          );
+        }
+      }
+
       $question_id = $question->question_id;
     }
     return [
@@ -289,6 +327,27 @@ class Question extends QuestionModel
         $question->content_rendered = $content_rendered;
         $question->update_time = Share::ServerTime();
         $is_edit = $question->save();
+        if($is_edit){
+          // NotificationController::AddInteractionNotification()
+          //从关注关系中获取所有关注此问题的用户id
+          $following_id_array = FollowController::GetFollowingObjectUserIds('question', $question_id);
+          if($following_id_array!=null){
+            //遍历$following_id_array数组，为每个用户添加关注的提问更新通知
+            foreach ($following_id_array as $key => $value) {
+              NotificationController::AddInteractionNotification(
+                $value,
+                $question->user_id,
+                'follow_question_update',
+                null,
+                null,
+                0,
+                0,
+                0,
+                $question_id
+              );
+            }
+          }
+        }
         //首先从TopicAbleController中删除所有的topicable_id为$question_id的数据
         // TopicAbleController::where('topicable_id', '=', $question_id)->where('topicable_type', '=', 'question')->delete();
 

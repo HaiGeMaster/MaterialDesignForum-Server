@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Author HaiGeMaster
  * @package MaterialDesignForum
@@ -23,6 +24,7 @@ use MaterialDesignForum\Controllers\Notification as NotificationController;
 // use MaterialDesignForum\Config\Config;
 
 use MaterialDesignForum\Controllers\User as UserController;
+use MaterialDesignForum\Models\Follow;
 
 class Article extends ArticleModel
 {
@@ -72,8 +74,8 @@ class Article extends ArticleModel
         UserGroupController::IsAdmin($user_token)
       )
     ) {
-      $content_markdown = preg_replace('/\s+/', '', $content_markdown);//去除回车和空格
-      
+      $content_markdown = preg_replace('/\s+/', '', $content_markdown); //去除回车和空格
+
       $article = new ArticleModel;
       $article->user_id = $user_id;
       $article->title = $title;
@@ -84,12 +86,48 @@ class Article extends ArticleModel
       $is_add = $article->save();
       if ($is_add) {
         UserController::AddArticleCount($user_id);
+        $following_id_array = FollowController::GetFollowingObjectUserIds('user', $user_id);
+        if ($following_id_array != null) {
+          //遍历$following_id_array数组，为每个用户添加关注的提问更新通知
+          foreach ($following_id_array as $key => $value) {
+            NotificationController::AddInteractionNotification(
+              $value,
+              $user_id,
+              'follow_user_update',
+              null,
+              null,
+              0,
+              0,
+              $article->article_id
+            );
+          }
+        }
       }
       foreach ($topics as $topic_id) {
         if (TopicAbleController::AddTopicAble($topic_id, $article->article_id, 'article')) {
           TopicController::AddArticleCount($topic_id);
         }
       }
+      //根据$topics查询话题的关注者
+      $follower_id_array = FollowController::where('followable_type', '=', 'topic')
+      ->whereIn('followable_id', $topics)
+      ->get()->pluck('user_id')->toArray();
+      if($follower_id_array != null){
+        //遍历$follower_id_array数组，为每个用户添加关注的提问更新通知
+        foreach ($follower_id_array as $key => $value) {
+          NotificationController::AddInteractionNotification(
+            $value,
+            $user_id,
+            'follow_topic_update',
+            null,
+            null,
+            0,
+            $topic_id,
+            $article->article_id,
+          );
+        }
+      }
+
       $article_id = $article->article_id;
     }
     return [
@@ -109,7 +147,7 @@ class Article extends ArticleModel
     if ($article) {
       $article->topics = TopicController::GetAblesTopic($article_id, 'article');
       $article->user = UserController::GetUserInfo($article->user_id, $user_token)['user'];
-      $article->is_follow = Follow::IsFollow($user_token, 'article', $article_id, true);
+      $article->is_follow = FollowController::IsFollow($user_token, 'article', $article_id, true);
       $article->vote = VoteController::GetVote($article_id, 'article', $user_token)['vote'];
     }
     return [
@@ -139,10 +177,10 @@ class Article extends ArticleModel
     $search_field = [],
     $specify_topic_id = ''
   ) {
-    if($search_field == []){
+    if ($search_field == []) {
       $search_field = self::$search_field;
     }
-    
+
     $data = Share::HandleDataAndPagination(null);
     $orders = Share::HandleArrayField($order);
 
@@ -153,7 +191,7 @@ class Article extends ArticleModel
         $article_ids = TopicAbleController::where('topic_id', '=', $specify_topic_id)
           ->where('topicable_type', '=', 'article')
           ->pluck('topicable_id'); //获取指定话题下的所有文章id
-          $data = self::where('delete_time', '=', 0)
+        $data = self::where('delete_time', '=', 0)
           ->whereIn('article_id', $article_ids) // 确保传递的是数组
           ->orderBy($field, $sort)
           ->paginate($per_page, ['*'], 'page', $page);
@@ -270,16 +308,36 @@ class Article extends ArticleModel
           UserGroupController::BeforeTime($user_token, 'time_before_edit_article', $article->create_time)
         )
         ||
-        (UserGroupController::IsAdmin($user_token)&&UserGroupController::Ability($user_token,'ability_admin_manage_article'))
-         // UserGroupController::IsAdmin($user_token)
+        (UserGroupController::IsAdmin($user_token) && UserGroupController::Ability($user_token, 'ability_admin_manage_article'))
+        // UserGroupController::IsAdmin($user_token)
       ) {
-        $content_markdown = preg_replace('/\s+/', '', $content_markdown);//去除回车和空格
-        
+        $content_markdown = preg_replace('/\s+/', '', $content_markdown); //去除回车和空格
+
         $article->title = $title;
         $article->content_markdown = $content_markdown;
         $article->content_rendered = $content_rendered;
         $article->update_time = Share::ServerTime();
         $is_edit = $article->save();
+        if ($is_edit) {
+          // NotificationController::AddInteractionNotification()
+          //从关注关系中获取所有关注此文章的用户id
+          $following_id_array = FollowController::GetFollowingObjectUserIds('article', $article_id);
+          if ($following_id_array != null) {
+            //遍历$following_id_array数组，为每个用户添加关注的提问更新通知
+            foreach ($following_id_array as $key => $value) {
+              NotificationController::AddInteractionNotification(
+                $value,
+                $article->user_id,
+                'follow_article_update',
+                null,
+                null,
+                0,
+                0,
+                $article_id
+              );
+            }
+          }
+        }
         // TopicAbleController::where('topicable_id', '=', $article_id)->where('topicable_type', '=', 'article')->delete();
 
         //首先从TopicAbleController获取所有的topicable_id为$article_id的数据的topic_id数组
@@ -337,8 +395,8 @@ class Article extends ArticleModel
             UserGroupController::BeforeTime($user_token, 'time_before_delete_article', $article->create_time)
           )
           ||
-          (UserGroupController::IsAdmin($user_token)&&UserGroupController::Ability($user_token,'ability_admin_manage_article'))
-           // UserGroupController::IsAdmin($user_token)
+          (UserGroupController::IsAdmin($user_token) && UserGroupController::Ability($user_token, 'ability_admin_manage_article'))
+          // UserGroupController::IsAdmin($user_token)
         ) {
           UserController::SubArticleCount($article->user_id);
           TopicController::SubArticleCount($article->topics);
@@ -364,7 +422,7 @@ class Article extends ArticleModel
           //   ->get();
           // if($comments!=null){
           //   foreach ($comments as $key => $comment) {
-  
+
           //     //将评论下的所有回复删除
           //     $replys = ReplyController::where('replyable_comment_id', '=', $comment->comment_id)
           //     ->get();
@@ -372,15 +430,15 @@ class Article extends ArticleModel
           //       foreach ($replys as $key => $reply) {
           //         $reply->delete_time = Share::ServerTime();
           //         $reply->save();
-    
+
           //         //从用户的回复数中减去1
           //         UserController::SubReplyCount($reply->user_id);
           //       }
           //     }
-  
+
           //     $comment->delete_time = Share::ServerTime();
           //     $comment->save();
-  
+
           //     //从用户的评论数中减去1
           //     UserController::SubCommentCount($comment->user_id);
           //   }

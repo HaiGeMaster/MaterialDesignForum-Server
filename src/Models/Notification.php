@@ -24,7 +24,7 @@ class Notification extends Eloquent
    * @typedef NotificationModel 通知
    * @property int $notification_id 通知ID
    * @property int $receiver_id 接收者ID
-   * @property int $sender_id 发送者ID
+   * @property int $sender_id 发送者ID system|user_id
    * @property string $type 消息类型
    * @property string $content_markdown 内容Markdown
    * @property string $content_rendered 内容渲染
@@ -97,6 +97,10 @@ class Notification extends Eloquent
      * @property string reply_like 回复被点赞 已做完
      * @property string reply_reply 回复被回复 已做完
      * @property string reply_delete 回复被删除 已做完
+     * @property string follow_user_update 关注的用户更新
+     * @property string follow_topic_update 关注的话题更新
+     * @property string follow_question_update 关注的提问更新
+     * @property string follow_article_update 关注的文章更新
      */
 
     public static $types = [
@@ -119,7 +123,11 @@ class Notification extends Eloquent
       'comment_delete', //评论被删除
       'reply_like', //回复被点赞
       'reply_reply', //回复被回复
-      'reply_delete' //回复被删除
+      'reply_delete', //回复被删除
+      'follow_user_update', //关注的用户更新
+      'follow_topic_update', //关注的话题更新
+      'follow_question_update', //关注的提问更新
+      'follow_article_update', //关注的文章更新
     ];
 
   /**

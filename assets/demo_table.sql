@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主机： localhost
--- 生成日期： 2025-07-19 16:45:56
+-- 生成日期： 2025-08-07 08:44:24
 -- 服务器版本： 8.0.12
 -- PHP 版本： 7.4.3
 
@@ -190,17 +190,19 @@ CREATE TABLE `notification` (
   `receiver_id` int(10) UNSIGNED NOT NULL COMMENT '接收者ID',
   `sender_id` int(10) NOT NULL COMMENT '发送者ID',
   `type` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '消息类型：\r\nquestion_answered, \r\nquestion_commented, \r\nquestion_deleted, \r\narticle_commented, \r\narticle_deleted, \r\nanswer_commented, \r\nanswer_deleted, \r\ncomment_replied, \r\ncomment_deleted',
-  `content_markdown` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '内容原文',
-  `content_rendered` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '内容正文',
-  `article_id` int(10) NOT NULL COMMENT '文章ID',
-  `question_id` int(10) NOT NULL COMMENT '提问ID',
-  `answer_id` int(10) NOT NULL COMMENT '回答ID',
-  `comment_id` int(10) NOT NULL COMMENT '评论ID',
-  `reply_id` int(10) NOT NULL COMMENT '回复ID',
-  `reply_to_reply_id` int(10) NOT NULL,
+  `content_markdown` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT '内容原文',
+  `content_rendered` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT '内容正文',
+  `user_id` int(10) NOT NULL DEFAULT '0' COMMENT '用户ID',
+  `topic_id` int(10) NOT NULL DEFAULT '0' COMMENT '话题ID',
+  `article_id` int(10) NOT NULL DEFAULT '0' COMMENT '文章ID',
+  `question_id` int(10) NOT NULL DEFAULT '0' COMMENT '提问ID',
+  `answer_id` int(10) NOT NULL DEFAULT '0' COMMENT '回答ID',
+  `comment_id` int(10) NOT NULL DEFAULT '0' COMMENT '评论ID',
+  `reply_id` int(10) NOT NULL DEFAULT '0' COMMENT '回复ID',
+  `reply_to_reply_id` int(10) NOT NULL DEFAULT '0' COMMENT '回复到回复的id',
   `create_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '发送时间',
   `read_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '阅读时间',
-  `delete_time` int(10) NOT NULL COMMENT '删除时间'
+  `delete_time` int(10) UNSIGNED DEFAULT '0' COMMENT '删除时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='通知表';
 
 -- --------------------------------------------------------
@@ -511,6 +513,19 @@ INSERT INTO `user_group` (`user_group_id`, `user_group_name`, `user_group_descri
 -- --------------------------------------------------------
 
 --
+-- 表的结构 `user_option`
+--
+
+CREATE TABLE `user_option` (
+  `user_option_id` int(10) UNSIGNED NOT NULL COMMENT '索引',
+  `user_id` int(10) NOT NULL COMMENT '归属用户ID',
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '名称',
+  `value` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '值'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户杂项键值表';
+
+-- --------------------------------------------------------
+
+--
 -- 表的结构 `vote`
 --
 
@@ -641,6 +656,12 @@ ALTER TABLE `user_group`
   ADD PRIMARY KEY (`user_group_id`);
 
 --
+-- 表的索引 `user_option`
+--
+ALTER TABLE `user_option`
+  ADD PRIMARY KEY (`user_option_id`);
+
+--
 -- 在导出的表使用AUTO_INCREMENT
 --
 
@@ -733,6 +754,12 @@ ALTER TABLE `user`
 --
 ALTER TABLE `user_group`
   MODIFY `user_group_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '用户组ID', AUTO_INCREMENT=10;
+
+--
+-- 使用表AUTO_INCREMENT `user_option`
+--
+ALTER TABLE `user_option`
+  MODIFY `user_option_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '索引';
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

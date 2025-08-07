@@ -58,7 +58,7 @@ class Notification extends NotificationModel
   /**
    * 添加互动通知 此方法不对外开放 仅供内部调用
    * @param int $receiver_id 接收者ID
-   * @param int $sender_id 发送者ID 一般是系统，也可以是用户
+   * @param int $sender_id 发送者ID system|user_id 一般是系统:0，也可以是用户id
    * @param string $type 消息类型 @type NotificationType 通知类型 必须是有效的通知类型
    * @param string $content_markdown 消息内容Markdown
    * @param string $content_rendered 消息内容HTML
@@ -73,7 +73,7 @@ class Notification extends NotificationModel
    */
   public static function AddInteractionNotification(
     $receiver_id = 0,
-    $sender_id = '',
+    $sender_id = 0,
     $type = '',
     $content_markdown = null,
     $content_rendered = null,
@@ -237,6 +237,10 @@ class Notification extends NotificationModel
            * @property string reply_like 回复被点赞 已做完
            * @property string reply_reply 回复被回复 已做完
            * @property string reply_delete 回复被删除 已做完
+           * @property string follow_user_update 关注的用户更新
+           * @property string follow_topic_update 关注的话题更新
+           * @property string follow_question_update 关注的提问更新
+           * @property string follow_article_update 关注的文章更新
            */
           case 'user_follow':
             break;
@@ -449,6 +453,54 @@ class Notification extends NotificationModel
             $notification->reply = ReplyController::where('reply_id', $notification->reply_id)->first();
             $receiver_content = $notification->reply->content;
             break;
+          case 'follow_user_update':
+            if($notification->question_id!=0){
+              $notification->question = QuestionController::where('question_id', $notification->question_id)->first();
+              if($notification->question != null){
+                $receiver_content = $notification->question->title;
+                $sender_content = 'Message.Client.Notification.NewQuestion';
+              }
+            }else if($notification->article_id!=0){
+              $notification->article = ArticleController::where('article_id', $notification->article_id)->first();
+              if($notification->article != null){
+                $receiver_content = $notification->article->title;
+                $sender_content = 'Message.Client.Notification.NewArticle';
+              }
+            }
+            break;
+          case 'follow_topic_update':
+            $notification->topic = TopicController::where('topic_id', $notification->topic_id)->first();
+            // if($notification->topic != null){
+            //   $receiver_content = $notification->topic->name;
+            // }
+            if($notification->question_id!=0){
+              $notification->question = QuestionController::where('question_id', $notification->question_id)->first();
+              if($notification->question != null){
+                $receiver_content = $notification->question->title;
+                $sender_content = 'Message.Client.Notification.NewQuestion';
+              }
+            }else if($notification->article_id!=0){
+              $notification->article = ArticleController::where('article_id', $notification->article_id)->first();
+              if($notification->article != null){
+                $receiver_content = $notification->article->title;
+                $sender_content = 'Message.Client.Notification.NewArticle';
+              }
+            }
+            break;
+          case 'follow_question_update':
+            $notification->question = QuestionController::where('question_id', $notification->question_id)->first();
+            if($notification->question != null){
+              $receiver_content = $notification->question->title;
+              $sender_content = 'Message.Client.Notification.NewQuestion';
+            }
+            break;
+          case 'follow_article_update':
+            $notification->article = ArticleController::where('article_id', $notification->article_id)->first();
+            if($notification->article != null){
+              $receiver_content = $notification->article->title;
+              $sender_content = 'Message.Client.Notification.NewArticle';
+            }
+            break;
         }
         //如果$receiver_content超过10个字符，截取前10个字符
         // if(strlen($receiver_content) > 10){
@@ -508,7 +560,7 @@ class Notification extends NotificationModel
    * 获取用户通知设置
    * @param int $user_id 用户ID
    * @param string $type 通知类型
-   * @return array [web_message=>bool,email_message=>bool] 用户通知设置为空的情况下默认都为true
+   * @return array [web_message=>bool,email_message=>bool] 用户通知设置为空的情况下默认都为['web_message' => true, 'email_message' => false]
    */
   public static function GetUserOptionNotificationSetting($user_id, $type): array
   {
@@ -522,6 +574,6 @@ class Notification extends NotificationModel
         ];
       }
     }
-    return ['web_message' => true, 'email_message' => true]; //用户通知设置为空的情况下默认都为true
+    return ['web_message' => true, 'email_message' => false]; //用户通知设置为空的情况下默认都为['web_message' => true, 'email_message' => false]
   }
 }

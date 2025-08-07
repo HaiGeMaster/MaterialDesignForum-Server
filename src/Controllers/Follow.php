@@ -23,6 +23,17 @@ use MaterialDesignForum\Controllers\Notification as NotificationController;
 class Follow extends FollowModel
 {
   /**
+   * 获取关注对象的用户ID列表
+   * @param string $followable_type 关注类型
+   * @param int $followable_id 关注ID
+   * @return array|null 关注对象的用户ID数组
+   */
+  public static function GetFollowingObjectUserIds(string $followable_type, int $followable_id)
+  {
+    $following_ids = self::where('followable_type', $followable_type)->where('followable_id', $followable_id)->pluck('user_id')->toArray();
+    return $following_ids??null;
+  }
+  /**
    * 是否关注
    * @param int $user 用户ID或token
    * @param string $followable_type 关注类型

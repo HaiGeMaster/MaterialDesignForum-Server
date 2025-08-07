@@ -2,6 +2,49 @@
 ### 版本更新日志
 
 
+#### 2025-8-7 版本更新
+**新增功能**
+ - ​​通知系统功能完善​​
+ - ​前端（Vuetify2/MDUI2主题客户端）​​优化通知系统的交互细节与功能完整性，提升用户体验。
+ - ​后端​​完善通知系统的底层功能逻辑，支持全量通知类型处理。
+​ - ​通知类型定义
+ - 你可以在通知-右上角设置-通知设置中查看和管理所有通知类型。
+ - 明确定义所有通知类型及其当前开发状态（已全部完成）：
+     ```javascript
+     /**
+      * @typedef NotificationType 通知类型
+      * @property string user_follow 自己被关注
+      * @property string topic_follow 话题被关注
+      * @property string topic_delete 话题被删除
+      * @property string question_follow 提问被关注
+      * @property string question_comment 提问被评论
+      * @property string question_answer 提问被回答
+      * @property string question_delete 提问被删除
+      * @property string article_follow 文章被关注
+      * @property string article_comment 文章被评论
+      * @property string article_like 文章被点赞
+      * @property string article_delete 文章被删除
+      * @property string answer_comment 回答被评论
+      * @property string answer_like 回答被点赞
+      * @property string answer_delete 回答被删除
+      * @property string comment_like 评论被点赞
+      * @property string comment_reply 评论被回复
+      * @property string comment_delete 评论被删除
+      * @property string reply_like 回复被点赞
+      * @property string reply_reply 回复被回复
+      * @property string reply_delete 回复被删除
+      */
+     ```
+
+**注意事项**
+ - notification表结构有变更，请手动覆盖更新数据库
+ - user_option表为新增表，请手动导入数据库
+
+---
+
+<details>
+<summary>点击展开/收起 历史更新</summary>
+
 #### 2025-8-6 版本更新
 **新增功能**
  - Vuetify2/MDUI2主题客户端富文本编辑器添加背景提示
@@ -15,8 +58,6 @@
 
 ---
 
-<details>
-<summary>点击展开/收起 历史更新</summary>
 
 #### 2025-7-31 版本更新
 **新增功能**

@@ -11,21 +11,24 @@
 namespace MaterialDesignForum\Controllers;
 
 use itbdw\Ip\IpLocation;
-use MaterialDesignForum\Models\MailCaptcha as MailCaptchaModel;
-use MaterialDesignForum\Models\ImageCaptcha as ImageCaptchaModel;
-use MaterialDesignForum\Models\User as UserModel;
+
+use MaterialDesignForum\Controllers\Oauth as OauthController;
 use MaterialDesignForum\Controllers\Cache as CacheController;
 use MaterialDesignForum\Controllers\Image as ImageController;
-use MaterialDesignForum\Controllers\UserGroup as UserGroupController;
 use MaterialDesignForum\Controllers\Token as TokenController;
 use MaterialDesignForum\Controllers\Follow as FollowController;
+use MaterialDesignForum\Controllers\Answer as AnswerController;
+use MaterialDesignForum\Controllers\Article as ArticleController;
+use MaterialDesignForum\Controllers\Question as QuestionController;
+use MaterialDesignForum\Controllers\UserGroup as UserGroupController;
+
+use MaterialDesignForum\Models\User as UserModel;
+use MaterialDesignForum\Models\MailCaptcha as MailCaptchaModel;
+use MaterialDesignForum\Models\ImageCaptcha as ImageCaptchaModel;
+
 use MaterialDesignForum\Config\Config;
 use MaterialDesignForum\Plugins\i18n;
 use MaterialDesignForum\Plugins\Share;
-use MaterialDesignForum\Controllers\Question as QuestionController;
-use MaterialDesignForum\Controllers\Article as ArticleController;
-use MaterialDesignForum\Controllers\Answer as AnswerController;
-use MaterialDesignForum\Controllers\Oauth as OauthController;
 
 class User extends UserModel
 {

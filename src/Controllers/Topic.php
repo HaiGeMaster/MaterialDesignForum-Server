@@ -279,6 +279,26 @@ class Topic extends TopicModel
         $topic->description = $description;
         $topic->update_time = Share::ServerTime();
         $is_edit = $topic->save();
+        
+        if ($is_edit) {
+          // NotificationController::AddInteractionNotification()
+          //从关注关系中获取所有关注此话题的用户id
+          // $following_id_array = FollowController::GetFollowingObjectUserIds('topic', $topic_id);
+          // if ($following_id_array != null) {
+          //   //遍历$following_id_array数组，为每个用户添加关注的提问更新通知
+          //   foreach ($following_id_array as $key => $value) {
+          //     NotificationController::AddInteractionNotification(
+          //       $value,
+          //       $topic->user_id,
+          //       'follow_topic_update',
+          //       null,
+          //       null,
+          //       0,
+          //       $topic_id
+          //     );
+          //   }
+          // }
+        }
       }
     }
     return [

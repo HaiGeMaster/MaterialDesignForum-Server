@@ -105,12 +105,16 @@ class Topic extends Eloquent
   public static function SubArticleCount($topic_id, $count = 1): bool
   {
     $topic = self::find($topic_id);
-    if ($topic->article_count <= 0) {
-      $topic->article_count = 0;
+    if ($topic) {
+      if ($topic->article_count <= 0) {
+        $topic->article_count = 0;
+        return $topic->save();
+      }
+      $topic->article_count -= $count;
       return $topic->save();
+    } else {
+      return false;
     }
-    $topic->article_count -= $count;
-    return $topic->save();
   }
   /**
    * 减少问题数量
@@ -120,12 +124,16 @@ class Topic extends Eloquent
   public static function SubQuestionCount($topic_id, $count = 1): bool
   {
     $topic = self::find($topic_id);
-    if ($topic->question_count <= 0) {
-      $topic->question_count = 0;
+    if ($topic) {
+      if ($topic->question_count <= 0) {
+        $topic->question_count = 0;
+        return $topic->save();
+      }
+      $topic->question_count -= $count;
       return $topic->save();
+    } else {
+      return false;
     }
-    $topic->question_count -= $count;
-    return $topic->save();
   }
   /**
    * 减少关注者数量
@@ -135,11 +143,15 @@ class Topic extends Eloquent
   public static function SubFollowerCount($topic_id, $count = 1): bool
   {
     $topic = self::find($topic_id);
-    if ($topic->follower_count <= 0) {
-      $topic->follower_count = 0;
+    if ($topic) {
+      if ($topic->follower_count <= 0) {
+        $topic->follower_count = 0;
+        return $topic->save();
+      }
+      $topic->follower_count -= $count;
       return $topic->save();
+    } else {
+      return false;
     }
-    $topic->follower_count -= $count;
-    return $topic->save();
   }
 }
