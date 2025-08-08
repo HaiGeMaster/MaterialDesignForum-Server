@@ -137,7 +137,7 @@ class Image extends ImageModel
 
     // 检查并创建保存路径
     if (!is_dir($path)) {
-      mkdir($path, 0777, true);
+      mkdir($path, 0755, true);
     }
 
     // 检测图片类型
@@ -217,7 +217,7 @@ class Image extends ImageModel
           // 如果没有指定大小，直接保存原图
           $paths = $path . '/' . $key;
           if (!is_dir($paths)) {
-            mkdir($paths, 0777, true);
+            mkdir($paths, 0755, true);
           }
           $save_img = $paths . '/' . $file_name . '.' . $extension;
           switch ($mime) {
@@ -268,7 +268,7 @@ class Image extends ImageModel
 
           $paths = $path . '/' . $key;
           if (!is_dir($paths)) {
-            mkdir($paths, 0777, true);
+            mkdir($paths, 0755, true);
           }
 
           $save_img = $paths . '/' . $file_name . '.' . $extension;
@@ -326,9 +326,14 @@ class Image extends ImageModel
       //路径修改为 公共上传/用户ID/细分类
       $path = 'public/static/upload/' . $user_id . '/' . self::$pathData['user_avatar_default']['path'] . '/' . $key;
 
+      //检查文件夹是否被创建
+      if (!is_dir($path)) {
+        mkdir($path, 0755, true);
+      }
+
       // 创建路径
       if (!file_exists($path)) {
-        mkdir($path, 0777, true);
+        mkdir($path, 0755, true);
       }
 
       $png = $path . '/' . $file_name . '.png';

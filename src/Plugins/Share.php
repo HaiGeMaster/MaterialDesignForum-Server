@@ -547,7 +547,7 @@ class Share
     $date = date('Y-m-d');
     //检查是否创建目录
     if (!is_dir('log/'.$date)) {
-        mkdir('log/'.$date, 0777, true);
+        mkdir('log/'.$date, 0755, true);
     }
     file_put_contents('log/'.$date.'/request.json', json_encode($logData, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) . PHP_EOL, FILE_APPEND);
   }

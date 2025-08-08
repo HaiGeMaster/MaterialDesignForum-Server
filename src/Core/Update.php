@@ -63,7 +63,7 @@ class Update
         }
 
         if (!file_exists(self::$downloadFolder)) {
-            mkdir(self::$downloadFolder, 0777, true);  // 如果文件夹不存在，创建文件夹
+            mkdir(self::$downloadFolder, 0755, true);  // 如果文件夹不存在，创建文件夹
         }
 
         file_put_contents($zipFile, $zipContent);
