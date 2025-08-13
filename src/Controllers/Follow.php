@@ -19,7 +19,6 @@ use MaterialDesignForum\Controllers\Question as QuestionController;
 use MaterialDesignForum\Controllers\Article as ArticleController;
 use MaterialDesignForum\Controllers\Notification as NotificationController;
 
-
 class Follow extends FollowModel
 {
   /**
@@ -31,7 +30,7 @@ class Follow extends FollowModel
   public static function GetFollowingObjectUserIds(string $followable_type, int $followable_id)
   {
     $following_ids = self::where('followable_type', $followable_type)->where('followable_id', $followable_id)->pluck('user_id')->toArray();
-    return $following_ids??null;
+    return $following_ids ?? null;
   }
   /**
    * 是否关注
@@ -62,6 +61,17 @@ class Follow extends FollowModel
   {
     // $user_id = !$user_is_token ? $user : TokenController::GetUserId($user);
     $user_id = TokenController::GetUserId($user_token);
+
+    //用户不能关注自己
+    if ($user_id == $followable_id && $followable_type == 'user') {
+      return [
+        'is_follow' => false,
+        'followable_type' => $followable_type,
+        'followable_id' => $followable_id,
+        'followable_object' => null
+      ];
+    }
+
     $follow = self::where('user_id', $user_id)->where('followable_type', $followable_type)->where('followable_id', $followable_id)->first();
     if ($follow) {
       // $delete = self::where('user_id', $user_id)->where('followable_type', $followable_type)->where('followable_id', $followable_id);
@@ -234,11 +244,6 @@ class Follow extends FollowModel
    */
   private static function GetFolloweesListObject($user_id, $followable_type, $page = 1, $per_page = 20, $user_token = '', $user_is_admin = false)
   {
-    // $user_token = ''; //用户token
-    // if ($user_id_is_token) {
-    //   $user_token = $user_id;
-    //   $user_id = TokenController::GetUserId($user_id);
-    // }
     $follow_list = self::where('user_id', '=', $user_id)
       ->where('followable_type', '=', $followable_type)
       ->paginate($per_page, ['*'], 'page', $page);
@@ -284,58 +289,6 @@ class Follow extends FollowModel
     }
     return Share::HandleMergeDataAndPagination($data, $follow_list);
   }
-  // private static function GetFolloweesListObject($user_id, $followable_type, $page = 1, $per_page = 20, $user_id_is_token = false, $user_is_admin = false)
-  // {
-  //   $user_token = ''; //用户token
-  //   if ($user_id_is_token) {
-  //     $user_token = $user_id;
-  //     $user_id = TokenController::GetUserId($user_id);
-  //   }
-  //   $follow_list = self::where('user_id', '=', $user_id)
-  //     ->where('followable_type', '=', $followable_type)
-  //     ->paginate($per_page, ['*'], 'page', $page);
-  //   $data = null;
-  //   $followable_id_list = array();
-  //   if ($follow_list) {
-  //     $follow_list_data = $follow_list->items();
-  //     foreach ($follow_list_data as $key => $value) {
-  //       array_push($followable_id_list, $value['followable_id']); //关注的对象ID
-  //     }
-  //     switch ($followable_type) {
-  //       case 'user':
-  //         $data = UserController::whereIn('user_id', $followable_id_list)->get();
-  //         foreach ($data as $key => $value) {
-  //           $data[$key] = UserController::GetUserInfo($value['user_id'],$user_token)['user'];
-  //         }
-  //         break;
-  //       case 'topic':
-  //         $data = TopicController::whereIn('topic_id', $followable_id_list)->get();
-  //         foreach ($data as $key => $value) {
-  //           if ($user_id_is_token && $user_token) {
-  //             $data[$key]['is_follow'] = self::IsFollow($user_token, 'topic', $value['topic_id'], true);
-  //           }
-  //         }
-  //         break;
-  //       case 'question':
-  //         $data = QuestionController::whereIn('question_id', $followable_id_list)->get();
-  //         foreach ($data as $key => $value) {
-  //           if ($user_id_is_token && $user_token) {
-  //             $data[$key]['is_follow'] = self::IsFollow($user_token, 'question', $value['question_id'], true);
-  //           }
-  //         }
-  //         break;
-  //       case 'article':
-  //         $data = ArticleController::whereIn('article_id', $followable_id_list)->get();
-  //         foreach ($data as $key => $value) {
-  //           if ($user_id_is_token && $user_token) {
-  //             $data[$key]['is_follow'] = self::IsFollow($user_token, 'article', $value['article_id'], true);
-  //           }
-  //         }
-  //         break;
-  //     }
-  //   }
-  //   return Share::HandleMergeDataAndPagination($data, $follow_list);
-  // }
   /**
    * 获取 被关注的对象 的 N个用户对象的列表
    * @param int $$followable_id 被关注的对象ID
@@ -359,18 +312,7 @@ class Follow extends FollowModel
       }
       foreach ($user_id_list as $key => $value) {
         $data[$key] = UserController::GetUserInfo($value, $user_token)['user'];
-        // $data[$key]['is_follow'] = self::IsFollow($user_token, 'user', $value, true);
       }
-      // $data = UserController::whereIn('user_id', $user_id_list)->get();
-      // foreach ($data as $key => $value) {
-      //   if ($user_token != '') {
-      //     $data[$key]['is_follow'] = self::IsFollow($user_token, 'user', $value['user_id'], true);
-      //   }
-      //   if (!$user_is_admin) {
-      //     $data[$key]['password'] = '';
-      //     $data[$key]['email'] = '';
-      //   }
-      // }
     }
     return Share::HandleMergeDataAndPagination($data, $follow_list);
   }
@@ -397,9 +339,6 @@ class Follow extends FollowModel
       ->paginate($per_page, ['*'], 'page', $page);
     $followees_user_list = [];
     if ($followees_id_list) {
-      // foreach ($followees_id_list as $value) {
-      //   array_push($followees_user_list,UserController::GetUserInfo($value));
-      // }
       $followees_id_list_data = $followees_id_list->items();
       foreach ($followees_id_list_data as $key => $value) {
         array_push($followees_user_list, UserController::GetUserInfo($value['user_id'])['user']);
