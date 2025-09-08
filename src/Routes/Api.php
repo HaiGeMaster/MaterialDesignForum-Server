@@ -490,7 +490,8 @@ class Api
         \MaterialDesignForum\Controllers\User::SetUsersUserGroup(
           $data['user_token'] ?? '',
           $data['user_group_id'],
-          $data['user_ids']
+          $data['old_user_group_id']??null,
+          $data['user_ids']??[]
         )
       );
     });

@@ -1097,14 +1097,27 @@ class User extends UserModel
    * 设置多个用户的用户组为新的用户组
    * @param string $user_token token 操作者用户token字符串
    * @param string $user_group_id 用户组id
-   * @param array $user_ids 用户id数组
+   * @param string $old_user_group_id 新用户组id 使用此参数时 表示将用户组里所有用户迁移到新用户组
+   * @param array $user_ids 用户id数组 使用此参数时 表示将用户从当前用户组迁移到新用户组
    */
-  public static function SetUsersUserGroup($user_token, $user_group_id, $user_ids)
+  public static function SetUsersUserGroup(
+    $user_token, 
+    $user_group_id, 
+    $old_user_group_id,
+    $user_ids)
   {
     $is_set = false;
     $is_admin = UserGroupController::IsAdmin($user_token);
     if ($is_admin) {
-      $is_set = UserGroupController::MoveUserGroups($user_group_id, $user_ids);
+      // $is_set = UserGroupController::MoveUserGroups($user_group_id, $user_ids);
+      if($old_user_group_id != null)
+      {
+        $is_set = UserGroupController::MoveAllUserGroupUsers($old_user_group_id,$user_group_id);
+      }
+      else
+      {
+        $is_set = UserGroupController::MoveUserGroups($user_group_id, $user_ids);
+      }
     }
     return [
       'is_set' => $is_set,

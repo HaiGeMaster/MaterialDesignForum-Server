@@ -302,8 +302,8 @@ class UserGroup extends UserGroupModel
     }
     $data = Share::HandleDataAndPagination(null);
     $is_admin = self::IsAdmin($user_token);
-    $is_admin_login = self::IsAdminLogin($user_token);//允许可登录后台的用户查看
-    if ($is_admin||$is_admin_login) {
+    $is_admin_login = self::IsAdminLogin($user_token); //允许可登录后台的用户查看
+    if ($is_admin || $is_admin_login) {
       if ($search_keywords != '') {
         // $data = self::where($search_field, 'like', '%' . $search_keywords . '%')
         //   ->where('delete_time', '=', 0)
@@ -399,7 +399,7 @@ class UserGroup extends UserGroupModel
       if ($user_group != null) {
         //管理用户组能力 self::Ability($user_token, 'ability_admin_manage_user_group')
         //使用遍历的方式//仅允许真正的管理员修改用户组
-        if (self::Ability($user_token, 'ability_admin_manage_user_group')&&self::IsAdmin($user_token)) {
+        if (self::Ability($user_token, 'ability_admin_manage_user_group') && self::IsAdmin($user_token)) {
           foreach ($user_group_data as $key => $value) {
             //如果$user_group->$key的值是整数且$value的值是布尔值，那么$value的值就是0或1，所以要转换成整数
             // if (is_int($user_group->$key) && (is_bool($value) || ($value == 'true') || ($value == 'false'))) {
@@ -478,66 +478,172 @@ class UserGroup extends UserGroupModel
         //如果修改成功
         if ($user->save()) {
           //然后将旧的用户组ID的用户组人数减1，最后将新的用户组ID的用户组人数加1
-          return self::SubUserGroupUserCount($old_user_group_id) &&
-            self::AddUserGroupUserCount($user_group_id);
+          // return self::SubUserGroupUserCount($old_user_group_id) &&
+          //   self::AddUserGroupUserCount($user_group_id);
+          // self::SubUserGroupUserCount($old_user_group_id);
+          // self::AddUserGroupUserCount($user_group_id);
+          self::UpdateUserGroupUserCount($old_user_group_id);
+          self::UpdateUserGroupUserCount($user_group_id);
+          return true;
         }
       }
     }
     return false;
   }
+  // /**
+  //  * 将多个用户从一个用户组移动到另一个用户组，同时变更新旧用户组人数
+  //  * @param int $user_group_id 用户组ID
+  //  * @param array $user_ids 用户ID数组
+  //  * @return [bool,array]
+  //  */
+  // public static function MoveUserGroups($user_group_id, $user_ids): bool
+  // {
+  //   $user_group = self::where('user_group_id', '=', $user_group_id)
+  //     // ->where('delete_time', '=', 0)
+  //     ->first();
+  //   if ($user_group != null) {
+  //     $users = UserModel::whereIn('user_id', $user_ids)
+  //       // ->where('disable_time', '=', 0)
+  //       ->get();
+  //     if ($users != null) {
+  //       // //首先保存旧的用户组ID数组，可以用来撤销？
+  //       // $old_user_group_id = [];
+  //       // foreach ($users as $user) {
+  //       //   // array_push($old_user_group_id, $user->user_group_id);
+  //       //   //首先保存旧的用户组ID
+  //       //   $old_user_group_id = $user->user_group_id;
+  //       //   //然后将用户组ID修改为新的用户组ID
+  //       //   $user->user_group_id = $user_group_id;
+  //       //   //如果修改成功
+  //       //   if ($user->save()) {
+  //       //     //然后将旧的用户组ID的用户组人数减1，最后将新的用户组ID的用户组人数加1
+  //       //     self::SubUserGroupUserCount($old_user_group_id);
+  //       //     self::AddUserGroupUserCount($user_group_id);
+  //       //     // self::UpdateUserGroupUserCount($old_user_group_id);
+  //       //     // self::UpdateUserGroupUserCount($user_group_id);
+  //       //   }
+  //       // }
+
+  //       $users_count = $users->count();
+  //       $old_user_group_ids = $users->pluck('user_group_id')->toArray();
+  //       $old_user_group_ids = array_unique($old_user_group_ids);
+  //       $users->update([
+  //         'user_group_id' => $user_group_id,
+  //       ]);
+  //       foreach($old_user_group_ids as $old_user_group_id)
+  //       {
+  //         if($old_user_group_id != $user_group_id)
+  //         {
+  //           self::SubUserGroupUserCount($old_user_group_id,$users_count);
+  //         }
+  //       }
+  //       self::AddUserGroupUserCount($user_group_id,$users_count);
+
+  //       return true;
+  //     }
+  //   }
+  //   // return true;
+  //   return false;
+  // }
   /**
    * 将多个用户从一个用户组移动到另一个用户组，同时变更新旧用户组人数
-   * @param int $user_group_id 用户组ID
+   * @param int $user_group_id 目标用户组ID
    * @param array $user_ids 用户ID数组
-   * @return [bool,array]
+   * @return bool 是否操作成功
    */
-  public static function MoveUserGroups($user_group_id, $user_ids): bool
+  public static function MoveUserGroups(int $user_group_id, array $user_ids): bool
   {
-    $user_group = self::where('user_group_id', '=', $user_group_id)
-      // ->where('delete_time', '=', 0)
-      ->first();
-    if ($user_group != null) {
-      $users = UserModel::whereIn('user_id', $user_ids)
-        // ->where('disable_time', '=', 0)
-        ->get();
-      if ($users != null) {
-        // //首先保存旧的用户组ID数组，可以用来撤销？
-        // $old_user_group_id = [];
-        foreach ($users as $user) {
-          // array_push($old_user_group_id, $user->user_group_id);
-          //首先保存旧的用户组ID
-          $old_user_group_id = $user->user_group_id;
-          //然后将用户组ID修改为新的用户组ID
-          $user->user_group_id = $user_group_id;
-          //如果修改成功
-          if ($user->save()) {
-            //然后将旧的用户组ID的用户组人数减1，最后将新的用户组ID的用户组人数加1
-            self::SubUserGroupUserCount($old_user_group_id);
-            self::AddUserGroupUserCount($user_group_id);
-          }
-        }
-        return true;
+    // 查找目标用户组是否存在且未删除
+    $user_group = self::where('user_group_id', $user_group_id)->first();
+    if (!$user_group) {
+      return false; // 目标用户组不存在
+    }
 
-        // $is_move = false;
-        // $is_move = UserModel::whereIn('user_id', $user_ids)
-        //   ->where('disable_time', '=', 0)
-        //   ->update([
-        //     'user_group_id' => $user_group_id,
-        //   ]);
-        // if ($is_move) {
-        //   //然后将旧的用户组ID的用户组人数减1，最后将新的用户组ID的用户组人数加1
-        //   foreach ($user_ids as $user_id) {
-        //     $old_user_group_id = UserModel::where('user_id', '=', $user_id)
-        //       ->where('disable_time', '=', 0)
-        //       ->first()->user_group_id;
-        //     self::SubUserGroupUserCount($old_user_group_id);
-        //     self::AddUserGroupUserCount($user_group_id);
-        //   }
-        //   return true;
-        // }
+    // 查找所有需要移动的用户
+    $users = UserModel::whereIn('user_id', $user_ids)->get();
+
+    if ($users->isEmpty()) {
+      return false; // 没有找到要移动的用户
+    }
+
+    // 取出这些用户当前的 user_group_id（可能各不相同）
+    $old_user_group_ids = $users->pluck('user_group_id')->filter()->unique()->values()->toArray();
+
+    $users_count = $users->count();
+
+    // 🔥 关键修改：使用查询构造器批量更新这些用户的 user_group_id
+    UserModel::whereIn('user_id', $user_ids)
+      ->update(['user_group_id' => $user_group_id]);
+
+    // 遍历旧用户组，如果不同则减少对应用户组的人数
+    foreach ($old_user_group_ids as $old_user_group_id) {
+      if ($old_user_group_id != $user_group_id) {
+        self::SubUserGroupUserCount($old_user_group_id, $users_count);
       }
     }
-    // return true;
+
+    // 增加新用户组的人数
+    self::AddUserGroupUserCount($user_group_id, $users_count);
+
+    return true;
+  }
+  /**
+   * 将旧用户组里的所有用户移动到另一个用户组
+   * @param int $old_user_group_id 旧用户组ID
+   * @param int $user_group_id 新用户组ID
+   * @return bool
+   */
+  public static function MoveAllUserGroupUsers($old_user_group_id, $user_group_id): bool
+  {
+    $is_move = false;
+    // $is_move = UserModel::where('user_group_id', '=', $old_user_group_id)
+    //   ->where('disable_time', '=', 0)
+    //   ->update([
+    //     'user_group_id' => $user_group_id,
+    //   ]);
+    $users = UserModel::where('user_group_id', '=', $old_user_group_id);
+    // ->where('disable_time', '=', 0)
+    // ->update([
+    //   'user_group_id' => $user_group_id,
+    // ]);
+    if ($users) {
+      $old_users_count = $users->count();
+      $users->update([
+        'user_group_id' => $user_group_id,
+      ]);
+      //然后将旧的用户组ID的用户组人数减1，最后将新的用户组ID的用户组人数加1
+      self::SubUserGroupUserCount($old_user_group_id, $old_users_count);
+      self::AddUserGroupUserCount($user_group_id, $old_users_count);
+      // self::UpdateUserGroupUserCount($old_user_group_id);
+      // self::UpdateUserGroupUserCount($user_group_id);
+      return true;
+    }
+    return false;
+  }
+  /**
+   * 更新正确的用户组人数-消耗性能！！！
+   * @param int $user_group_id 用户组ID
+   * @return bool
+   */
+  public static function UpdateUserGroupUserCount($user_group_id): bool
+  {
+    $user_count = UserModel::where('user_group_id', '=', $user_group_id)
+      // ->where('disable_time', '=', 0)
+      ->count();
+    if ($user_count != null) {
+      $is_update = self::where('user_group_id', '=', $user_group_id)
+        // ->where('delete_time', '=', 0)
+        ->first();
+      if ($is_update) {
+        if($is_update->user_group_user_count - $user_count != 0){
+          $is_update->user_group_user_count = $user_count;
+        }else if($is_update->user_group_user_count - $user_count < 0){
+          $is_update->user_group_user_count = 0;
+        }
+        return $is_update->save();
+        // return true;
+      }
+    }
     return false;
   }
 }
