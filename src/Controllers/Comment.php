@@ -390,9 +390,9 @@ class Comment extends CommentModel
             null,
             0,
             0,
-            0,
-            0,
-            0,
+            $comment->commentable_type=='article'?ArticleController::GetArticle($comment->commentable_id)['article']->article_id:0,
+            $comment->commentable_type=='question'?QuestionController::GetQuestion($comment->commentable_id)['question']->question_id:0,
+            $comment->commentable_type=='answer'?AnswerController::GetAnswer($comment->commentable_id)['answer']->answer_id:0,
             $comment->comment_id,
             0
           );

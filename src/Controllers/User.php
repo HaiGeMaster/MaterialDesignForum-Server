@@ -487,6 +487,15 @@ class User extends UserModel
   public static function GetUser($user_id, $user_token = '', $is_admin = false)
   {
     $user = self::find($user_id);
+
+    if($user==null)
+    {
+      return [
+        'is_get' => false,
+        'user' => null,
+      ];
+    }
+
     $_user_id = '';
     if ($user_token != '' && $user != null) {
       $_user_id = TokenController::GetUserId($user_token);

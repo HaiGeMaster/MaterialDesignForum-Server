@@ -199,6 +199,14 @@ class Notification extends NotificationModel
         $notification->sender_user = UserController::GetUser($notification->sender_id)['user'];
         $notification->receiver_user = UserController::GetUser($notification->receiver_id)['user'];
 
+        //如果发送者或接收者不存在，则删除这个通知，避免引起报错。
+        if($notification->sender_user==null||$notification->receiver_user==null)
+        {
+          //从$notifications中删除这个通知
+          unset($notifications[$key]);
+          continue;
+        }
+
         $receiver_content = ''; //附加值
         $sender_content = ''; //附加值
         switch ($notification->type) {
