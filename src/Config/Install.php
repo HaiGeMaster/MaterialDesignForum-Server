@@ -45,9 +45,10 @@ class Install
       } else {
         // self::SaveInstallJSON(false, 2);
         //如果路由含没有localhost则返回true
-        if (!preg_match('/localhost/', $_SERVER['HTTP_HOST'])) {
+        // if (!preg_match('/localhost/', $_SERVER['HTTP_HOST'])) {
+          self::SaveInstallJSON(true, 3);
           return true;
-        }
+        // }
       }
       //默认情况下返回false
       $json = file_get_contents(self::$path);
