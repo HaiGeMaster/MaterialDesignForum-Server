@@ -71,7 +71,7 @@ try {
   echo '错误追踪：<br>' . nl2br($e->getTraceAsString()) . '<br>';
   echo '</pre>';
   echo '</code>';
-  
+
   echo '<p>请检查服务器日志以获取更多详细信息。</p>';
   echo '<p>如果您是开发者，请检查代码并修复错误。</p>';
   echo '<p>如果您是用户，请联系网站管理员。</p>';

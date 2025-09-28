@@ -1,8 +1,12 @@
 <?php
+
 /**
  * Author HaiGeMaster
  * @package MaterialDesignForum
  * @link https://github.com/HaiGeMaster
+ * @link https://github.com/HaiGeMaster/MaterialDesignForum-Server
+ * @link https://github.com/HaiGeMaster/MaterialDesignForum-Vuetify2
+ * @link https://github.com/HaiGeMaster/MaterialDesignForum-MDUI2
  * @copyright Copyright (c) 2023 HaiGeMaster
  * @start-date 2023/07/03-16:17:41
  */
@@ -10,7 +14,6 @@
 namespace MaterialDesignForum\Config;
 
 use MaterialDesignForum\Models\Option;
-// use Dotenv\Dotenv as Dotenv;
 
 //##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##
 //##更新站点时默认不覆盖本文件。如需覆盖请将Config.php删除，然后将Config.php.new重命名为Config.php。之后手动填写数据库信息//##
@@ -24,10 +27,6 @@ class Config
   public static $sql_is_connect = false;
   public static function getConfig()
   {
-    
-    // $dotenv = Dotenv::createImmutable('././');
-    // $dotenv->load();
-
     $config['web_version'] = '1.0.0';
     $config['web_dev'] = true; //false; //
     $config['web_theme_path'] = '././public/themes/'; //主题路径
@@ -39,12 +38,6 @@ class Config
     $config['mysql_password'] = 'root'; //数据库密码
     $config['mysql_database'] = 'demo'; //'root';//数据库名
     $config['mysql_port'] = 3306; //数据库端口
-    
-    // $config['mysql_hostname'] = getenv('DB_HOST');
-    // $config['mysql_username'] = getenv('DB_USER'); //数据库用户名
-    // $config['mysql_password'] = getenv('DB_PASS'); //数据库密码
-    // $config['mysql_database'] = getenv('DB_NAME'); //'root';//数据库名
-    // $config['mysql_port'] = getenv('DB_PORT'); //数据库端口
     $config['mysql_prefix'] = ''; //数据库表前缀
     //以上是可以修改的配置↑
     
