@@ -349,4 +349,29 @@ class Follow extends FollowModel
     }
     return Share::HandleMergeDataAndPagination($followees_user_list, $followees_id_list);
   }
+  // /**
+  //  * 让全部用户关注指定用户id
+  //  * @param int $user_id 被关注的用户id
+  //  * @return array||null $[data,pagination] data:用户对象列表 pagination:分页信息
+  //  */
+  // public static function AllUserFollowUser($user_id)
+  // {
+  //   //首先删除所有用户对该用户的关注
+  //   $delete_all_follow = self::where('followable_id', '=', $user_id)
+  //     ->where('followable_type', '=', 'user')
+  //     ->delete();
+  //   if ($delete_all_follow) {
+  //     //获取全部用户id列表
+  //     $user_id_list = UserController::pluck('user_id');
+  //     //让全部用户关注指定用户id
+  //     foreach ($user_id_list as $key => $value) {
+  //       self::create([
+  //         'user_id' => $value,
+  //         'followable_id' => $user_id,
+  //         'followable_type' => 'user',
+  //       ]);
+  //     }
+  //     return Share::HandleMergeDataAndPagination($user_id_list);
+  //   }
+  // }
 }
