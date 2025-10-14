@@ -104,6 +104,8 @@ class Oauth
           // }
           break;
         case 'microsoft':
+          //流程：使用应用ID和应用机密先获取资产token，然后使用资产token获取用户信息
+          //格式为{"access_token":"","token_type":"Bearer","scope":"openid profile User.Read email","user":{...}}
           // Microsoft OAuth流程
           $clientID = OptionController::where('name', 'microsoft_client_id')->value('value');
           $clientSecret = OptionController::where('name', 'microsoft_client_secret')->value('value');
@@ -149,6 +151,16 @@ class Oauth
           // 3. 可以在这里获取更多用户信息(可选)
           // $userEmails = self::GetGitHubUserEmails($accessToken);
           break;
+        // case 'sso':
+        //   // SSO OAuth流程
+        //   $clientID = OptionController::where('name', 'sso_client_id')->value('value');
+        //   $clientSecret = OptionController::where('name', 'sso_client_secret')->value('value');
+        //   // 1. 获取SSO OAuth Access Token
+        //   $tokenResponse = self::GetSSOAccessToken($clientID, $clientSecret, $requestToken);
+        //   $accessToken = $tokenResponse['access_token'];
+        //   // 2. 获取用户基本信息
+        //   $userInfo = self::GetSSOUserInfo($accessToken);
+        //   break;
         default:
           throw new \Exception("不支持的OAuth名称: $oauthName");
       }

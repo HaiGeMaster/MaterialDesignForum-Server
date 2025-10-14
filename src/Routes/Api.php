@@ -968,6 +968,10 @@ class Api
     });
     //回调路由
     $collector->get('/api/oauth/redirect/{oauth_name}', function ($oauth_name) {
+      //oauth_name为github、microsoft、sso等平台名称
+      //第三方登录完成后需要设置回调到此地址：/api/oauth/redirect/{oauth_name}
+      //然后需要获取到code参数，示例：/api/oauth/redirect/github?code=123456
+
       //获取当前路径?后面的字符
       $str = parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY);
       //将其转换为变量
