@@ -222,7 +222,9 @@ class User extends UserModel
           $user_data->username = $username;
           $user_data->email = $email;
 
-          if (UserGroupController::IsAdmin($user_token)) { //确定是否是管理员再修改用户组
+          if (UserGroupController::IsAdmin($user_token)&&
+            $user_group_id!=$user_data->user_group_id//用户组不相同时才更新。
+            ) { //确定是否是管理员再修改用户组
             UserGroupController::MoveUserGroups(
               $user_group_id,
               [$edit_target_user_id]
