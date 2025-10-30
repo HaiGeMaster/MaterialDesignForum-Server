@@ -1,3 +1,12 @@
+
+### Material Design Forum - Server
+
+
+<img src="https://mdf.xbedrock.com/assets/info_content/md3/device_info_template_auto.png" alt="MDUI2主题预览图" width="100%">
+
+
+<img src="https://mdf.xbedrock.com/assets/info_content/md2/device_info_template_auto.png" alt="Vuetify2主题预览图" width="100%">
+
 # [CN] Material Design Forum - 现代化网页论坛应用
 
 ## 产品概述
@@ -9,8 +18,8 @@ Material Design Forum是一款基于网页的论坛应用程序，致力于为�
 ## UI设计与技术实现
 
 ### 框架与主题
-- **前端框架**：Vuetify 2
-- **客户端主题**：MDUI 2.0
+- **前端框架**：Vuetify2、MDUI2
+- **客户端主题**：Vuetify2、MDUI2
 - **设计规范**：严格遵循Material Design
 
 ### 响应式布局
@@ -124,8 +133,8 @@ The Material Design Forum is a web-based forum application designed to provide u
 ## UI Design and Technical Implementation  
 
 ### Framework and Theme  
-• Frontend Framework: Vuetify 2  
-• Client-Side Theme: MDUI 2.0  
+• Frontend Framework: Vuetify2、MDUI2
+• Client-Side Theme: Vuetify2、MDUI2
 • Design Standards: Strictly follows Material Design guidelines  
 
 ### Responsive Layout  
