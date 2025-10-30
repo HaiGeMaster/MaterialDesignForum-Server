@@ -18,12 +18,13 @@ use MaterialDesignForum\Controllers\Option as OptionController;
 
 class Oauth
 {
+  private static $sso_client_main_url = '';
   /**
    * 执行完整的GitHub OAuth认证流程
    * @param string $oauthName OAuth名称(如 "github","google","microsoft"等)
   //  * @param string $clientID GitHub应用的Client ID
   //  * @param string $clientSecret GitHub应用的Client Secret
-   * @param string $requestToken 前端传递过来的授权code
+   * @param string $requestCode 前端传递过来的授权code
    * @param string $redirectUri 回调URI(可选，如果不提供则使用GitHub应用设置的默认URI)
    * @return array 包含用户信息和access_token的关联数组,其中mdf_user_token为当前用户的token
    * @throws Exception 如果流程中任何步骤失败则抛出异常
@@ -32,7 +33,7 @@ class Oauth
     string $oauthName,
     // string $clientID,
     // string $clientSecret,
-    string $requestToken,
+    string $requestCode,
     string $redirectUri = ''
   ) {
     try {
@@ -42,9 +43,9 @@ class Oauth
 
       if (
         // empty($clientID) || empty($clientSecret) || 
-        empty($requestToken)
+        empty($requestCode)
       ) {
-        throw new \Exception("OAuth参数(clientID, clientSecret, requestToken)不能为空");
+        throw new \Exception("OAuth参数(clientID, clientSecret, requestCode)不能为空");
       }
 
       switch ($oauthName) {
@@ -53,8 +54,18 @@ class Oauth
           $clientID = OptionController::where('name', 'github_client_id')->value('value');
           $clientSecret = OptionController::where('name', 'github_client_secret')->value('value');
           // 1. 获取GitHub OAuth Access Token
-          $tokenResponse = self::GetGitHubAccessToken($clientID, $clientSecret, $requestToken);
+          $tokenResponse = self::GetGitHubAccessToken($clientID, $clientSecret, $requestCode);
           $accessToken = $tokenResponse['access_token'];
+
+          // echo json_encode($tokenResponse);
+          // exit;
+          // json_encode($tokenResponse)此时的数据:
+          // {
+          //   "access_token":"",
+          //   "token_type":"bearer",
+          //   "scope":"user"
+          // }
+
           // 2. 获取用户基本信息
           $userInfo = self::GetGitHubUserInfo($accessToken);
           // 3. 可以在这里获取更多用户信息(可选)
@@ -104,13 +115,25 @@ class Oauth
           // }
           break;
         case 'microsoft':
-          //流程：使用应用ID和应用机密先获取资产token，然后使用资产token获取用户信息
+          //流程：使用 应用ID 和 应用秘钥 和 code授权码 先获取 资产token，然后使用资产token获取用户信息
           //格式为{"access_token":"","token_type":"Bearer","scope":"openid profile User.Read email","user":{...}}
           // Microsoft OAuth流程
           $clientID = OptionController::where('name', 'microsoft_client_id')->value('value');
           $clientSecret = OptionController::where('name', 'microsoft_client_secret')->value('value');
           // 1. 获取Microsoft OAuth Access Token
-          $tokenResponse = self::GetMicrosoftAccessToken($clientID, $clientSecret, $requestToken);
+          $tokenResponse = self::GetMicrosoftAccessToken($clientID, $clientSecret, $requestCode);
+          
+          // echo json_encode($tokenResponse);
+          // exit;
+          // json_encode($tokenResponse)此时的数据:
+          // {
+          //   "token_type":"Bearer",
+          //   "scope":"openid profile User.Read",
+          //   "expires_in":3599,
+          //   "ext_expires_in":3599,
+          //   "access_token":""
+          // }
+
           $accessToken = $tokenResponse['access_token'];
           // 2. 获取用户基本信息
           $userInfo = self::GetMicrosoftUserInfo($accessToken);
@@ -141,7 +164,7 @@ class Oauth
           $clientID = OptionController::where('name', 'google_client_id')->value('value');
           $clientSecret = OptionController::where('name', 'google_client_secret')->value('value');
           // 1. 获取Google OAuth Access Token
-          $tokenResponse = self::GetGoogleAccessToken($clientID, $clientSecret, $requestToken);
+          $tokenResponse = self::GetGoogleAccessToken($clientID, $clientSecret, $requestCode);
           $accessToken = $tokenResponse['access_token'];
 
           echo $tokenResponse;
@@ -151,16 +174,20 @@ class Oauth
           // 3. 可以在这里获取更多用户信息(可选)
           // $userEmails = self::GetGitHubUserEmails($accessToken);
           break;
-        // case 'sso':
-        //   // SSO OAuth流程
-        //   $clientID = OptionController::where('name', 'sso_client_id')->value('value');
-        //   $clientSecret = OptionController::where('name', 'sso_client_secret')->value('value');
-        //   // 1. 获取SSO OAuth Access Token
-        //   $tokenResponse = self::GetSSOAccessToken($clientID, $clientSecret, $requestToken);
-        //   $accessToken = $tokenResponse['access_token'];
-        //   // 2. 获取用户基本信息
-        //   $userInfo = self::GetSSOUserInfo($accessToken);
-        //   break;
+        case 'sso':
+          self::$sso_client_main_url = OptionController::where('name', 'sso_client_main_url')->value('value');
+          if (self::$sso_client_main_url == null) {
+            throw new \Exception("SSO客户端主URL未配置");
+          }
+          // SSO OAuth流程
+          $clientID = OptionController::where('name', 'sso_client_id')->value('value');
+          $clientSecret = OptionController::where('name', 'sso_client_secret')->value('value');
+          // 1. 获取SSO OAuth Access Token
+          $tokenResponse = self::GetSSOAccessToken($clientID, $clientSecret, $requestCode);
+          $accessToken = $tokenResponse['access_token'];
+          // 2. 获取用户基本信息
+          $userInfo = self::GetSSOUserInfo($accessToken);
+          break;
         default:
           throw new \Exception("不支持的OAuth名称: $oauthName");
       }
@@ -212,6 +239,8 @@ class Oauth
           );
           break;
         case 'google':
+          echo 'Not support google oauth';
+          exit;
           // $res = UserController::OauthLoginOrRegister(
           //   $oauthName,
           //   $data['user']['id'] ?? '',
@@ -220,6 +249,16 @@ class Oauth
           //   $data['user'],
           //   $client_user_token
           // );
+          break;
+        case 'sso':
+          $res = UserController::OauthLoginOrRegister(
+            $oauthName,
+            $data['user']['id'] ?? '',
+            $data['user']['name'] ?? '',
+            $data['user']['email'] ?? '',
+            $data['user'],
+            $client_user_token
+          );
           break;
       }
       //设置cookie
@@ -249,18 +288,18 @@ class Oauth
    *
    * @param string $clientID GitHub 应用的 Client ID
    * @param string $clientSecret GitHub 应用的 Client Secret
-   * @param string $requestToken 前端传递过来的授权 code
+   * @param string $requestCode 前端传递过来的授权 code
    * @return array GitHub 返回的 JSON 响应(已解析为关联数组)
    * @throws Exception 如果请求失败或解析出错则抛出异常
    */
-  public static function GetGitHubAccessToken(string $clientID, string $clientSecret, string $requestToken): array
+  public static function GetGitHubAccessToken(string $clientID, string $clientSecret, string $requestCode): array
   {
     // 构造请求 URL
     $url = 'https://github.com/login/oauth/access_token?' .
       'client_id=' . urlencode($clientID) .
       '&client_secret=' . urlencode($clientSecret) .
       // '&scope=' . urlencode('user') . // 可选的 scope，根据需要调整
-      '&code=' . urlencode($requestToken);
+      '&code=' . urlencode($requestCode);
 
     // 初始化 cURL
     $ch = curl_init($url);
@@ -312,7 +351,6 @@ class Oauth
 
     return $tokenResponse;
   }
-
   /**
    * 获取GitHub用户信息
    *
@@ -446,7 +484,7 @@ class Oauth
    *
    * @param string $clientID Microsoft 应用的 Client ID
    * @param string $clientSecret Microsoft 应用的 Client Secret
-   * @param string $requestToken 前端传递过来的授权 code
+   * @param string $requestCode 前端传递过来的授权 code
   //  * @param string $redirectUri 回调URI
    * @return array Microsoft 返回的 JSON 响应(已解析为关联数组)
    * @throws Exception 如果请求失败或解析出错则抛出异常
@@ -454,7 +492,7 @@ class Oauth
   public static function GetMicrosoftAccessToken(
     string $clientID,
     string $clientSecret,
-    string $requestToken,
+    string $requestCode,
     // string $redirectUri
   ): array {
     // 构造请求 URL
@@ -473,7 +511,7 @@ class Oauth
     $data = [
       'client_id' => $clientID,
       'client_secret' => $clientSecret,
-      'code' => $requestToken,
+      'code' => $requestCode,
       'redirect_uri' => $redirect_uri, // 确保与 Microsoft 应用设置的回调 URI 一致
       'grant_type' => 'authorization_code'
     ];
@@ -627,11 +665,11 @@ class Oauth
    *
    * @param string $clientID Google 应用的 Client ID
    * @param string $clientSecret Google 应用的 Client Secret
-   * @param string $requestToken 前端传递过来的授权 code
+   * @param string $requestCode 前端传递过来的授权 code
    * @return array Google 返回的 JSON 响应(已解析为关联数组)
    * @throws Exception 如果请求失败或解析出错则抛出异常
    */
-  public static function GetGoogleAccessToken(string $clientID, string $clientSecret, string $requestToken): array
+  public static function GetGoogleAccessToken(string $clientID, string $clientSecret, string $requestCode): array
   {
     // 构造请求 URL
     $url = 'https://oauth2.googleapis.com/token';
@@ -650,7 +688,7 @@ class Oauth
     $data = [
       'client_id' => $clientID,
       'client_secret' => $clientSecret,
-      'code' => $requestToken,
+      'code' => $requestCode,
       'redirect_uri' => $redirect_uri, // 必须与 Google Cloud Console 中注册的一致
       'grant_type' => 'authorization_code'
     ];
@@ -798,6 +836,205 @@ class Oauth
     if ($data === NULL && $response !== "") {
       return ["error" => "Failed to decode JSON response", "raw_response" => $response];
     }
+
+    return $data;
+  }
+  /**
+   * 获取 SSO 访问令牌
+   *
+   * @param string $clientId 客户端ID
+   * @param string $clientSecret 客户端密钥
+   * @param string $requestCode 请求码
+   * @return array|string 访问令牌数组或错误信息 至少返回[access_token, token_type, scope]
+   */
+  public static function GetSSOAccessToken($clientId, $clientSecret, $requestCode)
+  {
+
+    $url = self::$sso_client_main_url . '/api/sso/token';
+
+    $data = [
+      'client_id' => $clientId,
+      'client_secret' => $clientSecret,
+      'code' => $requestCode,
+      'grant_type' => 'authorization_code',
+      'scope' => 'openid profile email'
+    ];
+    
+    // 初始化 cURL
+    $ch = curl_init($url);
+    
+    // 设置 cURL 选项
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // 返回响应内容
+    curl_setopt($ch, CURLOPT_POST, true); // POST 请求
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+      'Accept: application/json' // 设置请求头为 JSON
+    ]);
+
+    // SSL 验证设置
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);  // 启用证书验证
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);      // 严格验证主机名
+    curl_setopt($ch, CURLOPT_CAINFO, $_SERVER['DOCUMENT_ROOT'] . '/assets/cacert-2025-07-15.pem'); // 指定 CA 证书路径
+
+    // 执行请求
+    $response = curl_exec($ch);
+
+    // 检查 cURL 是否有错误
+    if (curl_errno($ch)) {
+      $errorMsg = 'SSO cURL 错误: ' . curl_error($ch);
+      curl_close($ch);
+      throw new \Exception($errorMsg);
+    }
+
+    // 获取 HTTP 状态码
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    if ($httpCode !== 200) {
+      // print_r($response);
+      $errorMsg = "SSO API 返回非 200 状态码: $httpCode";
+      curl_close($ch);
+      throw new \Exception($errorMsg);
+    }
+    
+     // 关闭 cURL
+    curl_close($ch);
+    
+    // 解析 JSON 响应
+    $tokenResponse = json_decode($response, true);
+
+    // 检查 JSON 解析是否成功
+    if ($tokenResponse === null) {
+      throw new \Exception('JSON 解析失败: ' . json_last_error_msg());
+    }
+
+    // 检查是否包含 access_token、token_type、scope 字段
+    if (!isset($tokenResponse['access_token']) || !isset($tokenResponse['token_type']) || !isset($tokenResponse['scope'])) {
+      throw new \Exception('SSO 响应中缺少 access_token、token_type、scope 字段');
+    }
+
+    return $tokenResponse;
+  }
+  /**
+   * 获取 SSO 用户信息
+   *
+   * @param string $accessToken SSO OAuth Access Token
+   * @return array 用户信息数组 至少返回[access_token,token_type,scope,user{}]
+   * @throws Exception 如果请求失败则抛出异常
+   */
+  public static function GetSSOUserInfo(string $accessToken): array
+  {
+    $data = self::CallSSOApi(self::$sso_client_main_url . "/api/sso/user", $accessToken, "POST");
+    // echo json_encode($data);
+    // exit;
+    // 检查 JSON 解析是否成功
+    // if ($data === null) {
+    //   throw new \Exception('JSON 解析失败: ' . json_last_error_msg());
+    // }
+    // 检查是否包含 id,name,email 字段
+    if (!isset($data['id']) || !isset($data['name']) || !isset($data['email'])) {
+      throw new \Exception('SSO 响应中缺少 id、name、email 字段');
+    }
+    return $data;
+  }
+  /**
+   * 调用 SSO API(cURL 版)
+   *
+   * @param string $endpoint SSO API 端点(如 "http://localhost:83/api/sso/user")
+   * @param string $accessToken SSO OAuth Access Token
+   * @param string $method HTTP 方法(GET/POST/PUT/DELETE，默认 GET)
+   * @param array $postData POST 数据(仅用于 POST/PUT 请求)
+   * @param int $timeout 超时时间(秒，默认 30)
+   * @return array|string API 返回的 JSON 数据(解析为数组)或错误信息
+   */
+  public static function CallSSOApi($endpoint, $accessToken, $method = "GET", $postData = [], $timeout = 30)
+  {
+    $url = $endpoint;
+
+    // 初始化 cURL
+    $ch = curl_init($url);
+
+    // 设置默认请求头
+    // $headers = [
+    //   "Authorization: Bearer $accessToken",
+    //   "Accept: application/json" // SSO 推荐的 API 版本
+    // ];
+
+    // 构造请求数据
+    $data = [
+      "access_token" => $accessToken
+    ];
+
+    // 如果是 POST/PUT 请求，添加 Content-Type
+    // if (in_array(strtoupper($method), ["POST", "PUT"])) {
+    //   $headers[] = "Content-Type: application/json";
+    // }
+
+    // // 设置 cURL 选项
+    // curl_setopt_array($ch, [
+    //   CURLOPT_HTTPHEADER => $headers,
+    //   CURLOPT_RETURNTRANSFER => true, // 返回响应数据而不是直接输出
+    //   CURLOPT_FOLLOWLOCATION => true, // 跟随重定向
+    //   CURLOPT_TIMEOUT => $timeout, // 超时时间
+    //   CURLOPT_SSL_VERIFYPEER => true, // 验证 SSL 证书(生产环境必须开启)
+    //   CURLOPT_SSL_VERIFYHOST => 2, // 严格验证主机名
+    //   CURLOPT_CAINFO => $_SERVER['DOCUMENT_ROOT'] . '/assets/cacert-2025-07-15.pem' // 指定 CA 证书路径(如果需要)
+    // ]);
+    
+    // curl_setopt($ch, CURLOPT_POST, true); // POST 请求
+    // curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+    
+    // // 如果是 POST/PUT 请求，添加请求体
+    // if (in_array(strtoupper($method), ["POST", "PUT"]) && !empty($postData)) {
+    //   curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postData));
+    // }
+
+    // 设置 HTTP 方法
+    // curl_setopt($ch, CURLOPT_CUSTOMREQUEST, strtoupper($method));
+
+
+    //改成post中传递参数
+    // 设置 cURL 选项
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // 返回响应内容
+    curl_setopt($ch, CURLOPT_POST, true); // POST 请求
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+      'Accept: application/json' // 设置请求头为 JSON
+    ]);
+
+    // SSL 验证设置
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);  // 启用证书验证
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);      // 严格验证主机名
+    curl_setopt($ch, CURLOPT_CAINFO, $_SERVER['DOCUMENT_ROOT'] . '/assets/cacert-2025-07-15.pem'); // 指定 CA 证书路径
+
+
+    // 发送请求
+    $response = curl_exec($ch);
+
+    // 检查 cURL 错误
+    if ($response === FALSE) {
+      $curlError = curl_error($ch);
+      $curlErrno = curl_errno($ch);
+      curl_close($ch);
+      return ["error" => "cURL Error", "details" => $curlError, "errno" => $curlErrno];
+    }
+
+    // 获取 HTTP 状态码
+    $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    // 检查 SSO API 错误状态码
+    if ($statusCode >= 400) {
+      return [
+        "error" => "SSO API Error",
+        "status_code" => $statusCode,
+        "response" => json_decode($response, true) ?: $response
+      ];
+    }
+
+    // 解析 JSON 响应
+    $data = json_decode($response, true); 
+    if ($data === NULL && $response !== "") {
+      return ["error" => "Failed to decode JSON response", "raw_response" => $response];
+    } 
 
     return $data;
   }

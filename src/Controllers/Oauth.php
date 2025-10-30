@@ -15,6 +15,9 @@ namespace MaterialDesignForum\Controllers;
 
 use MaterialDesignForum\Models\Oauth as OauthModel;
 use MaterialDesignForum\Controllers\Token as TokenController;
+use MaterialDesignForum\Controllers\Option as OptionController;
+
+
 
 class Oauth extends OauthModel
 {
@@ -29,7 +32,6 @@ class Oauth extends OauthModel
    * @return OauthModel 返回添加或更新后的Oauth模型实例
    */
   public static function AddOauthUser($oauthName, $oauthUserId, $oauthUserName,$oauthUserEmail, $oauthSourceResponse, $userId)
-
   {
     // 获取用户ID
     // $userId = TokenController::GetUserId($user_token);
@@ -109,13 +111,19 @@ class Oauth extends OauthModel
     $google = self::where('user_id', $userId)
       ->where('oauth_name', 'google')
       ->first();
+    // 查找sso的Oauth记录
+    $sso = self::where('user_id', $userId)
+      ->where('oauth_name', 'sso')
+      ->first();
 
     return [
       'is_get' => true,
       'data' => [
         'github' => $github,
         'microsoft' => $microsoft,
-        'google' => $google
+        'google' => $google,
+        'sso' => $sso,
+        'sso_client_main_name' => OptionController::find('sso_client_main_name')->value,
       ]
     ];
   }

@@ -493,8 +493,8 @@ class Api
         \MaterialDesignForum\Controllers\User::SetUsersUserGroup(
           $data['user_token'] ?? '',
           $data['user_group_id'],
-          $data['old_user_group_id']??null,
-          $data['user_ids']??[]
+          $data['old_user_group_id'] ?? null,
+          $data['user_ids'] ?? []
         )
       );
     });
@@ -1005,6 +1005,110 @@ class Api
           $data['oauth_id'] ?? null
         )
       );
+    });
+    $collector->get('/api/sso/authorize', function () {//由b.a.com调用
+      $data = Share::GetRequestData();
+      // 接收来自 b.a.com 的 SSO 登录请求，参数包括：
+      // client_id：客户端标识（由您分配，比如固定值或数据库存储）
+      // redirect_uri：固定为 http://b.a.com/api/oauth/redirect/sso
+      // response_type=code：表示使用授权码模式
+      // scope=openid profile email：请求用户基础信息
+
+      // 这里你自定义处理逻辑，比如验证 client_id、redirect_uri、scope 等参数
+
+      // 你的后端处理完后，应该携带 code 参数重定向到 redirect_uri
+      $client_id = $_GET['client_id'] ?? null;
+      $redirect_uri = $_GET['redirect_uri'] ?? null;
+
+      //请注意！！如果你的主站点用户没有登录，必须先跳转登录授权再回来生成code
+
+      // 返回示例：http://b.a.com/api/oauth/redirect/sso?code=123456
+      // header('Location: http://b.a.com/api/oauth/redirect/sso?code=123456');
+      // header('Location: http://localhost:83/api/oauth/redirect/sso?code=123456');
+      // header('Location: ' . $redirect_uri . '?code=123456');
+
+      //echo三秒后重定向
+      // echo '三秒后重定向到：' . $redirect_uri . '?code=123456';
+      //设置响应类型为html
+      header('Content-Type: text/html; charset=utf-8');
+      echo '三秒后重定向到：' . $redirect_uri . '?code=123456';
+      echo '<script>setTimeout(function(){window.location.href="' . $redirect_uri . '?code=123456";},3000);</script>';
+    });
+    $collector->post('/api/sso/token', function () {
+      $data = Share::GetRequestData();
+      // 接收来自 b.a.com 的请求，参数如下：
+      // client_id：客户端 ID（如您分配给 b.a.com 的固定值）
+      // client_secret：客户端密钥（请妥善保管，建议通过 POST body 传参更安全）
+      // code：上一步生成的授权码
+      // grant_type=authorization_code：固定值
+      // scope=openid profile email：固定值
+
+      $client_id = $data['client_id'] ?? null;
+      $client_secret = $data['client_secret'] ?? null;
+      $code = $data['code'] ?? null;
+      $grant_type = $data['grant_type'] ?? null;
+      $scope = $data['scope'] ?? null;
+
+      // $client_id = $_GET['client_id'] ?? null;
+      // $client_secret = $_GET['client_secret'] ?? null;
+      // $code = $_GET['code'] ?? null;
+      // $grant_type = $_GET['grant_type'] ?? null;
+      // $scope = $_GET['scope'] ?? null;
+
+      if (
+        $client_id == 'test_client_id'
+        &&
+        $client_secret == 'test_client_secret'
+        &&
+        $code == '123456'
+        &&
+        $grant_type == 'authorization_code'
+        &&
+        $scope == 'openid profile email'
+      ) {
+        // 您的后端需要：
+        // 校验 client_id和 client_secret是否匹配（即 b.a.com 的凭据是否正确）
+        // 校验 code是否有效、未过期、未被使用过
+        // 若全部校验通过，则签发一个 ​​access_token​​（通常是 JWT 或随机字符串），并返回如下 JSON：
+        return Share::HandleArrayToJSON(
+          [
+            'access_token' => 'test_access_token',
+            'token_type' => 'Bearer',
+            'scope' => 'openid profile email',
+          ]
+        );
+      }
+      return Share::HandleArrayToJSON(
+        [
+          'access_token' => 'error',
+          'token_type' => 'Bearer',
+          'scope' => 'openid profile email',
+        ]
+      );
+    });
+    $collector->post('/api/sso/user', function () {
+      $data = Share::GetRequestData();
+      // 该接口用于 b.a.com 获取当前授权用户的详细信息，以实现自动登录或注册绑定。
+      // b.a.com 会在请求头中自动携带：
+      // Authorization: Bearer ACCESS_TOKEN
+
+      // 您的后端需要：
+      // 从 HTTP Header 的 Authorization: Bearer {access_token}中解析出 access_token
+      // ​​校验 access_token 是否合法、是否过期、是否被撤销​​
+      // 如果 token 合法，则根据该 token 查找到对应的用户身份，返回如下结构：
+
+      $access_token = $data['access_token'] ?? null;
+
+      if ($access_token == 'test_access_token') {
+        return Share::HandleArrayToJSON([//这里返回示例的用户
+          'id' => 9999,
+          'name' => 'test_user',
+          'email' => 'test@example.com',
+        ]);
+      }
+      return Share::HandleArrayToJSON([
+        'error' => 'access_token_error',
+      ]);
     });
     $collector->post('/api/user/option/get', function () {
       $data = Share::GetRequestData();

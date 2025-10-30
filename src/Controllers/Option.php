@@ -16,16 +16,10 @@ namespace MaterialDesignForum\Controllers;
 use MaterialDesignForum\Models\Option as OptionModel;
 use MaterialDesignForum\Controllers\UserGroup as UserGroupController;
 use MaterialDesignForum\Plugins\Share;
-// form_data: {
-//   site_name: '',
-//   site_description: '',
-//   site_keywords: '',
-//   site_icp_beian: '',
-//   site_gongan_beian: '',
-//   default_language: '',
-// },
+
 class Option extends OptionModel
 {
+  // 敏感选项，不允许直接获取
   private $sensitive_options = [
     'site_activation_key',
     'smtp_host',
@@ -41,6 +35,40 @@ class Option extends OptionModel
     'google_client_secret',
     'microsoft_client_id',
     'microsoft_client_secret',
+    'sso_client_id',
+    'sso_client_secret',
+    'sso_client_main_url',
+  ];
+  // Oauth选项
+  private static $oauthOptions = [
+    'github_client_id',
+    'github_client_secret',
+    'google_client_id',
+    'google_client_secret',
+    'microsoft_client_id',
+    'microsoft_client_secret',
+    'sso_client_id',
+    'sso_client_secret',
+    'sso_client_main_url',
+    'sso_client_main_name',
+  ];
+  
+  private static $infoOptions = [
+    'site_name',
+    'site_description',
+    'site_keywords',
+    'site_icp_beian',
+    'site_gongan_beian',
+    'default_language',
+  ];
+  private static $mailOptions = [
+    'smtp_host',
+    'smtp_password',
+    'smtp_port',
+    'smtp_reply_to',
+    'smtp_secure',
+    'smtp_send_name',
+    'smtp_username',
   ];
   /**
    * 获取Oauth所有的选项
@@ -49,77 +77,42 @@ class Option extends OptionModel
    */
   public static function GetOauthOptions($user_token)
   {
+    if (!UserGroupController::IsAdmin($user_token)) {
+      return ['is_get' => false, 'form_data' => []];
+    }
+
     $form_data = [];
-    if (UserGroupController::IsAdmin($user_token)) {
-      $option = self::find('github_client_id');
-      if ($option) {
-        $form_data['github_client_id'] = $option->value;
-      }
-      $option = self::find('github_client_secret');
-      if ($option) {
-        $form_data['github_client_secret'] = $option->value;
-      }
-      $option = self::find('google_client_id');
-      if ($option) {
-        $form_data['google_client_id'] = $option->value;
-      }
-      $option = self::find('google_client_secret');
-      if ($option) {
-        $form_data['google_client_secret'] = $option->value;
-      }
-      $option = self::find('microsoft_client_id');
-      if ($option) {
-        $form_data['microsoft_client_id'] = $option->value;
-      }
-      $option = self::find('microsoft_client_secret');
-      if ($option) {
-        $form_data['microsoft_client_secret'] = $option->value;
+    foreach (self::$oauthOptions as $optionKey) {
+      if ($option = self::find($optionKey)) {
+        $form_data[$optionKey] = $option->value;
       }
     }
-    return [
-      'is_get' => !empty($form_data),
-      'form_data' => $form_data,
-    ];
+
+    return ['is_get' => !empty($form_data), 'form_data' => $form_data];
   }
   public static function SetOauthOptions($form_data, $user_token)
   {
-    $is_set = false;
-    if (UserGroupController::IsAdmin($user_token)) {
-      $option = self::find('github_client_id');
-      if ($option) {
-        $option->value = $form_data['github_client_id'];
-        $option->save();
-      }
-      $option = self::find('github_client_secret');
-      if ($option) {
-        $option->value = $form_data['github_client_secret'];
-        $option->save();
-      }
-      $option = self::find('google_client_id');
-      if ($option) {
-        $option->value = $form_data['google_client_id'];
-        $option->save();
-      }
-      $option = self::find('google_client_secret');
-      if ($option) {
-        $option->value = $form_data['google_client_secret'];
-        $option->save();
-      }
-      $option = self::find('microsoft_client_id');
-      if ($option) {
-        $option->value = $form_data['microsoft_client_id'];
-        $option->save();
-      }
-      $option = self::find('microsoft_client_secret');
-      if ($option) {
-        $option->value = $form_data['microsoft_client_secret'];
-        $option->save();
-      }
-      $is_set = true;
+    if (!UserGroupController::IsAdmin($user_token)) {
+      return ['is_set' => false];
     }
-    return [
-      'is_set' => $is_set,
-    ];
+
+    $is_set = false;
+    foreach (self::$oauthOptions as $optionKey) {
+      if (!isset($form_data[$optionKey])) continue;
+
+      if ($option = self::find($optionKey)) {
+        $option->value = $form_data[$optionKey];
+        $option->save();
+        $is_set = true;
+      }else{
+        self::create([
+          'name' => $optionKey,
+          'value' => $form_data[$optionKey],
+        ]);
+        $is_set = true;
+      }
+    }
+    return ['is_set' => $is_set];
   }
   /**
    * 获取指定第三方平台的Client ID
@@ -130,6 +123,19 @@ class Option extends OptionModel
   {
     $option = self::find($oauthName . '_client_id');
     if ($option) {
+      if($oauthName == 'sso'){
+        $sso_client_main_url = self::find('sso_client_main_url')->value;
+        $sso_client_main_name = self::find('sso_client_main_name')->value;
+        if($sso_client_main_url == null){
+          throw new \Exception("SSO客户端主URL未配置");
+        }
+        return [
+          'is_get' => true,
+          'client_id' => $option->value,
+          'sso_client_main_url' => $sso_client_main_url,
+          'sso_client_main_name' => $sso_client_main_name,
+        ];
+      }
       return [
         'is_get' => true,
         'client_id' => $option->value,
@@ -145,14 +151,15 @@ class Option extends OptionModel
    * @param string $oauthName 第三方平台标识符 可选值：github、microsoft
    * @return string|null 返回Client Link或null
    */
-  public static function GetOauthClientLink($oauthName){
+  public static function GetOauthClientLink($oauthName)
+  {
     $url = '';
     $redirectUri = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . '/api/oauth/redirect/' . $oauthName;
     //如果域名包含localhost
-    if(strpos($_SERVER['HTTP_HOST'], 'localhost') !== false){
+    if (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false) {
       $redirectUri = 'http://localhost:83/api/oauth/redirect/' . $oauthName;
     }
-    switch($oauthName){
+    switch ($oauthName) {
       case 'github':
         $client_id = self::GetOauthClientId('github');
         $url = 'https://github.com/login/oauth/authorize?client_id=' . $client_id . '&redirect_uri=' . $redirectUri . '&scope=user';
@@ -181,33 +188,44 @@ class Option extends OptionModel
     // $user_token
   )
   {
-    $form_data = null;
-    // if (UserGroupController::IsAdmin($user_token)) {
-    $option = self::find('site_name');
-    if ($option) {
-      $form_data['site_name'] = $option->value;
-    }
-    $option = self::find('site_description');
-    if ($option) {
-      $form_data['site_description'] = $option->value;
-    }
-    $option = self::find('site_keywords');
-    if ($option) {
-      $form_data['site_keywords'] = $option->value;
-    }
-    $option = self::find('site_icp_beian');
-    if ($option) {
-      $form_data['site_icp_beian'] = $option->value;
-    }
-    $option = self::find('site_gongan_beian');
-    if ($option) {
-      $form_data['site_gongan_beian'] = $option->value;
-    }
-    $option = self::find('default_language');
-    if ($option) {
-      $form_data['default_language'] = $option->value;
-    }
+    // $form_data = null;
+    // // if (UserGroupController::IsAdmin($user_token)) {
+    // $option = self::find('site_name');
+    // if ($option) {
+    //   $form_data['site_name'] = $option->value;
     // }
+    // $option = self::find('site_description');
+    // if ($option) {
+    //   $form_data['site_description'] = $option->value;
+    // }
+    // $option = self::find('site_keywords');
+    // if ($option) {
+    //   $form_data['site_keywords'] = $option->value;
+    // }
+    // $option = self::find('site_icp_beian');
+    // if ($option) {
+    //   $form_data['site_icp_beian'] = $option->value;
+    // }
+    // $option = self::find('site_gongan_beian');
+    // if ($option) {
+    //   $form_data['site_gongan_beian'] = $option->value;
+    // }
+    // $option = self::find('default_language');
+    // if ($option) {
+    //   $form_data['default_language'] = $option->value;
+    // }
+    // // }
+    // return [
+    //   'is_get' => $form_data != null,
+    //   'form_data' => $form_data,
+    // ];
+
+    $form_data = [];
+    foreach (self::$infoOptions as $optionKey) {
+      if ($option = self::find($optionKey)) {
+        $form_data[$optionKey] = $option->value;
+      }
+    }
     return [
       'is_get' => $form_data != null,
       'form_data' => $form_data,
@@ -221,37 +239,56 @@ class Option extends OptionModel
    */
   public static function SetInfoData($form_data, $user_token)
   {
+    // $is_set = false;
+    // if (UserGroupController::IsAdmin($user_token)) {
+    //   $option = self::find('site_name');
+    //   if ($option) {
+    //     $option->value = $form_data['site_name'];
+    //     $option->save();
+    //   }
+    //   $option = self::find('site_description');
+    //   if ($option) {
+    //     $option->value = $form_data['site_description'];
+    //     $option->save();
+    //   }
+    //   $option = self::find('site_keywords');
+    //   if ($option) {
+    //     $option->value = $form_data['site_keywords'];
+    //     $option->save();
+    //   }
+    //   $option = self::find('site_icp_beian');
+    //   if ($option) {
+    //     $option->value = $form_data['site_icp_beian'];
+    //     $option->save();
+    //   }
+    //   $option = self::find('site_gongan_beian');
+    //   if ($option) {
+    //     $option->value = $form_data['site_gongan_beian'];
+    //     $option->save();
+    //   }
+    //   $option = self::find('default_language');
+    //   if ($option) {
+    //     $option->value = $form_data['default_language'];
+    //     $option->save();
+    //   }
+    //   $is_set = true;
+    // }
+    // return [
+    //   'is_set' => $is_set,
+    // ];
+
     $is_set = false;
     if (UserGroupController::IsAdmin($user_token)) {
-      $option = self::find('site_name');
-      if ($option) {
-        $option->value = $form_data['site_name'];
-        $option->save();
-      }
-      $option = self::find('site_description');
-      if ($option) {
-        $option->value = $form_data['site_description'];
-        $option->save();
-      }
-      $option = self::find('site_keywords');
-      if ($option) {
-        $option->value = $form_data['site_keywords'];
-        $option->save();
-      }
-      $option = self::find('site_icp_beian');
-      if ($option) {
-        $option->value = $form_data['site_icp_beian'];
-        $option->save();
-      }
-      $option = self::find('site_gongan_beian');
-      if ($option) {
-        $option->value = $form_data['site_gongan_beian'];
-        $option->save();
-      }
-      $option = self::find('default_language');
-      if ($option) {
-        $option->value = $form_data['default_language'];
-        $option->save();
+      foreach (self::$infoOptions as $optionKey) {
+        if ($option = self::find($optionKey)) {
+          $option->value = $form_data[$optionKey];
+          $option->save();
+        }else{
+          self::create([
+            'name' => $optionKey,
+            'value' => $form_data[$optionKey],
+          ]);
+        }
       }
       $is_set = true;
     }
@@ -266,35 +303,48 @@ class Option extends OptionModel
    */
   public static function GetMailData($user_token)
   {
-    $form_data = null;
+    // $form_data = null;
+    // if (UserGroupController::IsAdmin($user_token)) {
+    //   $option = self::find('smtp_host');
+    //   if ($option) {
+    //     $form_data['smtp_host'] = $option->value;
+    //   }
+    //   $option = self::find('smtp_password');
+    //   if ($option) {
+    //     $form_data['smtp_password'] = $option->value;
+    //   }
+    //   $option = self::find('smtp_port');
+    //   if ($option) {
+    //     $form_data['smtp_port'] = $option->value;
+    //   }
+    //   $option = self::find('smtp_reply_to');
+    //   if ($option) {
+    //     $form_data['smtp_reply_to'] = $option->value;
+    //   }
+    //   $option = self::find('smtp_secure');
+    //   if ($option) {
+    //     $form_data['smtp_secure'] = $option->value;
+    //   }
+    //   $option = self::find('smtp_send_name');
+    //   if ($option) {
+    //     $form_data['smtp_send_name'] = $option->value;
+    //   }
+    //   $option = self::find('smtp_username');
+    //   if ($option) {
+    //     $form_data['smtp_username'] = $option->value;
+    //   }
+    // }
+    // return [
+    //   'is_get' => $form_data != null,
+    //   'form_data' => $form_data,
+    // ];
+
+    $form_data = [];
     if (UserGroupController::IsAdmin($user_token)) {
-      $option = self::find('smtp_host');
-      if ($option) {
-        $form_data['smtp_host'] = $option->value;
-      }
-      $option = self::find('smtp_password');
-      if ($option) {
-        $form_data['smtp_password'] = $option->value;
-      }
-      $option = self::find('smtp_port');
-      if ($option) {
-        $form_data['smtp_port'] = $option->value;
-      }
-      $option = self::find('smtp_reply_to');
-      if ($option) {
-        $form_data['smtp_reply_to'] = $option->value;
-      }
-      $option = self::find('smtp_secure');
-      if ($option) {
-        $form_data['smtp_secure'] = $option->value;
-      }
-      $option = self::find('smtp_send_name');
-      if ($option) {
-        $form_data['smtp_send_name'] = $option->value;
-      }
-      $option = self::find('smtp_username');
-      if ($option) {
-        $form_data['smtp_username'] = $option->value;
+      foreach (self::$mailOptions as $optionKey) {
+        if ($option = self::find($optionKey)) {
+          $form_data[$optionKey] = $option->value;
+        }
       }
     }
     return [
@@ -310,42 +360,61 @@ class Option extends OptionModel
    */
   public static function SetMailData($form_data, $user_token)
   {
+    // $is_set = false;
+    // if (UserGroupController::IsAdmin($user_token)) {
+    //   $option = self::find('smtp_host');
+    //   if ($option) {
+    //     $option->value = $form_data['smtp_host'];
+    //     $option->save();
+    //   }
+    //   $option = self::find('smtp_password');
+    //   if ($option) {
+    //     $option->value = $form_data['smtp_password'];
+    //     $option->save();
+    //   }
+    //   $option = self::find('smtp_port');
+    //   if ($option) {
+    //     $option->value = $form_data['smtp_port'];
+    //     $option->save();
+    //   }
+    //   $option = self::find('smtp_reply_to');
+    //   if ($option) {
+    //     $option->value = $form_data['smtp_reply_to'];
+    //     $option->save();
+    //   }
+    //   $option = self::find('smtp_secure');
+    //   if ($option) {
+    //     $option->value = $form_data['smtp_secure'];
+    //     $option->save();
+    //   }
+    //   $option = self::find('smtp_send_name');
+    //   if ($option) {
+    //     $option->value = $form_data['smtp_send_name'];
+    //     $option->save();
+    //   }
+    //   $option = self::find('smtp_username');
+    //   if ($option) {
+    //     $option->value = $form_data['smtp_username'];
+    //     $option->save();
+    //   }
+    //   $is_set = true;
+    // }
+    // return [
+    //   'is_set' => $is_set,
+    // ];
+
     $is_set = false;
     if (UserGroupController::IsAdmin($user_token)) {
-      $option = self::find('smtp_host');
-      if ($option) {
-        $option->value = $form_data['smtp_host'];
-        $option->save();
-      }
-      $option = self::find('smtp_password');
-      if ($option) {
-        $option->value = $form_data['smtp_password'];
-        $option->save();
-      }
-      $option = self::find('smtp_port');
-      if ($option) {
-        $option->value = $form_data['smtp_port'];
-        $option->save();
-      }
-      $option = self::find('smtp_reply_to');
-      if ($option) {
-        $option->value = $form_data['smtp_reply_to'];
-        $option->save();
-      }
-      $option = self::find('smtp_secure');
-      if ($option) {
-        $option->value = $form_data['smtp_secure'];
-        $option->save();
-      }
-      $option = self::find('smtp_send_name');
-      if ($option) {
-        $option->value = $form_data['smtp_send_name'];
-        $option->save();
-      }
-      $option = self::find('smtp_username');
-      if ($option) {
-        $option->value = $form_data['smtp_username'];
-        $option->save();
+      foreach (self::$mailOptions as $optionKey) {
+        if ($option = self::find($optionKey)) {
+          $option->value = $form_data[$optionKey];
+          $option->save();
+        }else{
+          self::create([
+            'name' => $optionKey,
+            'value' => $form_data[$optionKey],
+          ]);
+        }
       }
       $is_set = true;
     }
@@ -475,7 +544,7 @@ class Option extends OptionModel
     //{"light":{"primary":"#415f91","secondary":"#415f91","accent":"#8eace3"},"dark":{"primary":"#415f91","secondary":"#415f91","accent":"#8eace3"}}
     return [
       'is_set' => $is_set,
-      'json_text' => json_decode($json_text, true),//json文本转换为php数组
+      'json_text' => json_decode($json_text, true), //json文本转换为php数组
     ];
   }
   /**
@@ -490,7 +559,7 @@ class Option extends OptionModel
 
     return [
       'is_get' => $option != null && $option->value != null && $option->value != '',
-      'json_text' => json_decode($option->value, true),//json文本转换为php数组
+      'json_text' => json_decode($option->value, true), //json文本转换为php数组
     ];
   }
   /**
@@ -516,7 +585,7 @@ class Option extends OptionModel
 
     return [
       'is_set' => $is_set,
-      'json_text' => json_decode($json_text, true),//json文本转换为php数组
+      'json_text' => json_decode($json_text, true), //json文本转换为php数组
     ];
   }
   /**
@@ -530,7 +599,7 @@ class Option extends OptionModel
     //{"header":"Message.Components.TextPlay.With","body":"Message.Components.TextPlay.MaterialDesign,Message.Components.TextPlay.VueAsTheCore,Message.Components.TextPlay.ImplementedByVuetify,Message.Components.TextPlay.MoreElegant,Message.Components.TextPlay.UnlimitedDistance,Message.Components.TextPlay.CrossPlatform,Message.Components.TextPlay.DynamicResponsive","footer_header":"Message.Components.TextPlay.TheWay","footer_tail":"Message.Components.TextPlay.EnjoyCommunication"}
     return [
       'is_get' => $option != null && $option->value != null && $option->value != '',
-      'json_text' => json_decode($option->value, true),//json文本转换为php数组
+      'json_text' => json_decode($option->value, true), //json文本转换为php数组
     ];
   }
   /**
@@ -553,7 +622,7 @@ class Option extends OptionModel
     if ($option) {
       $option->value = $json_text;
       $is_set = $option->save();
-    }else{
+    } else {
       $option = new Option();
       $option->name = 'theme_carousel_param';
       $option->value = $json_text;
@@ -562,7 +631,7 @@ class Option extends OptionModel
     return [
       'is_set' => $is_set,
       // 'json_text' => json_decode($json_text, true),//json文本转换为php数组
-      'json_text' => json_decode($json_text, true)??[],//json文本转换为php数组
+      'json_text' => json_decode($json_text, true) ?? [], //json文本转换为php数组
     ];
   }
   /**
@@ -575,7 +644,7 @@ class Option extends OptionModel
     $option = self::find('theme_carousel_param');
     return [
       'is_get' => $option != null && $option->value != null && $option->value != '',
-      'json_text' => json_decode($option->value, true)??[],//json文本转换为php数组
+      'json_text' => json_decode($option->value, true) ?? [], //json文本转换为php数组
     ];
   }
   /**
@@ -590,8 +659,8 @@ class Option extends OptionModel
       $options_array[$option->name] = $option->value;
     }
 
-    foreach(self::$sensitive_options as $sensitive_option) {
-      unset($options_array[$sensitive_option]);// 移除敏感选项
+    foreach (self::$sensitive_options as $sensitive_option) {
+      unset($options_array[$sensitive_option]); // 移除敏感选项
     }
 
     return $options_array;
@@ -605,7 +674,7 @@ class Option extends OptionModel
   public static function GetOption($name, $user_token)
   {
     $option = self::find($name);
-    if (in_array($name, self::$sensitive_options)) {//检查是否敏感字段
+    if (in_array($name, self::$sensitive_options)) { //检查是否敏感字段
       if (!UserGroupController::IsAdmin($user_token)) {
         return [
           'is_get' => false,
