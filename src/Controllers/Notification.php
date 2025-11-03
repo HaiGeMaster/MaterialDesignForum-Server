@@ -202,11 +202,13 @@ class Notification extends NotificationModel
         $notification->sender_user = UserController::GetUser($notification->sender_id)['user'];
         $notification->receiver_user = UserController::GetUser($notification->receiver_id)['user'];
 
-        //如果发送者或接收者不存在，则删除这个通知，避免引起报错。
+        //如果发送者或接收者不存在，则删除这个通知，避免引起报错。管理员手动删除或修改了用户ID会发生此情况
         if($notification->sender_user==null||$notification->receiver_user==null)
         {
           //从$notifications中删除这个通知
           unset($notifications[$key]);
+
+          //删除此通知但是未同步notifications中的pagination数据。。待修复。
           continue;
         }
 
@@ -586,5 +588,6 @@ class Notification extends NotificationModel
       }
     }
     return ['web_message' => true, 'email_message' => false]; //用户通知设置为空的情况下默认都为['web_message' => true, 'email_message' => false]
+    // return ['web_message' => true, 'email_message' => true]; //用户通知设置为空的情况下默认都为['web_message' => true, 'email_message' => false]
   }
 }
