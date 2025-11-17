@@ -14,21 +14,17 @@
 namespace MaterialDesignForum\Controllers;
 
 use MaterialDesignForum\Models\Comment as CommentModel;
+
+use MaterialDesignForum\Controllers\Vote as VoteController;
 use MaterialDesignForum\Controllers\User as UserController;
 use MaterialDesignForum\Controllers\Token as TokenController;
-use MaterialDesignForum\Controllers\UserGroup as UserGroupController;
-use MaterialDesignForum\Controllers\Question as QuestionController;
 use MaterialDesignForum\Controllers\Answer as AnswerController;
 use MaterialDesignForum\Controllers\Article as ArticleController;
-use MaterialDesignForum\Controllers\Reply as ReplyController;
-use MaterialDesignForum\Controllers\Vote as VoteController;
+use MaterialDesignForum\Controllers\Question as QuestionController;
+use MaterialDesignForum\Controllers\UserGroup as UserGroupController;
 use MaterialDesignForum\Controllers\Notification as NotificationController;
 
-// use MaterialDesignForum\Controllers\Inbox as InboxController;
-
 use MaterialDesignForum\Plugins\Share;
-use MaterialDesignForum\Config\Config;
-use MaterialDesignForum\Models\Notification;
 
 class Comment extends CommentModel
 {

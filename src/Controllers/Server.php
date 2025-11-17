@@ -14,24 +14,21 @@
 namespace MaterialDesignForum\Controllers;
 
 use MaterialDesignForum\Models\User as UserModel;
-use MaterialDesignForum\Models\UserGroup as UserGroupModel;
-use MaterialDesignForum\Models\Report as ReportModel;
+use MaterialDesignForum\Models\Reply as ReplyModel;
 use MaterialDesignForum\Models\Topic as TopicModel;
-use MaterialDesignForum\Models\Question as QuestionModel;
+use MaterialDesignForum\Models\Report as ReportModel;
 use MaterialDesignForum\Models\Answer as AnswerModel;
 use MaterialDesignForum\Models\Article as ArticleModel;
 use MaterialDesignForum\Models\Comment as CommentModel;
-use MaterialDesignForum\Models\Reply as ReplyModel;
+use MaterialDesignForum\Models\Question as QuestionModel;
+use MaterialDesignForum\Models\UserGroup as UserGroupModel;
 
 use MaterialDesignForum\Controllers\UserGroup as UserGroupController;
 
 use MaterialDesignForum\Config\Config;
-
 use MaterialDesignForum\Plugins\Share;
 
-// use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Capsule\Manager as DB;
-
 
 class Server
 {
@@ -60,7 +57,8 @@ class Server
 
     //仅获取未被删除或用户未被禁用的数据
     $data_count = [
-      'user_count' => UserModel::where('disable_time', '=', 0)->count(),
+      // 'user_count' => UserModel::where('disable_time', '=', 0)->count(),
+      'user_count' => UserModel::count(),
       'user_group_count' => UserGroupModel::where('delete_time', '=', 0)->count(),
       'report_count' => ReportModel::count(),
       'topic_count' => TopicModel::where('delete_time', '=', 0)->count(),

@@ -13,9 +13,10 @@
 
 namespace MaterialDesignForum\Plugins;
 
-use MaterialDesignForum\Models\i18n as i18nModel;
-use MaterialDesignForum\Config\Config;
 use MaterialDesignForum\Models\Option;
+use MaterialDesignForum\Models\i18n as i18nModel;
+
+use MaterialDesignForum\Config\Config;
 
 class i18n
 {

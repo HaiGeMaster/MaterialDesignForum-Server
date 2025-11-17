@@ -13,12 +13,13 @@
 
 namespace MaterialDesignForum\Routes;
 
-use Phroute\Phroute\RouteCollector;
 use Phroute\Phroute\Dispatcher;
+use Phroute\Phroute\RouteCollector;
 use Phroute\Phroute\Exception\HttpRouteNotFoundException;
 
 use MaterialDesignForum\Config\Install;
 use MaterialDesignForum\Config\Config;
+
 use MaterialDesignForum\Plugins\Share;
 
 class Api

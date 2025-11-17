@@ -14,9 +14,7 @@ namespace MaterialDesignForum\Views;
 
 use MaterialDesignForum\Plugins\Share;
 use MaterialDesignForum\Plugins\i18n;
-use MaterialDesignForum\Models\Option;
 use MaterialDesignForum\Config\Config;
-// use MaterialDesignForum\Seo\Seo;
 
 class Client
 {

@@ -14,6 +14,7 @@
 namespace MaterialDesignForum\Config;
 
 use MaterialDesignForum\Plugins\i18n;
+
 use MaterialDesignForum\Models\Option;
 
 use PHPMailer\PHPMailer\PHPMailer;

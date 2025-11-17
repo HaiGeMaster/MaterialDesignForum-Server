@@ -13,27 +13,24 @@
 
 namespace MaterialDesignForum\Controllers;
 
+use MaterialDesignForum\Models\MailCaptcha as MailCaptchaModel;
 use MaterialDesignForum\Models\Notification as NotificationModel;
-use MaterialDesignForum\Controllers\Token as TokenController;
+
 use MaterialDesignForum\Controllers\User as UserController;
-use MaterialDesignForum\Controllers\Article as ArticleController;
-use MaterialDesignForum\Controllers\Question as QuestionController;
-use MaterialDesignForum\Controllers\Answer as AnswerController;
-use MaterialDesignForum\Controllers\Comment as CommentController;
+use MaterialDesignForum\Controllers\Token as TokenController;
 use MaterialDesignForum\Controllers\Reply as ReplyController;
-use MaterialDesignForum\Controllers\UserOption as UserOptionController;
 use MaterialDesignForum\Controllers\Topic as TopicController;
-
-
+use MaterialDesignForum\Controllers\Answer as AnswerController;
+use MaterialDesignForum\Controllers\Article as ArticleController;
+use MaterialDesignForum\Controllers\Comment as CommentController;
+use MaterialDesignForum\Controllers\Question as QuestionController;
+use MaterialDesignForum\Controllers\UserOption as UserOptionController;
 
 use MaterialDesignForum\Plugins\Share;
 use MaterialDesignForum\Plugins\i18n;
-use MaterialDesignForum\Models\MailCaptcha as MailCaptchaModel;
 
 class Notification extends NotificationModel
 {
-
-
   //通知设置类型注释定义
   /**
    * @typedef NotificationType 通知类型
@@ -203,8 +200,7 @@ class Notification extends NotificationModel
         $notification->receiver_user = UserController::GetUser($notification->receiver_id)['user'];
 
         //如果发送者或接收者不存在，则删除这个通知，避免引起报错。管理员手动删除或修改了用户ID会发生此情况
-        if($notification->sender_user==null||$notification->receiver_user==null)
-        {
+        if ($notification->sender_user == null || $notification->receiver_user == null) {
           //从$notifications中删除这个通知
           unset($notifications[$key]);
 
@@ -467,15 +463,15 @@ class Notification extends NotificationModel
             $receiver_content = $notification->reply->content;
             break;
           case 'follow_user_update':
-            if($notification->question_id!=0){
+            if ($notification->question_id != 0) {
               $notification->question = QuestionController::where('question_id', $notification->question_id)->first();
-              if($notification->question != null){
+              if ($notification->question != null) {
                 $receiver_content = $notification->question->title;
                 $sender_content = 'Message.Client.Notification.NewQuestion';
               }
-            }else if($notification->article_id!=0){
+            } else if ($notification->article_id != 0) {
               $notification->article = ArticleController::where('article_id', $notification->article_id)->first();
-              if($notification->article != null){
+              if ($notification->article != null) {
                 $receiver_content = $notification->article->title;
                 $sender_content = 'Message.Client.Notification.NewArticle';
               }
@@ -486,15 +482,15 @@ class Notification extends NotificationModel
             // if($notification->topic != null){
             //   $receiver_content = $notification->topic->name;
             // }
-            if($notification->question_id!=0){
+            if ($notification->question_id != 0) {
               $notification->question = QuestionController::where('question_id', $notification->question_id)->first();
-              if($notification->question != null){
+              if ($notification->question != null) {
                 $receiver_content = $notification->question->title;
                 $sender_content = 'Message.Client.Notification.NewQuestion';
               }
-            }else if($notification->article_id!=0){
+            } else if ($notification->article_id != 0) {
               $notification->article = ArticleController::where('article_id', $notification->article_id)->first();
-              if($notification->article != null){
+              if ($notification->article != null) {
                 $receiver_content = $notification->article->title;
                 $sender_content = 'Message.Client.Notification.NewArticle';
               }
@@ -502,14 +498,14 @@ class Notification extends NotificationModel
             break;
           case 'follow_question_update':
             $notification->question = QuestionController::where('question_id', $notification->question_id)->first();
-            if($notification->question != null){
+            if ($notification->question != null) {
               $receiver_content = $notification->question->title;
               $sender_content = 'Message.Client.Notification.NewQuestion';
             }
             break;
           case 'follow_article_update':
             $notification->article = ArticleController::where('article_id', $notification->article_id)->first();
-            if($notification->article != null){
+            if ($notification->article != null) {
               $receiver_content = $notification->article->title;
               $sender_content = 'Message.Client.Notification.NewArticle';
             }

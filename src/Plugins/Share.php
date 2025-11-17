@@ -13,11 +13,13 @@
 
 namespace MaterialDesignForum\Plugins;
 
-use MaterialDesignForum\Plugins\i18n;
-use MaterialDesignForum\Config\Config;
-use MaterialDesignForum\Models\Option;
 use Carbon\Carbon;
 
+use MaterialDesignForum\Config\Config;
+
+use MaterialDesignForum\Models\Option;
+
+use MaterialDesignForum\Plugins\i18n;
 
 class Share
 {
@@ -313,19 +315,19 @@ class Share
    * @param string $name Cookie名称
    * @return string
    */
-  public static function GetCookie($name = ''):string
+  public static function GetCookie($name = ''): string
   {
     if (isset($_COOKIE[$name])) {
       return $_COOKIE[$name];
     } else {
-      return isset(self::GetRequestData()[$name]) ? self::GetRequestData()[$name] : '';//Option::Get('theme') || Config::GetDefaultTheme();
+      return isset(self::GetRequestData()[$name]) ? self::GetRequestData()[$name] : ''; //Option::Get('theme') || Config::GetDefaultTheme();
     }
   }
   /**
    * 获取客户端主题名称
    * @return string
    */
-  public static function GetClientThemeName():string
+  public static function GetClientThemeName(): string
   {
 
     // //停止报错
@@ -349,23 +351,23 @@ class Share
 
     // 检查 cookie 是否存在
     if (!isset($_COOKIE['theme'])) {
-        // 开启报错
-        error_reporting(E_ALL);
+      // 开启报错
+      error_reporting(E_ALL);
 
-        // 检查其他来源的主题
-        $sql_theme = Option::Get('theme');
-        $request_data = self::GetRequestData();
+      // 检查其他来源的主题
+      $sql_theme = Option::Get('theme');
+      $request_data = self::GetRequestData();
 
-        // 使用空合并运算符获取主题，确保不会报错
-        $theme = $request_data['theme'] ?? $sql_theme ?? Config::GetDefaultTheme();
+      // 使用空合并运算符获取主题，确保不会报错
+      $theme = $request_data['theme'] ?? $sql_theme ?? Config::GetDefaultTheme();
     } else {
-        // 开启报错
-        error_reporting(E_ALL);
-        $theme = $_COOKIE['theme'];
+      // 开启报错
+      error_reporting(E_ALL);
+      $theme = $_COOKIE['theme'];
     }
-    
+
     return $theme;
-    
+
 
     // return $_COOKIE['theme'] || self::GetRequestData()['theme'] || Option::Get('theme') || Config::GetDefaultTheme();
     // return $_COOKIE['theme'];
@@ -380,8 +382,8 @@ class Share
    */
   public static function GetClientUserToken()
   {
-    $user_token = self::GetCookie('user_token') ?? self::GetCookie('user_token') ?? $_COOKIE['user_token']?? '';
-    if($user_token==1){
+    $user_token = self::GetCookie('user_token') ?? self::GetCookie('user_token') ?? $_COOKIE['user_token'] ?? '';
+    if ($user_token == 1) {
       $user_token = $_COOKIE['user_token'];
     }
     return $user_token;
@@ -527,31 +529,175 @@ class Share
    * @param array $request_data 请求数据
    * @return void
    */
-  public static function SaveRequest($request_data){
+  public static function SaveRequest($request_data)
+  {
     return; //暂时不记录请求日志
-    if(!Config::Dev()){
+    if (!Config::Dev()) {
       //如果是开发环境，则不记录请求日志
       return;
     }
-    
+
     //将请求地址和请求数据输出到/log/request.json
     $requestIP = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
     $requestUri = $_SERVER['REQUEST_URI'];
     $requestMethod = $_SERVER['REQUEST_METHOD'];
     $requestData = file_get_contents('php://input');
     $logData = [
-        'ip' => $requestIP,
-        'uri' => $requestUri,
-        'method' => $requestMethod,
-        'data' => $requestData,
-        'return' => $request_data,
-        'timestamp' => date('Y-m-d H:i:s'),
+      'ip' => $requestIP,
+      'uri' => $requestUri,
+      'method' => $requestMethod,
+      'data' => $requestData,
+      'return' => $request_data,
+      'timestamp' => date('Y-m-d H:i:s'),
     ];
     $date = date('Y-m-d');
     //检查是否创建目录
-    if (!is_dir('log/'.$date)) {
-        mkdir('log/'.$date, 0755, true);
+    if (!is_dir('log/' . $date)) {
+      mkdir('log/' . $date, 0755, true);
     }
-    file_put_contents('log/'.$date.'/request.json', json_encode($logData, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) . PHP_EOL, FILE_APPEND);
+    file_put_contents('log/' . $date . '/request.json', json_encode($logData, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) . PHP_EOL, FILE_APPEND);
+  }
+  /**
+   * 渲染错误页面
+   */
+  public static function RenderErrorPage(\Exception $e): string
+  {
+    $errorDetails = [
+      'message' => htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8'),
+      'code' => $e->getCode(),
+      'file' => htmlspecialchars($e->getFile(), ENT_QUOTES, 'UTF-8'),
+      'line' => $e->getLine(),
+      'trace' => nl2br(htmlspecialchars($e->getTraceAsString(), ENT_QUOTES, 'UTF-8'))
+    ];
+
+    return <<<HTML
+      <!DOCTYPE html>
+      <html lang="zh-CN">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Material Design Forum - 系统错误 System Error</title>
+          <style>
+              * { margin: 0; padding: 0; box-sizing: border-box; }
+              body { 
+                  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+                  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                  min-height: 100vh;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  padding: 20px;
+              }
+              .error-container {
+                  background: white;
+                  border-radius: 12px;
+                  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                  max-width: 800px;
+                  width: 100%;
+                  overflow: hidden;
+              }
+              .error-header {
+                  background: #f44336;
+                  color: white;
+                  padding: 20px;
+                  text-align: center;
+              }
+              .error-header h1 {
+                  font-size: 24px;
+                  margin-bottom: 5px;
+              }
+              .error-content {
+                  padding: 30px;
+              }
+              .error-section {
+                  margin-bottom: 25px;
+                  padding: 20px;
+                  background: #f8f9fa;
+                  border-radius: 8px;
+                  border-left: 4px solid #667eea;
+              }
+              .error-section h3 {
+                  color: #495057;
+                  margin-bottom: 10px;
+                  font-size: 18px;
+              }
+              .error-details {
+                  background: #2d3748;
+                  color: #e2e8f0;
+                  padding: 15px;
+                  border-radius: 6px;
+                  font-family: 'Courier New', monospace;
+                  font-size: 14px;
+                  overflow-x: auto;
+                  margin-top: 10px;
+              }
+              .action-buttons {
+                  display: flex;
+                  gap: 10px;
+                  margin-top: 20px;
+                  flex-wrap: wrap;
+              }
+              .btn {
+                  padding: 10px 20px;
+                  border: none;
+                  border-radius: 6px;
+                  text-decoration: none;
+                  font-weight: 500;
+                  cursor: pointer;
+                  transition: all 0.3s ease;
+              }
+              .btn-primary {
+                  background: #667eea;
+                  color: white;
+              }
+              .btn-secondary {
+                  background: #6c757d;
+                  color: white;
+              }
+              .btn:hover {
+                  transform: translateY(-2px);
+                  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+              }
+          </style>
+      </head>
+      <body>
+          <div class="error-container">
+              <div class="error-header">
+                  <h1>🚨 系统错误</h1>
+                  <p>Material Design Forum 遇到问题</p>
+              </div>
+              
+              <div class="error-content">
+                  <div class="error-section">
+                      <h3>错误信息</h3>
+                      <p>{$errorDetails['message']}</p>
+                  </div>
+                  
+                  <div class="error-section">
+                      <h3>错误详情</h3>
+                      <div class="error-details">
+                          错误代码: {$errorDetails['code']}<br>
+                          文件: {$errorDetails['file']}<br>
+                          行号: {$errorDetails['line']}<br>
+                      </div>
+                  </div>
+                  
+                  <div class="error-section">
+                      <h3>堆栈追踪</h3>
+                      <div class="error-details">
+                          {$errorDetails['trace']}
+                      </div>
+                  </div>
+                  
+                  <div class="action-buttons">
+                      <button class="btn btn-primary" onclick="location.reload()">🔄 刷新页面</button>
+                      <button class="btn btn-secondary" onclick="history.back()">⬅️ 返回上页</button>
+                      <a href="/" class="btn btn-primary">🏠 返回首页</a>
+                  </div>
+              </div>
+          </div>
+      </body>
+      </html>
+      HTML;
   }
 }

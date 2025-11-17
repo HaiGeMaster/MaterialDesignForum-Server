@@ -14,20 +14,17 @@
 namespace MaterialDesignForum\Controllers;
 
 use MaterialDesignForum\Models\Article as ArticleModel;
+
+use MaterialDesignForum\Controllers\Vote as VoteController;
+use MaterialDesignForum\Controllers\User as UserController;
 use MaterialDesignForum\Controllers\Token as TokenController;
-use MaterialDesignForum\Controllers\UserGroup as UserGroupController;
-use MaterialDesignForum\Controllers\TopicAble as TopicAbleController;
 use MaterialDesignForum\Controllers\Topic as TopicController;
 use MaterialDesignForum\Controllers\Follow as FollowController;
-use MaterialDesignForum\Controllers\Vote as VoteController;
-use MaterialDesignForum\Controllers\Comment as CommentController;
-use MaterialDesignForum\Controllers\Reply as ReplyController;
-use MaterialDesignForum\Plugins\Share;
+use MaterialDesignForum\Controllers\UserGroup as UserGroupController;
+use MaterialDesignForum\Controllers\TopicAble as TopicAbleController;
 use MaterialDesignForum\Controllers\Notification as NotificationController;
-// use MaterialDesignForum\Config\Config;
 
-use MaterialDesignForum\Controllers\User as UserController;
-use MaterialDesignForum\Models\Follow;
+use MaterialDesignForum\Plugins\Share;
 
 class Article extends ArticleModel
 {

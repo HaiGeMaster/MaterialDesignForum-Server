@@ -13,19 +13,18 @@
 namespace MaterialDesignForum\Controllers;
 
 use MaterialDesignForum\Models\Report as ReportModel;
+
 use MaterialDesignForum\Controllers\User as UserController;
-use MaterialDesignForum\Plugins\Share;
-
-use MaterialDesignForum\Controllers\UserGroup as UserGroupController;
 use MaterialDesignForum\Controllers\Topic as TopicController;
-use MaterialDesignForum\Controllers\Question as QuestionController;
-use MaterialDesignForum\Controllers\Article as ArticleController;
-use MaterialDesignForum\Controllers\Answer as AnswerController;
-use MaterialDesignForum\Controllers\Comment as CommentController;
 use MaterialDesignForum\Controllers\Reply as ReplyController;
-
 use MaterialDesignForum\Controllers\Token as TokenController;
-use MaterialDesignForum\Config\Config;
+use MaterialDesignForum\Controllers\Answer as AnswerController;
+use MaterialDesignForum\Controllers\Article as ArticleController;
+use MaterialDesignForum\Controllers\Comment as CommentController;
+use MaterialDesignForum\Controllers\Question as QuestionController;
+use MaterialDesignForum\Controllers\UserGroup as UserGroupController;
+
+use MaterialDesignForum\Plugins\Share;
 
 class Report extends ReportModel
 {

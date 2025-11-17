@@ -13,9 +13,11 @@
 
 namespace MaterialDesignForum\Controllers;
 
-use MaterialDesignForum\Models\UserGroup as UserGroupModel;
 use MaterialDesignForum\Models\User as UserModel;
+use MaterialDesignForum\Models\UserGroup as UserGroupModel;
+
 use MaterialDesignForum\Controllers\Token as TokenController;
+
 use MaterialDesignForum\Plugins\Share;
 // use MaterialDesignForum\Config\Config;
 

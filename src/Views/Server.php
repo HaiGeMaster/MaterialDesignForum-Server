@@ -13,8 +13,6 @@
 namespace MaterialDesignForum\Views;
 
 use MaterialDesignForum\Plugins\Share;
-use MaterialDesignForum\Plugins\i18n;
-use MaterialDesignForum\Models\Option;
 
 class Server
 {

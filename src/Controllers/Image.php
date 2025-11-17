@@ -14,8 +14,9 @@
 namespace MaterialDesignForum\Controllers;
 
 use Md\MDAvatars;
-// use Intervention\Image\ImageManager;
+
 use MaterialDesignForum\Models\Image as ImageModel;
+
 use MaterialDesignForum\Plugins\Share;
 
 class Image extends ImageModel

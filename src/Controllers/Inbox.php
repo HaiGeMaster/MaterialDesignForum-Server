@@ -13,20 +13,13 @@
 namespace MaterialDesignForum\Controllers;
 
 use MaterialDesignForum\Models\Inbox as InboxModel;
-use MaterialDesignForum\Controllers\Token as TokenController;
+
 use MaterialDesignForum\Controllers\User as UserController;
+use MaterialDesignForum\Controllers\Token as TokenController;
 use MaterialDesignForum\Controllers\UserGroup as UserGroupController;
+
 use MaterialDesignForum\Plugins\Share;
-// protected $fillable = [
-//   'inbox_id',
-//   'sender_id',
-//   'sender_type',
-//   'receiver_id',
-//   'content_markdown',
-//   'content_rendered',
-//   'create_time',
-//   'read_time'
-// ];
+
 class Inbox extends InboxModel
 {
   //角色类型：系统system，用户user_id

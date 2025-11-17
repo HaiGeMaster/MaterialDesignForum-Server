@@ -11,6 +11,7 @@
  */
 
 use Illuminate\Database\Capsule\Manager as Capsule;
+
 use MaterialDesignForum\Config\Config;
 
 $capsule = new Capsule();

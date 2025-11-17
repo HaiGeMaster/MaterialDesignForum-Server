@@ -12,8 +12,8 @@
 
 namespace MaterialDesignForum\Controllers;
 
-use MaterialDesignForum\Plugins\Share;
 use MaterialDesignForum\Models\Vote as VoteModel;
+
 use MaterialDesignForum\Controllers\Token as TokenController;
 use MaterialDesignForum\Controllers\Reply as ReplyController;
 use MaterialDesignForum\Controllers\Answer as AnswerController;
@@ -22,6 +22,7 @@ use MaterialDesignForum\Controllers\Comment as CommentController;
 use MaterialDesignForum\Controllers\UserGroup as UserGroupController;
 use MaterialDesignForum\Controllers\Notification as NotificationController;
 
+use MaterialDesignForum\Plugins\Share;
 
 class Vote extends VoteModel
 {

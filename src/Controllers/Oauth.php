@@ -14,10 +14,9 @@
 namespace MaterialDesignForum\Controllers;
 
 use MaterialDesignForum\Models\Oauth as OauthModel;
+
 use MaterialDesignForum\Controllers\Token as TokenController;
 use MaterialDesignForum\Controllers\Option as OptionController;
-
-
 
 class Oauth extends OauthModel
 {

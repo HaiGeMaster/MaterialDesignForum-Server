@@ -13,14 +13,16 @@
 
 namespace MaterialDesignForum\Controllers;
 
-use MaterialDesignForum\Plugins\Share;
 use MaterialDesignForum\Models\Follow as FollowModel;
+
 use MaterialDesignForum\Controllers\User as UserController;
 use MaterialDesignForum\Controllers\Token as TokenController;
 use MaterialDesignForum\Controllers\Topic as TopicController;
-use MaterialDesignForum\Controllers\Question as QuestionController;
 use MaterialDesignForum\Controllers\Article as ArticleController;
+use MaterialDesignForum\Controllers\Question as QuestionController;
 use MaterialDesignForum\Controllers\Notification as NotificationController;
+
+use MaterialDesignForum\Plugins\Share;
 
 class Follow extends FollowModel
 {

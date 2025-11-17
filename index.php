@@ -7,12 +7,7 @@ header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 use MaterialDesignForum\Routes\Api;
 use MaterialDesignForum\Routes\Page;
 use MaterialDesignForum\Config\Install;
-// use Dotenv\Dotenv as Dotenv;
-
-// //输出从请求标头中获取的内容
-// echo json_encode(getallheaders());
-// return;
-
+use MaterialDesignForum\Plugins\Share;
 try {
 
   // $dotenv = Dotenv::createImmutable('././');
@@ -85,5 +80,8 @@ try {
 
   echo '</body>';
   echo '</html>';
+
+  // header('Content-Type: text/html; charset=utf-8');
+  // Share::RenderErrorPage($e);
   exit;
 }

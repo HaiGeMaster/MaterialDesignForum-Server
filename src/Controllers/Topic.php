@@ -12,15 +12,17 @@
 
 namespace MaterialDesignForum\Controllers;
 
-use MaterialDesignForum\Plugins\Share;
 use MaterialDesignForum\Models\Topic as TopicModel;
+
+use MaterialDesignForum\Controllers\User as UserController;
 use MaterialDesignForum\Controllers\Image as ImageController;
 use MaterialDesignForum\Controllers\Token as TokenController;
-use MaterialDesignForum\Controllers\User as UserController;
-use MaterialDesignForum\Controllers\UserGroup as UserGroupController;
 use MaterialDesignForum\Controllers\Follow as FollowController;
+use MaterialDesignForum\Controllers\UserGroup as UserGroupController;
 use MaterialDesignForum\Controllers\TopicAble as TopicAbleController;
 use MaterialDesignForum\Controllers\Notification as NotificationController;
+
+use MaterialDesignForum\Plugins\Share;
 
 class Topic extends TopicModel
 {

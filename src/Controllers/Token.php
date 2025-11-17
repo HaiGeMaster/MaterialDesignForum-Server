@@ -12,9 +12,11 @@
 
 namespace MaterialDesignForum\Controllers;
 
-use MaterialDesignForum\Models\Token as TokenModel;
 use MaterialDesignForum\Models\User as UserModel;
+use MaterialDesignForum\Models\Token as TokenModel;
+
 use MaterialDesignForum\Controllers\UserGroup as UserGroupController;
+
 use MaterialDesignForum\Plugins\Share;
 
 class Token extends TokenModel

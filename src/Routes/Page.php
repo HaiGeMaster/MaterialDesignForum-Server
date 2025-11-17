@@ -13,16 +13,20 @@
 
 namespace MaterialDesignForum\Routes;
 
-use Phroute\Phroute\RouteCollector;
 use Phroute\Phroute\Dispatcher;
+use Phroute\Phroute\RouteCollector;
 use Phroute\Phroute\Exception\HttpRouteNotFoundException;
+
+use MaterialDesignForum\Config\Config;
+use MaterialDesignForum\Config\Install;
+
+use MaterialDesignForum\Controllers\Image;
+
 use MaterialDesignForum\Plugins\Share;
 use MaterialDesignForum\Plugins\i18n;
-use MaterialDesignForum\Config\Config;
-use MaterialDesignForum\Controllers\Image;
+
 use MaterialDesignForum\Views\Client;
 use MaterialDesignForum\Views\Admin;
-use MaterialDesignForum\Config\Install;
 
 class Page
 {

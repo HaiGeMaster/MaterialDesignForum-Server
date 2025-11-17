@@ -14,7 +14,9 @@
 namespace MaterialDesignForum\Controllers;
 
 use MaterialDesignForum\Models\Option as OptionModel;
+
 use MaterialDesignForum\Controllers\UserGroup as UserGroupController;
+
 use MaterialDesignForum\Plugins\Share;
 
 class Option extends OptionModel

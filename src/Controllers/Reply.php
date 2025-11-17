@@ -14,17 +14,16 @@
 namespace MaterialDesignForum\Controllers;
 
 use MaterialDesignForum\Models\Reply as ReplyModel;
+
 use MaterialDesignForum\Controllers\User as UserController;
-use MaterialDesignForum\Controllers\Token as TokenController;
-use MaterialDesignForum\Controllers\UserGroup as UserGroupController;
-// use MaterialDesignForum\Controllers\Follow as FollowController;
-use MaterialDesignForum\Controllers\Comment as CommentController;
 use MaterialDesignForum\Controllers\Vote as VoteController;
+use MaterialDesignForum\Controllers\Token as TokenController;
 use MaterialDesignForum\Controllers\Answer as AnswerController;
-// use MaterialDesignForum\Controllers\Question as QuestionController;
-use MaterialDesignForum\Plugins\Share;
+use MaterialDesignForum\Controllers\Comment as CommentController;
+use MaterialDesignForum\Controllers\UserGroup as UserGroupController;
 use MaterialDesignForum\Controllers\Notification as NotificationController;
-// use MaterialDesignForum\Config\Config;
+
+use MaterialDesignForum\Plugins\Share;
 
 class Reply extends ReplyModel
 {

@@ -13,6 +13,7 @@
 namespace MaterialDesignForum\Controllers;
 
 use MaterialDesignForum\Models\Cache as CacheModel;
+
 use MaterialDesignForum\Plugins\Share;
 
 class Cache extends CacheModel
