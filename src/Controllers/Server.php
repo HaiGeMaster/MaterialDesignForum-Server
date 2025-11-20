@@ -96,39 +96,105 @@ class Server
     }
     $startTimestamp = null;
     $endTimestamp = null;
-    // 获取时间段 从当前时间开始。分别有：last_7_days, this_month, last_month, last_30_days, this_year, last_year, last_1_year
-    if ($time_type == 'last_7_days') {
-      $startTimestamp = strtotime('-7 days');
-      $endTimestamp = Share::ServerTime();
-    } else if ($time_type == 'this_month') {
-      $startTimestamp = strtotime(date('Y-m-01'));
-      $endTimestamp = Share::ServerTime();
-    } else if ($time_type == 'last_month') {
-      $startTimestamp = strtotime(date('Y-m-01', strtotime('-1 month')));
-      $endTimestamp = strtotime(date('Y-m-01')) - 1;
-    } else if ($time_type == 'last_30_days') {
-      $startTimestamp = strtotime('-30 days');
-      $endTimestamp = Share::ServerTime();
-    } else if ($time_type == 'this_year') {
-      $startTimestamp = strtotime(date('Y-01-01'));
-      $endTimestamp = Share::ServerTime();
-    } else if ($time_type == 'last_year') {
-      $startTimestamp = strtotime(date('Y-01-01', strtotime('-1 year')));
-      $endTimestamp = strtotime(date('Y-01-01')) - 1;
-    } else if ($time_type == 'last_1_year') {
-      $startTimestamp = strtotime('-1 year');
-      $endTimestamp = Share::ServerTime();
-    }//如果time_type是其他则将视为年份文本,startTimestamp为年份的1月1日，endTimestamp为年份的12月31日23:59:59
-    else if (is_numeric($time_type)) {
-      $startTimestamp = strtotime($time_type . '-01-01');
-      $endTimestamp = strtotime($time_type . '-12-31 23:59:59');
+
+    // last_7_days 最近 7 天
+    // this_month 本月
+    // last_month 上月
+    // last_30_days 最近 30 天
+    // this_year 今年
+    // last_year 去年
+    // last_1_year 最近 1 年
+    // 其他 自定义年份
+
+    // // 获取时间段 从当前时间开始。分别有：last_7_days, this_month, last_month, last_30_days, this_year, last_year, last_1_year
+    // if ($time_type == 'last_7_days') {
+    //   $startTimestamp = strtotime('-7 days');
+    //   $endTimestamp = Share::ServerTime();
+    // } else if ($time_type == 'this_month') {
+    //   $startTimestamp = strtotime(date('Y-m-01'));
+    //   $endTimestamp = Share::ServerTime();
+    // } else if ($time_type == 'last_month') {
+    //   $startTimestamp = strtotime(date('Y-m-01', strtotime('-1 month')));
+    //   $endTimestamp = strtotime(date('Y-m-01')) - 1;
+    // } else if ($time_type == 'last_30_days') {
+    //   $startTimestamp = strtotime('-30 days');
+    //   $endTimestamp = Share::ServerTime();
+    // } else if ($time_type == 'this_year') {
+    //   $startTimestamp = strtotime(date('Y-01-01'));
+    //   $endTimestamp = Share::ServerTime();
+    // } else if ($time_type == 'last_year') {
+    //   $startTimestamp = strtotime(date('Y-01-01', strtotime('-1 year')));
+    //   $endTimestamp = strtotime(date('Y-01-01')) - 1;
+    // } else if ($time_type == 'last_1_year') {
+    //   //这个是最近1年的时间，从本月往回推1年
+    //   $startTimestamp = strtotime(date('Y-m-01', strtotime('-1 year')));
+    //   $endTimestamp = Share::ServerTime();
+    // }//如果time_type是其他则将视为年份文本,startTimestamp为年份的1月1日，endTimestamp为年份的12月31日23:59:59
+    // else if (is_numeric($time_type)) {
+    //   $startTimestamp = strtotime($time_type . '-01-01');
+    //   $endTimestamp = strtotime($time_type . '-12-31 23:59:59');
+    // }
+
+    // 获取当前时间戳（减少重复调用）
+    $now = Share::ServerTime();
+
+    // 使用 DateTime 提升日期计算可读性和准确性
+    $date = new \DateTime();
+
+    switch ($time_type) {
+      case 'last_7_days':
+        $date->modify('-7 days');
+        $startTimestamp = $date->getTimestamp();
+        $endTimestamp = $now;
+        break;
+
+      case 'this_month':
+        $startTimestamp = (new \DateTime('first day of this month'))->getTimestamp();
+        $endTimestamp = $now;
+        break;
+
+      case 'last_month':
+        $startTimestamp = (new \DateTime('first day of last month'))->getTimestamp();
+        $endTimestamp = (new \DateTime('last day of last month'))->getTimestamp() + 86399; // 23:59:59
+        break;
+
+      case 'last_30_days':
+        $date->modify('-30 days');
+        $startTimestamp = $date->getTimestamp();
+        $endTimestamp = $now;
+        break;
+
+      case 'this_year':
+        $startTimestamp = (new \DateTime('first day of january'))->getTimestamp();
+        $endTimestamp = $now;
+        break;
+
+      case 'last_year':
+        $startTimestamp = (new \DateTime('first day of january last year'))->getTimestamp();
+        $endTimestamp = (new \DateTime('last day of december last year'))->getTimestamp() + 86399;
+        break;
+
+      case 'last_1_year':
+        $startTimestamp = (new \DateTime('first day of this month last year'))->getTimestamp();
+        $endTimestamp = $now;
+        break;
+
+      default:
+        // 处理年份数字输入
+        if (is_numeric($time_type)) {
+          $year = $time_type;
+          $startTimestamp = strtotime("$year-01-01");
+          $endTimestamp = strtotime("$year-12-31 23:59:59");
+        } else {
+          // 默认当前月
+          $startTimestamp = (new \DateTime('first day of this month'))->getTimestamp();
+          $endTimestamp = $now;
+        }
     }
 
     $model = null;
-
     $data = null;
-
-    switch ($model_type) {//user、user_group、report、topic、question、answer、article、comment、reply
+    switch ($model_type) { //user、user_group、report、topic、question、answer、article、comment、reply
       case 'user':
         $model = UserModel::class;
         break;
@@ -157,13 +223,11 @@ class Server
         $model = ReplyModel::class;
         break;
     }
-
-
     if ($model) {
 
       $formattedData = [];
       // 如果$time_type包含year，最多只会有12条月份数据
-      if (strpos($time_type, 'year') !== false) {
+      if (in_array($time_type, ['this_year', 'last_year', 'last_1_year'])) {
 
         for ($currentDate = $startTimestamp; $currentDate < $endTimestamp; $currentDate = strtotime('+1 month', $currentDate)) {
           // Calculate the start and end of the current month
@@ -182,7 +246,7 @@ class Server
           ];
         }
       } // 如果$time_type包含this和last，最多只会有30条天数数据
-      else if(strpos($time_type, 'this') !== false || strpos($time_type, 'last') !== false) {
+      else if (in_array($time_type, ['last_7_days', 'this_month', 'last_month', 'last_30_days'])) {
         for ($currentDate = $startTimestamp; $currentDate < $endTimestamp; $currentDate += 86400) {
           // 计算当前天的结束时间戳（当前日期的最后一秒）
           $nextDate = $currentDate + 86399;
@@ -198,8 +262,8 @@ class Server
             'count' => $count,
           ];
         }
-      }//剩余的都视为年份数字，比如2023，则取2023年1月到2023年12月的数据，共12条
-      else{
+      } //剩余的都视为年份数字，比如2023，则取2023年1月到2023年12月的数据，共12条
+      else {
         for ($currentDate = $startTimestamp; $currentDate < $endTimestamp; $currentDate = strtotime('+1 month', $currentDate)) {
           // Calculate the start and end of the current month
           $startOfMonth = $currentDate;
@@ -217,7 +281,6 @@ class Server
           ];
         }
       }
-
       $data = $formattedData;
     }
 

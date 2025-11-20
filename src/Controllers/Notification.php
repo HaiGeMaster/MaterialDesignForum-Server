@@ -54,6 +54,10 @@ class Notification extends NotificationModel
    * @property string reply_like 回复被点赞
    * @property string reply_reply 回复被回复
    * @property string reply_delete 回复被删除
+   * @property string follow_user_update 关注用户更新
+   * @property string follow_topic_update 关注话题更新
+   * @property string follow_question_update 关注提问更新
+   * @property string follow_article_update 关注文章更新
    */
   /**
    * 添加互动通知 此方法不对外开放 仅供内部调用
@@ -576,7 +580,7 @@ class Notification extends NotificationModel
     $data = self::GetUserOptionNotificationValue($user_id);
     if ($data != null) {
       if (array_key_exists($type, $data)) {
-        // return $data[$type];//相当于返回了[web_message=>bool,email_message=>bool]
+        // return $data[$type];//相当于返回了 type [web_message=>bool,email_message=>bool]
         return [
           'web_message' => $data[$type]['web_message'],
           'email_message' => $data[$type]['email_message'],

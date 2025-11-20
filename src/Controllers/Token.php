@@ -21,37 +21,6 @@ use MaterialDesignForum\Plugins\Share;
 
 class Token extends TokenModel
 {
-  // /**
-  //  * 创建用户token
-  //  * @param $user_id
-  //  * @param $device
-  //  * @return Token
-  //  */
-  // public static function CreateUserToken($user_id, $device = null)
-  // {
-  //   if ($device == null) {
-  //     $device = $_SERVER['HTTP_USER_AGENT'];
-  //   }
-  //   //先查询token是否大于5个，如果大于5个则删除最早的一个
-  //   $tokenCount = Token::where('user_id', $user_id)->count();
-  //   if ($tokenCount >= 5) {
-  //     $token = Token::where('user_id', $user_id)->orderBy('create_time', 'asc')->first();
-  //     $token->delete();
-  //   }
-
-  //   $token = md5(uniqid());
-  //   $expireTime = Share::ServerTime() + 3600 * 24 * 30;
-  //   $token = new Token();
-  //   $token->token = $token;
-  //   $token->user_id = $user_id;
-  //   $token->device = $device;
-  //   $token->create_time = Share::ServerTime();
-  //   $token->update_time = Share::ServerTime();
-  //   $token->expire_time = $expireTime;
-  //   $token->save();
-  //   return $token;
-  // }
-
   /**
    * 生成用户Token 仅允许用户在密码验证成功后调用
    * @param UserModel $user 用户模型
