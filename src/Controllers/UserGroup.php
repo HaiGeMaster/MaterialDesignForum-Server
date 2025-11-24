@@ -68,7 +68,7 @@ class UserGroup extends UserGroupModel
   /**
    * 验证用户的权限是否满足 only_no项如果true则只有没有xx项目才能xx
    * @param string $token token字符串
-   * @param string $name 权限名称
+   * @param string|array $name 权限名称 支持数组输入多个权限名称鉴权
    * @param string $ability = [
    * @param string 'ability_normal_login',//用户前台登录
    * @param string 'ability_admin_login',//管理员登录
@@ -117,7 +117,7 @@ class UserGroup extends UserGroupModel
    * @param string '];
    * @return bool 是否满足
    */
-  public static function Ability($token, $name): bool
+  public static function Ability(string $token, string|array $name): bool
   {
     $ability = [
       'is_admin',
@@ -168,9 +168,27 @@ class UserGroup extends UserGroupModel
       'ability_edit_own_info',
       'ability_vote',
     ];
-    if (!in_array($name, $ability)) {
+    // if (!in_array($name, $ability)) {
+    //   return false;
+    // }
+
+    if($name == null || $name == ''){
       return false;
     }
+
+    //支持数组权限检查
+    if (is_array($name)) {
+      foreach ($name as $ability_name) {
+        if (!in_array($ability_name, $ability)) {
+          return false;
+        }
+      }
+    } else {
+      if (!in_array($name, $ability)) {
+        return false;
+      }
+    }
+
     $user_id = null;
 
     if ($token == null || $token == '') {

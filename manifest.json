@@ -1,41 +1,35 @@
 {
-  "name": "MaterialDesignForum",
-  "short_name": "MDF",
-  "start_url": "https://mdf.xbedrock.com",
-  "display": "standalone",
-  "background_color": "#000000",
-  "description": "MaterialDesignForum For Vuetify2",
+  "name": "Material Design Forum",
+  "short_name": "MDForum",
+  "description": "一个Material Design风格的中文论坛。",
   "icons": [
     {
-      "src": "public/themes/MaterialDesignVuetify2/new_icon/MDF72.png",
-      "sizes": "72x72",
-      "type": "image/png"
-    },
-    {
-      "src": "public/themes/MaterialDesignVuetify2/new_icon/MDF96.png",
-      "sizes": "96x96",
-      "type": "image/png"
-    },
-    {
-      "src": "public/themes/MaterialDesignVuetify2/new_icon/MDF144.png",
-      "sizes": "144x144",
-      "type": "image/png"
-    },
-    {
-      "src": "public/themes/MaterialDesignVuetify2/new_icon/MDF168.png",
-      "sizes": "168x168",
-      "type": "image/png"
-    },
-    {
-      "src": "public/themes/MaterialDesignVuetify2/new_icon/MDF192.png",
+      "src": "/assets/md3.webp",
       "sizes": "192x192",
-      "type": "image/png"
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/md3.webp",
+      "sizes": "192x192",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/assets/md3.webp",
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/md3.webp",
+      "sizes": "512x512",
+      "purpose": "maskable"
     }
   ],
-  "related_applications": [
-    {
-      "platform": "play",
-      "url": ""
-    }
-  ]
+  "lang": "zh-Hans",
+  "dir": "ltr",
+  "display": "standalone",
+  "scope": "/",
+  "id": "/",
+  "start_url": "/",
+  "background_color": "#e1eef9",
+  "theme_color": "#e1eef9"
 }

@@ -290,8 +290,19 @@ class User extends UserModel
   public static function GetClientLocation()
   {
     $ip = self::GetClientIP();
-    $Location = IpLocation::getLocation($ip);
-    return $Location['country'] . ' ' . $Location['province'] . ' ' . $Location['city'] . ' ' . $Location['county'] . ' ' . $Location['isp'];
+    //$ip如果是两个ip的情况，两个并取
+    if (strpos($ip, ',') !== false) {
+      $ip1 = explode(',', $ip)[0];
+      $ip2 = explode(',', $ip)[1];
+      $Location1 = IpLocation::getLocation($ip1);
+      $Location2 = IpLocation::getLocation($ip2);
+      $LocationText1 = $Location1['country'] . ' ' . $Location1['province'] . ' ' . $Location1['city'] . ' ' . $Location1['county'] . ' ' . $Location1['isp'];
+      $LocationText2 = $Location2['country'] . ' ' . $Location2['province'] . ' ' . $Location2['city'] . ' ' . $Location2['county'] . ' ' . $Location2['isp'];
+      return $LocationText1 . ',' . $LocationText2;
+    }else{
+      $Location = IpLocation::getLocation($ip);
+      return $Location['country'] . ' ' . $Location['province'] . ' ' . $Location['city'] . ' ' . $Location['county'] . ' ' . $Location['isp'];
+    }
   }
   /**
    * 请求发送邮件验证码

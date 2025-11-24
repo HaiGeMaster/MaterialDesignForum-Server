@@ -21,7 +21,7 @@ use MaterialDesignForum\Config\Config;
 use MaterialDesignForum\Config\Install;
 
 use MaterialDesignForum\Controllers\Image;
-
+use MaterialDesignForum\Controllers\Option;
 use MaterialDesignForum\Plugins\Share;
 use MaterialDesignForum\Plugins\i18n;
 
@@ -30,9 +30,31 @@ use MaterialDesignForum\Views\Admin;
 
 class Page
 {
+  public static function HandleManifest($dark = null)
+  {
+    //读取manifest.json
+    $manifest = file_get_contents(__DIR__ . '/../../manifest.json');
+    //解析manifest.json
+    $manifest = json_decode($manifest, true);
+    //设置lang
+    $manifest['name'] = Option::Get('site_name');
+    $manifest['short_name'] = Option::Get('site_name');
+    $manifest['description'] = Option::Get('site_description');
+    $manifest['lang'] = i18n::t('Message.langInfo.bcp47');
+    $background_color = json_decode(Option::Get('theme_color_param'), true);
+    $primary_color = $dark ? $background_color['dark']['primary'] : $background_color['light']['primary'];
+    $manifest['background_color'] = $primary_color;
+    $manifest['theme_color'] = $primary_color;
+    //返回manifest.json
+    header('Content-Type: application/manifest+json; charset=utf-8');
+    return json_encode($manifest, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+  }
   public static function HandleRoute()
   {
     $collector = new RouteCollector();
+    $collector->get('/webmanifest.json/{dark}?', function ($dark = null) {
+      return self::HandleManifest($dark);
+    });
     $collector->get('/info', function () {
       return Share::HandleThemePage(
         i18n::i18n()->locale,
