@@ -360,8 +360,7 @@ class Api
         \MaterialDesignForum\Controllers\Follow::Follow(
           $data['user_token'] ?? '',
           $data['followable_type'],
-          $data['followable_id'],
-          true
+          $data['followable_id']
         )
       );
     });

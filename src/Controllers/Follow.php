@@ -60,15 +60,26 @@ class Follow extends FollowModel
    * @param int $user_token 用户ID或token
    * @param string $followable_type 关注类型
    * @param int $followable_id 关注ID
+   * @param bool $user_token_as_user_id 用户token是否作为用户ID，让其可以通过系统调用代替某个用户关注某个对象
    * @return array [is_follow:是否关注 followable_type:关注类型 followable_id:关注ID followable_object:关注对象]
    */
-  public static function Follow($user_token, $followable_type, $followable_id): array
+  public static function Follow(string|int $user_token, $followable_type, $followable_id, $user_token_as_user_id = false): array
   {
     // $user_id = !$user_is_token ? $user : TokenController::GetUserId($user);
-    $user_id = TokenController::GetUserId($user_token);
+    // $user_id = TokenController::GetUserId($user_token);
 
-    //用户不能关注自己
-    if ($user_id == $followable_id && $followable_type == 'user') {
+    $user_id = 0;
+    if ($user_token_as_user_id === true) {//让其可以通过系统调用代替某个用户关注某个对象
+      $user_id = $user_token;
+    }else{
+      $user_id = TokenController::GetUserId($user_token);
+    }
+    
+    //用户不能关注自己 或 系统调用代替某个用户关注某个对象时用户ID为 0
+    if (
+      ($user_id == $followable_id && $followable_type == 'user')||
+      $user_id == 0||$user_id == null
+    ) {
       return [
         'is_follow' => false,
         'followable_type' => $followable_type,

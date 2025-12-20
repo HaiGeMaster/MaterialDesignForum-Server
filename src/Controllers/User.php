@@ -45,33 +45,33 @@ class User extends UserModel
    * @param string $user_token 对应的用户token。可以为空
    * @return OauthModel|null 返回添加或更新后的Oauth模型实例或null
    */
-  public static function OauthLoginOrRegister($oauthName, $oauthUserId, $oauthUserName, $oauthUserMail, $oauthSourceResponse, $user_token):array
+  public static function OauthLoginOrRegister($oauthName, $oauthUserId, $oauthUserName, $oauthUserMail, $oauthSourceResponse, $user_token): array
   {
     $is_login = false;
     $token = '';
     //首先根据oauthUserId和oauthName查找是否存在对应的Oauth记录
     $oauthUser = OauthController::GetOauthUser($oauthName, $oauthUserId);
-    if ($oauthUser) {//如果有绑定第三方平台记录，则直接查找对应用户去让其登录账号
+    if ($oauthUser) { //如果有绑定第三方平台记录，则直接查找对应用户去让其登录账号
       $user_id = $oauthUser->user_id;
       $local_user = self::where('user_id', '=', $user_id)
         ->where('disable_time', '=', 0)
         ->first();
-        if($local_user){
-          //顺便更新oauth记录的用户名
-          $update_oauth = OauthController::where('oauth_id', '=', $oauthUser->oauth_id)
-            ->update([
-              'oauth_user_name' => $oauthUserName,
-            ]);
-          $is_login = true;
-          $token = TokenController::SpawnUserToken($local_user);
-        }
-    }else if ($user_token) { //如果没有绑定第三方平台记录，且传入用户token，则根据token查找用户
+      if ($local_user) {
+        //顺便更新oauth记录的用户名
+        $update_oauth = OauthController::where('oauth_id', '=', $oauthUser->oauth_id)
+          ->update([
+            'oauth_user_name' => $oauthUserName,
+          ]);
+        $is_login = true;
+        $token = TokenController::SpawnUserToken($local_user);
+      }
+    } else if ($user_token) { //如果没有绑定第三方平台记录，且传入用户token，则根据token查找用户
       $user_id = TokenController::GetUserId($user_token);
       if ($user_id) {
         $local_user = self::where('user_id', '=', $user_id)
           ->where('disable_time', '=', 0)
           ->first();
-        if ($local_user) {//为其绑定Oauth记录
+        if ($local_user) { //为其绑定Oauth记录
           $oauthUser = OauthController::AddOauthUser($oauthName, $oauthUserId, $oauthUserName, $oauthUserMail, $oauthSourceResponse, $local_user->user_id);
           if ($oauthUser) {
             $is_login = true;
@@ -79,13 +79,13 @@ class User extends UserModel
           }
         }
       }
-    }else{//如果没有绑定第三方平台记录，则根据 oauthUserMail 查找是否有对应的用户
+    } else { //如果没有绑定第三方平台记录，则根据 oauthUserMail 查找是否有对应的用户
       $local_user = self::where('email', '=', $oauthUserMail)
         ->where('disable_time', '=', 0)
         ->first();
       if ($local_user) { //如果有对应的用户，则添加或更新Oauth记录
         $oauthUser = OauthController::AddOauthUser($oauthName, $oauthUserId, $oauthUserName, $oauthUserMail, $oauthSourceResponse, $local_user->user_id);
-        if ($oauthUser) {// 如果添加或更新成功，则登录用户
+        if ($oauthUser) { // 如果添加或更新成功，则登录用户
           $is_login = true;
           $token = TokenController::SpawnUserToken($local_user);
         }
@@ -106,7 +106,7 @@ class User extends UserModel
           'avatar' => self::CreateDefaultAvatar($oauthUserName),
           'cover' => self::CreateDefaultCover()
         ]);
-        if ($new_user) {//如果新用户注册成功，则添加或更新Oauth记录
+        if ($new_user) { //如果新用户注册成功，则添加或更新Oauth记录
           $new_user_model = self::where('email', '=', $oauthUserMail)->first();
           if ($new_user_model) {
             $oauthUser = OauthController::AddOauthUser($oauthName, $oauthUserId, $oauthUserName, $oauthUserMail, $oauthSourceResponse, $new_user_model->user_id);
@@ -222,9 +222,10 @@ class User extends UserModel
           $user_data->username = $username;
           $user_data->email = $email;
 
-          if (UserGroupController::IsAdmin($user_token)&&
-            $user_group_id!=$user_data->user_group_id//用户组不相同时才更新。
-            ) { //确定是否是管理员再修改用户组
+          if (
+            UserGroupController::IsAdmin($user_token) &&
+            $user_group_id != $user_data->user_group_id //用户组不相同时才更新。
+          ) { //确定是否是管理员再修改用户组
             UserGroupController::MoveUserGroups(
               $user_group_id,
               [$edit_target_user_id]
@@ -296,10 +297,34 @@ class User extends UserModel
       $ip2 = explode(',', $ip)[1];
       $Location1 = IpLocation::getLocation($ip1);
       $Location2 = IpLocation::getLocation($ip2);
-      $LocationText1 = $Location1['country'] . ' ' . $Location1['province'] . ' ' . $Location1['city'] . ' ' . $Location1['county'] . ' ' . $Location1['isp'];
-      $LocationText2 = $Location2['country'] . ' ' . $Location2['province'] . ' ' . $Location2['city'] . ' ' . $Location2['county'] . ' ' . $Location2['isp'];
-      return $LocationText1 . ',' . $LocationText2;
-    }else{
+
+      // return $LocationText1 . ',' . $LocationText2;
+      if (
+        isset($Location1['error']) ||
+        !isset($Location1['country']) ||
+        !isset($Location1['province']) ||
+        !isset($Location1['city']) ||
+        !isset($Location1['county']) ||
+        !isset($Location1['isp'])
+      ) {
+        // return $LocationText2;
+        return $Location2['country'] . ' ' . $Location2['province'] . ' ' . $Location2['city'] . ' ' . $Location2['county'] . ' ' . $Location2['isp'];
+      } else if (
+        isset($Location2['error']) ||
+        !isset($Location2['country']) ||
+        !isset($Location2['province']) ||
+        !isset($Location2['city']) ||
+        !isset($Location2['county']) ||
+        !isset($Location2['isp'])
+      ) {
+        // return $LocationText1;
+        return $Location1['country'] . ' ' . $Location1['province'] . ' ' . $Location1['city'] . ' ' . $Location1['county'] . ' ' . $Location1['isp'];
+      } else {
+        $LocationText1 = $Location1['country'] . ' ' . $Location1['province'] . ' ' . $Location1['city'] . ' ' . $Location1['county'] . ' ' . $Location1['isp'];
+        $LocationText2 = $Location2['country'] . ' ' . $Location2['province'] . ' ' . $Location2['city'] . ' ' . $Location2['county'] . ' ' . $Location2['isp'];
+        return $LocationText1 . ',' . $LocationText2;
+      }
+    } else {
       $Location = IpLocation::getLocation($ip);
       return $Location['country'] . ' ' . $Location['province'] . ' ' . $Location['city'] . ' ' . $Location['county'] . ' ' . $Location['isp'];
     }
@@ -504,8 +529,7 @@ class User extends UserModel
   {
     $user = self::find($user_id);
 
-    if($user==null)
-    {
+    if ($user == null) {
       return [
         'is_get' => false,
         'user' => null,
@@ -1126,21 +1150,18 @@ class User extends UserModel
    * @param array $user_ids 用户id数组 使用此参数时 表示将用户从当前用户组迁移到新用户组
    */
   public static function SetUsersUserGroup(
-    $user_token, 
-    $user_group_id, 
+    $user_token,
+    $user_group_id,
     $old_user_group_id,
-    $user_ids)
-  {
+    $user_ids
+  ) {
     $is_set = false;
     $is_admin = UserGroupController::IsAdmin($user_token);
     if ($is_admin) {
       // $is_set = UserGroupController::MoveUserGroups($user_group_id, $user_ids);
-      if($old_user_group_id != null)
-      {
-        $is_set = UserGroupController::MoveAllUserGroupUsers($old_user_group_id,$user_group_id);
-      }
-      else
-      {
+      if ($old_user_group_id != null) {
+        $is_set = UserGroupController::MoveAllUserGroupUsers($old_user_group_id, $user_group_id);
+      } else {
         $is_set = UserGroupController::MoveUserGroups($user_group_id, $user_ids);
       }
     }

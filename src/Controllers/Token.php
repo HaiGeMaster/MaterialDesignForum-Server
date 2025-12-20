@@ -82,9 +82,10 @@ class Token extends TokenModel
     // $token->save();
     // return $token_text;
   }
+  
+  //  * 【※警告：基于 UserGroup 的类不可以使用，会死循环。】
   /**
    * 通过token获取用户ID 经过验证
-   * 【※警告：基于UserGroup的类不可以使用，会死循环。】
    * @param string $token token字符串
    * @return int|null 用户ID 从Token表中获取user_id 之后可做其它比较
    */
