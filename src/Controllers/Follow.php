@@ -57,20 +57,31 @@ class Follow extends FollowModel
   }
   /**
    * 关注或取消关注
-   * @param int $user_token 用户ID或token
+   * @param int $user_token 用户ID或token //string|array 为了兼容7.4版本的PHP 暂时不使用变量类型或定义
    * @param string $followable_type 关注类型
    * @param int $followable_id 关注ID
    * @param bool $user_token_as_user_id 用户token是否作为用户ID，让其可以通过系统调用代替某个用户关注某个对象
    * @return array [is_follow:是否关注 followable_type:关注类型 followable_id:关注ID followable_object:关注对象]
    */
-  public static function Follow(string|int $user_token, $followable_type, $followable_id, $user_token_as_user_id = false): array
+  public static function Follow(string $user_token, $followable_type, $followable_id, $user_token_as_user_id = false): array
   {
     // $user_id = !$user_is_token ? $user : TokenController::GetUserId($user);
     // $user_id = TokenController::GetUserId($user_token);
 
     $user_id = 0;
     if ($user_token_as_user_id === true) {//让其可以通过系统调用代替某个用户关注某个对象
-      $user_id = $user_token;
+      // $user_id = $user_token;
+      //尝试将其转换为整数
+      $user_id = intval($user_token);
+      //如果转换失败，说明用户token不是整数，返回错误
+      if ($user_id == 0) {
+        return [
+          'is_follow' => false,
+          'followable_type' => $followable_type,
+          'followable_id' => $followable_id,
+          'followable_object' => null
+        ];
+      }
     }else{
       $user_id = TokenController::GetUserId($user_token);
     }

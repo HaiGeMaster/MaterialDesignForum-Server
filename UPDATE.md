@@ -2,6 +2,17 @@
 
 ### 版本更新日志
 
+#### 2026-01-12 版本更新
+**新增功能**
+ - 某些提示将以Snackbar提示展现
+
+**修复**
+ - 修复了关注的方法参数缺少问题`\MaterialDesignForum\Controllers\Follow::Follow`
+
+---
+
+<details>
+<summary>点击展开/收起 历史更新</summary>
 
 #### 2025-11-24 版本更新
 **修复**
@@ -12,9 +23,6 @@
  - Manifest.json现在根据站点信息动态配置，并使用新图标。添加了md2.png和md3.png资源。
  - 更新了语言包和文档。
 ---
-
-<details>
-<summary>点击展开/收起 历史更新</summary>
 
 #### 2025-11-04 版本更新
 **修复**

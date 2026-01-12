@@ -117,7 +117,7 @@ class UserGroup extends UserGroupModel
    * @param string '];
    * @return bool 是否满足
    */
-  public static function Ability(string $token, string|array $name): bool
+  public static function Ability(string $token, $name): bool //string|array 为了兼容7.4版本的PHP 暂时不使用变量类型或定义
   {
     $ability = [
       'is_admin',
