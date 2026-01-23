@@ -463,6 +463,23 @@ class Api
         )
       );
     });
+    $collector->post('/api/user/notification/delete', function () {
+      $data = Share::GetRequestData();
+      return Share::HandleArrayToJSON(
+        \MaterialDesignForum\Controllers\Notification::DeleteNotification(
+          $data['user_token'] ?? '',
+          $data['notification_id']
+        )
+      );
+    });
+    $collector->post('/api/user/notifications/delete/all', function () {
+      $data = Share::GetRequestData();
+      return Share::HandleArrayToJSON(
+        \MaterialDesignForum\Controllers\Notification::DeleteAllNotifications(
+          $data['user_token'] ?? ''
+        )
+      );
+    });
     $collector->post('/api/user/set/language', function () {
       $data = Share::GetRequestData();
       return Share::HandleArrayToJSON(

@@ -531,7 +531,7 @@ class Notification extends NotificationModel
    * 设置通知为删除状态
    * @param int $user_token 用户Token
    * @param int $notification_id 通知ID
-   * @return bool
+   * @return array [is_delete=>bool,notification=>NotificationModel]
    */
   public static function DeleteNotification($user_token, $notification_id)
   {
@@ -545,6 +545,32 @@ class Notification extends NotificationModel
     return [
       'is_delete' => $is_delete,
       'notification' => $notification
+    ];
+  }
+  /**
+   * 设置用户的所有通知为删除状态
+   * @param int $user_token 用户Token
+   * @return array [is_delete=>bool]
+   */
+  public static function DeleteAllNotifications($user_token)
+  {
+    $is_delete = false;
+    $user_id = TokenController::GetUserId($user_token);
+    $notifications = NotificationModel::where('receiver_id', $user_id)
+      ->where('delete_time', 0)
+    ->update([
+      'delete_time' => Share::ServerTime(),
+    ]);
+    $is_delete = $notifications;
+    // if ($notifications != null) {
+    //   foreach ($notifications as $notification) {
+    //     $notification->delete_time = Share::ServerTime();
+    //     $is_delete = $notification->save();
+    //   }
+    // }
+    return [
+      'is_delete' => $is_delete,
+      // 'notifications' => $notifications
     ];
   }
   /**
@@ -587,7 +613,7 @@ class Notification extends NotificationModel
         ];
       }
     }
-    return ['web_message' => true, 'email_message' => false]; //用户通知设置为空的情况下默认都为['web_message' => true, 'email_message' => false]
-    // return ['web_message' => true, 'email_message' => true]; //用户通知设置为空的情况下默认都为['web_message' => true, 'email_message' => false]
+    // return ['web_message' => true, 'email_message' => false]; //用户通知设置为空的情况下默认都为['web_message' => true, 'email_message' => false]
+    return ['web_message' => true, 'email_message' => true]; //用户通知设置为空的情况下默认都为['web_message' => true, 'email_message' => false] //这样子将会邮件通知用户
   }
 }

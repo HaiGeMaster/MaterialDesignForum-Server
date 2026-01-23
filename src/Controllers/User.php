@@ -134,6 +134,7 @@ class User extends UserModel
   public static function AddUser($email, $password, $email_captcha, $username = "", $language = "")
   {
     $v = false;
+    $snackbar = '';
     $client_email = base64_decode($email);
     $client_password = self::HandlePassword(base64_decode($password)); //base64_decode($password);
     $client_email_captcha = md5(base64_decode($email_captcha));
@@ -181,11 +182,18 @@ class User extends UserModel
             }
             CacheController::DeleteCaptcha($client_email_captcha);
           }
+        }else{
+          $snackbar = 'Message.Components.Account.CodeError';
         }
+      }else{
+        $snackbar = 'Message.Components.Account.TheUsernameCanOnlyBeUniqueOrTheEmailHasBeenRegisteredOrTheVerificationCodeIsIncorrect';
       }
+    }else{
+      $snackbar = 'Message.Components.Account.UserIsHasBeenRegistered';
     }
     $data = array(
       'is_add' => $v,
+      'snackbar' => $snackbar
       // 'user' => $v ? $user : null,//安全问题不得返回用户信息
     );
     return $data;
@@ -246,7 +254,7 @@ class User extends UserModel
       return [
         'is_edit' => $is_edit,
         'user' => self::GetUser($edit_target_user_id, $user_token)['user'],
-        'message' => $e->getMessage(),
+        'error' => $e->getMessage(),
       ];
     }
     return [
@@ -393,6 +401,7 @@ class User extends UserModel
   public static function Login($username_or_email, $password, $image_capthca = "")
   {
     try {
+      $snackbar = '';
       // 不使用base64的原因是为了防止用户输入的用户名中包含base64编码的字符，导致解码失败
       // $username_or_email = base64_decode($username_or_email);
       $password = self::HandlePassword(base64_decode($password));
@@ -442,17 +451,22 @@ class User extends UserModel
             } //删除验证码
             $is_login = true;
           }
+        }else{
+          $snackbar = 'Message.Components.Account.LoginEmailOrUsernameDoesNotExistOrPasswordOrVerificationCodeIsIncorrect';
         }
+      }else{
+        $snackbar = 'Message.Components.Account.UserNameOrEMailNotFound';
       }
       return [
         'is_login' => $is_login,
         'token' => $token,
+        'snackbar' => $snackbar,
       ];
     } catch (\Exception $e) {
       return [
         'is_login' => false,
         'token' => '',
-        'message' => $e->getMessage(),
+        'error' => $e->getMessage(),
       ];
     }
   }
@@ -479,6 +493,7 @@ class User extends UserModel
     }
     $data = array(
       'is_reset' => $v,
+      'snackbar' => $v ? 'Message.Components.Account.ResetPasswordSuccess' : 'Message.Components.Account.TheResetEmailDoesNotExistOrTheVerificationCodeIsIncorrectOrTheNewPasswordCannotBeTheSameAsTheOldPassword',
     );
     // if (Config::Dev()) {
     //   $data['dev_client_email'] = $client_email;
@@ -867,7 +882,7 @@ class User extends UserModel
     } catch (\Exception $e) {
       return [
         'is_reset' => $is_reset,
-        'message' => $e->getMessage(),
+        'error' => $e->getMessage(),
       ];
     }
     return [
@@ -909,7 +924,7 @@ class User extends UserModel
     } catch (\Exception $e) {
       return [
         'is_reset' => $is_reset,
-        'message' => $e->getMessage(),
+        'error' => $e->getMessage(),
       ];
     }
     return [
