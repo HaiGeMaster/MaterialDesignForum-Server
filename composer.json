@@ -12,7 +12,8 @@
     "lincanbin/material-design-avatars": "^1.4",
     "illuminate/pagination": "^8.83",
     "nesbot/carbon": "^2.72",
-    "league/oauth2-google": "^4.0"
+    "league/oauth2-google": "^4.0",
+    "fzaninotto/faker": "^1.9"
   },
   "autoload": {
     "psr-4": {

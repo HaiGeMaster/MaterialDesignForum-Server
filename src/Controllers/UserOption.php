@@ -25,10 +25,10 @@ class UserOption extends UserOptionModel
    * 设置用户自定义设置
    * @param string $user_token 令牌
    * @param string $name 自定义设置名称
-   * @param string|array $value 自定义设置值
+   * @param string|array $value 自定义设置值  string|array
    * @return array [is_set=>bool, data=>mixed, error=>string|null]
    */
-  public static function SetUserOption(string $user_token, string $name, string|array $value): array
+  public static function SetUserOption(string $user_token, string $name, array $value): array
   {
     if (is_array($value)) {
       $value = json_encode($value);
