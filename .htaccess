@@ -1,0 +1,9 @@
+# 禁止访问 .env 文件（无论路径如何）
+location ~ /\.env {
+    deny all;          # 拒绝所有请求
+    return 404;        # 返回 404 隐藏存在性（推荐）
+}
+location / {
+    try_files $uri $uri/ /index.php;
+    # try_files $uri $uri/ /public/index.php;
+}

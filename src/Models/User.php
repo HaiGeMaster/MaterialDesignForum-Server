@@ -19,9 +19,11 @@ class User extends Eloquent
   protected $table = 'user';
   public $timestamps = false;
   protected $primaryKey = 'user_id';
+  // const DELETE_AT = 'delete_time';
   protected $casts = [
     'avatar' => 'array', //这个字段的值将会被自动转换为 PHP 数组：
     'cover' => 'array',
+    // 'delete_time' => 'timestamp',
   ];
   /**
    * @typedef UserModel 用户

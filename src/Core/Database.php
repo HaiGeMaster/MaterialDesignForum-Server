@@ -21,6 +21,7 @@ $capsule->addConnection([
     'database' => Config::GetMySqlDatabase(),
     'username' => Config::GetMySqlUsername(),
     'password' => Config::GetMySqlPassword(),
+    'port' => Config::GetMySqlPort(),
     // 'charset' => 'utf8',
     // 'collation' => 'utf8_general_ci',
     // 'charset' => 'utf8mb4',
@@ -31,4 +32,4 @@ $capsule->addConnection([
 ]);
 $capsule->setAsGlobal();
 $capsule->bootEloquent();
-Config::$sql_is_connect = true;
+// Config::$sql_is_connect = true;

@@ -1,6 +1,6 @@
 {
   "app_name": "MaterialDesignForum",
-  "version": "26.01.23",
+  "version": "26.02.26",
   "zip_link": "https://www.123865.com/s/VFB9-QEnsd",
   "prefer-stable": true,
   "minimum-stability": "stable",
@@ -13,7 +13,9 @@
     "illuminate/pagination": "^8.83",
     "nesbot/carbon": "^2.72",
     "league/oauth2-google": "^4.0",
-    "fzaninotto/faker": "^1.9"
+    "fakerphp/faker": "^1.23",
+    "filp/whoops": "^2.16",
+    "vlucas/phpdotenv": "^5.6"
   },
   "autoload": {
     "psr-4": {

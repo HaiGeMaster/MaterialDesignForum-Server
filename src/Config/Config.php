@@ -13,64 +13,86 @@
 
 namespace MaterialDesignForum\Config;
 
-use MaterialDesignForum\Models\Option;
+use Dotenv\Dotenv;
 
-//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##
-//##更新站点时默认不覆盖本文件。如需覆盖请将Config.php删除，然后将Config.php.new重命名为Config.php。之后手动填写数据库信息//##
-//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##
-//##更新站点时默认不覆盖本文件。如需覆盖请将Config.php删除，然后将Config.php.new重命名为Config.php。之后手动填写数据库信息//##
-//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##//##
-//##更新站点时默认不覆盖本文件。如需覆盖请将Config.php删除，然后将Config.php.new重命名为Config.php。之后手动填写数据库信息//##
+use MaterialDesignForum\Models\Option;
+use MaterialDesignForum\Plugins\EnvEditor;
 
 class Config
 {
-  public static $sql_is_connect = false;
+
+  public static $dotenv = null;
+  // public static $sql_is_connect = false;
   public static function getConfig()
   {
+    //首先检查是否存在.env文件
+    if (!file_exists('././.env')) {
+      // throw new \Exception('未找到.env文件');
+      //如果没有，则读取.env.example文件
+      if (file_exists('././.env.example')) {
+        copy('././.env.example', '././.env');
+      }
+    }
+
+    // 指定 .env 文件所在目录（通常是项目根目录）
+    self::$dotenv = Dotenv::createImmutable('././');
+    self::$dotenv->load();
+
     $config['web_version'] = '1.0.0';
     $config['web_dev'] = true; //false; //
     $config['web_theme_path'] = '././public/themes/'; //主题路径
     $config['web_locale_path'] = '././public/locale/json/'; //语言路径
 
-    //以下是可以修改的配置↓
-    $config['mysql_hostname'] = 'localhost'; //数据库地址
-    $config['mysql_username'] = 'root'; //数据库用户名
-    $config['mysql_password'] = 'root'; //数据库密码
-    $config['mysql_database'] = 'demo'; //'root';//数据库名
-    $config['mysql_port'] = 3306; //数据库端口
-    $config['mysql_prefix'] = ''; //数据库表前缀
-    //以上是可以修改的配置↑
-    
-    if (self::$sql_is_connect) {
-      //请勿在此处修改邮箱配置。因为这些是从数据库自动获取的。
-      //不要在这里写你的邮箱配置。请在后台管理设置中设置。
-      $config['site_name'] = Option::Get('site_name');
-      $config['default_language'] = Option::Get('default_language'); //默认语言
-      $config['smtp_username'] = Option::Get('smtp_username'); //邮箱用户名(默认为QQ邮箱
-      $config['smtp_password'] = Option::Get('smtp_password'); //邮箱密码(默认为QQ邮箱密码
-      $config['smtp_send_name'] = Option::Get('smtp_send_name'); //发件人名称(
-      $config['smtp_host'] = Option::Get('smtp_host'); //邮箱服务器地址(
-      $config['smtp_port'] = Option::Get('smtp_port'); //邮箱服务器端口(
-      $config['smtp_secure'] = Option::Get('smtp_secure'); //邮箱服务器安全协议(
-    }else{
-      $config['site_name'] = 'MaterialDesignForum'; //网站名称
-      $config['default_language'] = 'zh_CN'; //默认语言
-      $config['smtp_username'] = ''; //邮箱用户名(默认为QQ邮箱
-      $config['smtp_password'] = ''; //邮箱密码(默认为QQ邮箱密码
-      $config['smtp_send_name'] = ''; //发件人名称(
-      $config['smtp_host'] = ''; //邮箱服务器地址(
-      $config['smtp_port'] = ''; //邮箱服务器端口(
-      $config['smtp_secure'] = ''; //邮箱服务器安全协议(
-    }
-    
-    $config['mysql_max_query'] = 20; //最大每次查询数据库的数量（条） 过大可能导致服务器缓慢查询
-    $config['seo'] = true; //是否开启SEO
-    $config['php_default_theme'] = 'MaterialDesignForum-Vuetify2'; //默认主题
+    $config['mysql_hostname'] = $_ENV['DB_HOST']; //数据库地址
+    $config['mysql_username'] = $_ENV['DB_USERNAME']; //数据库用户名
+    $config['mysql_password'] = $_ENV['DB_PASSWORD']; //数据库密码
+    $config['mysql_database'] = $_ENV['DB_DATABASE']; //'root';//数据库名
+    $config['mysql_port'] = $_ENV['DB_PORT']; //数据库端口
+    $config['mysql_prefix'] = $_ENV['DB_PREFIX']; //数据库表前缀
+
+    $config['site_name'] = $_ENV['APP_NAME']; //网站名称
+    $config['default_language'] = $_ENV['APP_LOCALE']; //默认语言
+    $config['smtp_username'] = $_ENV['MAIL_USERNAME']; //邮箱用户名(默认为QQ邮箱
+    $config['smtp_password'] = $_ENV['MAIL_PASSWORD']; //邮箱密码(默认为QQ邮箱密码
+    $config['smtp_send_name'] = $_ENV['MAIL_SENDER_NAME']; //发件人名称(
+    $config['smtp_host'] = $_ENV['MAIL_HOST']; //邮箱服务器地址(
+    $config['smtp_port'] = $_ENV['MAIL_PORT']; //邮箱服务器端口(
+    $config['smtp_secure'] = $_ENV['MAIL_SCHEME']; //邮箱服务器安全协议(
+    $config['smtp_mailer'] = $_ENV['MAIL_MAILER']; //邮箱服务器发送器(
+
+    $config['mysql_max_query'] = $_ENV['APP_MAX_QUERY']; //最大每次查询数据库的数量（条） 过大可能导致服务器缓慢查询
+    $config['seo'] = $_ENV['APP_SEO']; //是否开启SEO
+    $config['php_default_theme'] = $_ENV['APP_DEFAULT_THEME']; //默认主题
     return $config;
+  }
+  /**
+   * 设置环境变量
+   * @param string $key 环境变量键
+   * @param string $value 环境变量值
+   * @return void
+   */
+  public static function SetEnv(string $key, string $value): bool
+  {
+    // 读取
+    $parser = new EnvEditor('././.env');
+    // 修改
+    // $parser->set($key, $value);
+
+    //去除value中的空格
+    // $value = trim($value);
+
+    //如果包含空格则添加引号
+    if (strpos($value, ' ') !== false) {
+      $value = '"' . $value . '"';
+    }
+
+    $parser->set($key, $value);
+    // 写入
+    return $parser->save();
   }
   public static function Dev(): bool
   {
-    return self::getConfig()['web_dev'];
+    return self::getConfig()['web_dev'] && strpos($_SERVER['HTTP_HOST'], 'localhost') !== false;
   }
   public static function GetWebVersion(): string
   {
@@ -117,7 +139,7 @@ class Config
   public static function GetWebTitleName($additional_content = null): string
   {
     if ($additional_content == null) {
-      return self::getConfig()['site_name']??'';
+      return self::getConfig()['site_name'] ?? '';
     } else {
       return $additional_content . ' - ' . self::getConfig()['site_name'];
     }
@@ -130,7 +152,7 @@ class Config
   public static function GetWebDescription($additional_content = null): string
   {
     if ($additional_content == null) {
-      return self::GetWebTitleName() . ' - ' . Option::Get('site_description')??'';
+      return self::GetWebTitleName() . ' - ' . Option::Get('site_description') ?? '';
     } else {
       return $additional_content . ' - ' . self::GetWebTitleName() . ' - ' . Option::Get('site_description');
     }
@@ -143,7 +165,7 @@ class Config
   public static function GetWebKeywords($additional_content = null): string
   {
     if ($additional_content == null) {
-      return self::GetWebTitleName() . ',' . Option::Get('site_keywords')??'';
+      return self::GetWebTitleName() . ',' . Option::Get('site_keywords') ?? '';
     } else {
       return $additional_content . ',' . self::GetWebTitleName() . ',' . Option::Get('site_keywords');
     }
@@ -166,6 +188,6 @@ class Config
   }
   public static function GetDefaultTheme(): string
   {
-    return Option::Get('theme')||self::getConfig()['php_default_theme'];
+    return Option::Get('theme') || self::getConfig()['php_default_theme'];
   }
 }

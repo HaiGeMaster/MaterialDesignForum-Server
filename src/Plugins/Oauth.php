@@ -51,8 +51,10 @@ class Oauth
       switch ($oauthName) {
         case 'github':
           // GitHub OAuth流程
-          $clientID = OptionController::where('name', 'github_client_id')->value('value');
-          $clientSecret = OptionController::where('name', 'github_client_secret')->value('value');
+          // $clientID = OptionController::where('name', 'github_client_id')->value('value');
+          // $clientSecret = OptionController::where('name', 'github_client_secret')->value('value');
+          $clientID = $_ENV['OAUTH2_GITHUB_CLIENT_ID'];
+          $clientSecret = $_ENV['OAUTH2_GITHUB_CLIENT_SECRET'];
           // 1. 获取GitHub OAuth Access Token
           $tokenResponse = self::GetGitHubAccessToken($clientID, $clientSecret, $requestCode);
           $accessToken = $tokenResponse['access_token'];
@@ -118,8 +120,10 @@ class Oauth
           //流程：使用 应用ID 和 应用秘钥 和 code授权码 先获取 资产token，然后使用资产token获取用户信息
           //格式为{"access_token":"","token_type":"Bearer","scope":"openid profile User.Read email","user":{...}}
           // Microsoft OAuth流程
-          $clientID = OptionController::where('name', 'microsoft_client_id')->value('value');
-          $clientSecret = OptionController::where('name', 'microsoft_client_secret')->value('value');
+          // $clientID = OptionController::where('name', 'microsoft_client_id')->value('value');
+          // $clientSecret = OptionController::where('name', 'microsoft_client_secret')->value('value');
+          $clientID = $_ENV['OAUTH2_MICROSOFT_CLIENT_ID'];
+          $clientSecret = $_ENV['OAUTH2_MICROSOFT_CLIENT_SECRET'];
           // 1. 获取Microsoft OAuth Access Token
           $tokenResponse = self::GetMicrosoftAccessToken($clientID, $clientSecret, $requestCode);
           
@@ -161,8 +165,10 @@ class Oauth
           break;
         case 'google':
           // Google OAuth流程
-          $clientID = OptionController::where('name', 'google_client_id')->value('value');
-          $clientSecret = OptionController::where('name', 'google_client_secret')->value('value');
+          // $clientID = OptionController::where('name', 'google_client_id')->value('value');
+          // $clientSecret = OptionController::where('name', 'google_client_secret')->value('value');
+          $clientID = $_ENV['OAUTH2_GOOGLE_CLIENT_ID'];
+          $clientSecret = $_ENV['OAUTH2_GOOGLE_CLIENT_SECRET'];
           // 1. 获取Google OAuth Access Token
           $tokenResponse = self::GetGoogleAccessToken($clientID, $clientSecret, $requestCode);
           $accessToken = $tokenResponse['access_token'];
@@ -175,13 +181,16 @@ class Oauth
           // $userEmails = self::GetGitHubUserEmails($accessToken);
           break;
         case 'sso':
-          self::$sso_client_main_url = OptionController::where('name', 'sso_client_main_url')->value('value');
+          // self::$sso_client_main_url = OptionController::where('name', 'sso_client_main_url')->value('value');
+          self::$sso_client_main_url = $_ENV['OAUTH2_SSO_CLIENT_MAIN_URL'];
           if (self::$sso_client_main_url == null) {
             throw new \Exception("SSO客户端主URL未配置");
           }
           // SSO OAuth流程
-          $clientID = OptionController::where('name', 'sso_client_id')->value('value');
-          $clientSecret = OptionController::where('name', 'sso_client_secret')->value('value');
+          // $clientID = OptionController::where('name', 'sso_client_id')->value('value');
+          // $clientSecret = OptionController::where('name', 'sso_client_secret')->value('value');
+          $clientID = $_ENV['OAUTH2_SSO_CLIENT_ID'];
+          $clientSecret = $_ENV['OAUTH2_SSO_CLIENT_SECRET'];
           // 1. 获取SSO OAuth Access Token
           $tokenResponse = self::GetSSOAccessToken($clientID, $clientSecret, $requestCode);
           $accessToken = $tokenResponse['access_token'];

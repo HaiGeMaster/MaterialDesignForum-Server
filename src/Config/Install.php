@@ -17,6 +17,9 @@ use MaterialDesignForum\Plugins\i18n;
 
 use MaterialDesignForum\Models\Option;
 
+
+use MaterialDesignForum\Config\Config;
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
@@ -39,6 +42,7 @@ class Install
     $json = null;
     try {
       $conn = Option::Get('site_name');
+      
       if (!$conn) {
         self::SaveInstallJSON(false, 1);
         return false;
@@ -47,8 +51,16 @@ class Install
         // self::SaveInstallJSON(false, 2);
         //如果路由含没有localhost则返回true
         // if (!preg_match('/localhost/', $_SERVER['HTTP_HOST'])) {
-          self::SaveInstallJSON(true, 3);
-          return true;
+
+          // self::SaveInstallJSON(true, 3);
+
+          if(self::GetInstallInfoJson()['install']){
+            return true;
+          }else{
+            return false;
+          }
+          
+          // return true;
         // }
       }
       //默认情况下返回false
@@ -139,6 +151,7 @@ class Install
       'database' => $mysqlDatabase,
       'username' => $mysqlUsername,
       'password' => $mysqlPassword,
+      'port' => 3306,
       'prefix' => $mysqlPrefix,
     ]);
     $capsule->setAsGlobal();
@@ -146,17 +159,24 @@ class Install
 
     $site_name = Option::Get('site_name');
     if ($site_name) {
-      // print_r($site_name);
-      // exit;
+      // // print_r($site_name);
+      // // exit;
 
-      $config = file_get_contents(self::$defaultConfigFiePath);
-      // $config = str_replace('// namespace', 'namespace', $config);
-      $config = str_replace('{mysql_hostname}', $mysqlHostname, $config);
-      $config = str_replace('{mysql_username}', $mysqlUsername, $config);
-      $config = str_replace('{mysql_password}', $mysqlPassword, $config);
-      $config = str_replace('{mysql_database}', $mysqlDatabase, $config);
-      //$config = str_replace('{mysqlPrefix}', $mysqlPrefix, $config);
-      $set = file_put_contents(self::$configFiePath, $config);
+      // $config = file_get_contents(self::$defaultConfigFiePath);
+      // // $config = str_replace('// namespace', 'namespace', $config);
+      // $config = str_replace('{mysql_hostname}', $mysqlHostname, $config);
+      // $config = str_replace('{mysql_username}', $mysqlUsername, $config);
+      // $config = str_replace('{mysql_password}', $mysqlPassword, $config);
+      // $config = str_replace('{mysql_database}', $mysqlDatabase, $config);
+      // //$config = str_replace('{mysqlPrefix}', $mysqlPrefix, $config);
+      // $set = file_put_contents(self::$configFiePath, $config);
+
+      $set = Config::SetEnv('DB_HOST', $mysqlHostname)&&
+      Config::SetEnv('DB_USERNAME', $mysqlUsername)&&
+      Config::SetEnv('DB_PASSWORD', $mysqlPassword)&&
+      Config::SetEnv('DB_DATABASE', $mysqlDatabase)&&
+      Config::SetEnv('DB_PREFIX', $mysqlPrefix);
+
       if ($set) {
         $is_install = self::SaveInstallJSON(false, 2);
       }
@@ -209,6 +229,7 @@ class Install
       $mail->Subject = 'MaterialDesignForum Test Mail';
       $mail->Body = 'MaterialDesignForum Test Mail';
       $mail->isHTML(true);
+
       if ($mail->send()) {
         $data = true;
       } else {
@@ -227,12 +248,19 @@ class Install
   public static function SetSqlMail($smtp_username, $smtp_password, $smtp_send_name, $smtp_host, $smtp_port, $smtp_secure)
   {
     $data = false;
-    $data = Option::Set('smtp_username', $smtp_username) &&
-      Option::Set('smtp_password', $smtp_password) &&
-      Option::Set('smtp_send_name', $smtp_send_name) &&
-      Option::Set('smtp_host', $smtp_host) &&
-      Option::Set('smtp_port', $smtp_port) &&
-      Option::Set('smtp_secure', $smtp_secure);
+    // $data = Option::Set('smtp_username', $smtp_username) &&
+    //   Option::Set('smtp_password', $smtp_password) &&
+    //   Option::Set('smtp_send_name', $smtp_send_name) &&
+    //   Option::Set('smtp_host', $smtp_host) &&
+    //   Option::Set('smtp_port', $smtp_port) &&
+    //   Option::Set('smtp_secure', $smtp_secure);
+    $data = Config::SetEnv('MAIL_USERNAME', $smtp_username)&&
+    Config::SetEnv('MAIL_PASSWORD', $smtp_password)&&
+    Config::SetEnv('MAIL_SENDER_NAME', $smtp_send_name)&&
+    Config::SetEnv('MAIL_HOST', $smtp_host)&&
+    Config::SetEnv('MAIL_PORT', $smtp_port)&&
+    Config::SetEnv('MAIL_SCHEME', $smtp_secure);
+
     if ($data) {
       self::SaveInstallJSON(false, 3);
     }
@@ -249,6 +277,8 @@ class Install
     $data = Option::Set('site_name', $site_name) &&
       Option::Set('default_language', $default_language);
     if ($data) {
+      // Config::SetEnv('APP_NAME', $site_name);
+      Config::SetEnv('APP_LOCALE', $default_language);
       self::SaveInstallJSON(false, 4);
     }
     return [

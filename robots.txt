@@ -4,4 +4,4 @@ Disallow: /admin/
 Disallow: /public/locale/
 
 # 主站点地图位置（必须）
-Sitemap: https://mdf.xbedrock.com/public/sitemaps/sitemap.xml
+Sitemap: /public/sitemaps/sitemap.xml

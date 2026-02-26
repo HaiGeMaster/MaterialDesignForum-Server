@@ -18,6 +18,7 @@ use MaterialDesignForum\Models\Option as OptionModel;
 use MaterialDesignForum\Controllers\UserGroup as UserGroupController;
 
 use MaterialDesignForum\Plugins\Share;
+use  MaterialDesignForum\Config\Config;
 
 class Option extends OptionModel
 {
@@ -43,18 +44,41 @@ class Option extends OptionModel
   ];
   // Oauth选项
   private static $oauthOptions = [
-    'github_client_id',
-    'github_client_secret',
-    'google_client_id',
-    'google_client_secret',
-    'microsoft_client_id',
-    'microsoft_client_secret',
-    'sso_client_id',
-    'sso_client_secret',
-    'sso_client_main_url',
-    'sso_client_main_name',
+    // 'github_client_id',
+    // 'github_client_secret',
+    // 'google_client_id',
+    // 'google_client_secret',
+    // 'microsoft_client_id',
+    // 'microsoft_client_secret',
+    // 'sso_client_id',
+    // 'sso_client_secret',
+    // 'sso_client_main_url',
+    // 'sso_client_main_name',
+
+    // 'OAUTH2_GITHUB_CLIENT_ID',
+    // 'OAUTH2_GITHUB_CLIENT_SECRET',
+    // 'OAUTH2_GOOGLE_CLIENT_ID',
+    // 'OAUTH2_GOOGLE_CLIENT_SECRET',
+    // 'OAUTH2_MICROSOFT_CLIENT_ID',
+    // 'OAUTH2_MICROSOFT_CLIENT_SECRET',
+    // 'OAUTH2_SSO_CLIENT_MAIN_URL',
+    // 'OAUTH2_SSO_CLIENT_MAIN_NAME',
+    // 'OAUTH2_SSO_CLIENT_ID',
+    // 'OAUTH2_SSO_CLIENT_SECRET',
+
+    
+    'github_client_id' => 'OAUTH2_GITHUB_CLIENT_ID',
+    'github_client_secret' => 'OAUTH2_GITHUB_CLIENT_SECRET',  
+    'google_client_id' => 'OAUTH2_GOOGLE_CLIENT_ID',
+    'google_client_secret' => 'OAUTH2_GOOGLE_CLIENT_SECRET',
+    'microsoft_client_id' => 'OAUTH2_MICROSOFT_CLIENT_ID',
+    'microsoft_client_secret' => 'OAUTH2_MICROSOFT_CLIENT_SECRET',
+    'sso_client_id' => 'OAUTH2_SSO_CLIENT_ID',
+    'sso_client_secret' => 'OAUTH2_SSO_CLIENT_SECRET',
+    'sso_client_main_url' => 'OAUTH2_SSO_CLIENT_MAIN_URL',
+    'sso_client_main_name' => 'OAUTH2_SSO_CLIENT_MAIN_NAME',
   ];
-  
+
   private static $infoOptions = [
     'site_name',
     'site_description',
@@ -64,13 +88,28 @@ class Option extends OptionModel
     'default_language',
   ];
   private static $mailOptions = [
-    'smtp_host',
-    'smtp_password',
-    'smtp_port',
-    'smtp_reply_to',
-    'smtp_secure',
-    'smtp_send_name',
-    'smtp_username',
+    // 'smtp_host',
+    // 'smtp_password',
+    // 'smtp_port',
+    // 'smtp_reply_to',
+    // 'smtp_secure',
+    // 'smtp_send_name',
+    // 'smtp_username',
+    // 'MAIL_USERNAME',
+    // 'MAIL_PASSWORD',
+    // 'MAIL_SENDER_NAME',
+    // 'MAIL_HOST',
+    // 'MAIL_PORT',
+    // 'MAIL_REPLY_TO',
+    // 'MAIL_SCHEME',
+    
+    'smtp_host' => 'MAIL_HOST',
+    'smtp_password' => 'MAIL_PASSWORD',
+    'smtp_port' => 'MAIL_PORT',
+    'smtp_reply_to' => 'MAIL_REPLY_TO',
+    'smtp_secure' => 'MAIL_SCHEME',
+    'smtp_send_name' => 'MAIL_SENDER_NAME',
+    'smtp_username' => 'MAIL_USERNAME',
   ];
   /**
    * 获取Oauth所有的选项
@@ -84,10 +123,13 @@ class Option extends OptionModel
     }
 
     $form_data = [];
-    foreach (self::$oauthOptions as $optionKey) {
-      if ($option = self::find($optionKey)) {
-        $form_data[$optionKey] = $option->value;
-      }
+    // foreach (self::$oauthOptions as $optionKey) {
+    //   if ($option = self::find($optionKey)) {
+    //     $form_data[$optionKey] = $option->value;
+    //   }
+    // }
+    foreach (self::$oauthOptions as $optionKey => $envKey) {
+      $form_data[$optionKey] = $_ENV[$envKey];
     }
 
     return ['is_get' => !empty($form_data), 'form_data' => $form_data];
@@ -99,20 +141,24 @@ class Option extends OptionModel
     }
 
     $is_set = false;
-    foreach (self::$oauthOptions as $optionKey) {
-      if (!isset($form_data[$optionKey])) continue;
+    // foreach (self::$oauthOptions as $optionKey) {
+    //   if (!isset($form_data[$optionKey])) continue;
 
-      if ($option = self::find($optionKey)) {
-        $option->value = $form_data[$optionKey];
-        $option->save();
-        $is_set = true;
-      }else{
-        self::create([
-          'name' => $optionKey,
-          'value' => $form_data[$optionKey],
-        ]);
-        $is_set = true;
-      }
+    //   if ($option = self::find($optionKey)) {
+    //     $option->value = $form_data[$optionKey];
+    //     $option->save();
+    //     $is_set = true;
+    //   }else{
+    //     self::create([
+    //       'name' => $optionKey,
+    //       'value' => $form_data[$optionKey],
+    //     ]);
+    //     $is_set = true;
+    //   }
+    // }
+    foreach (self::$oauthOptions as $optionKey => $envKey) {
+      if (!isset($form_data[$optionKey])) continue;
+      $is_set = Config::SetEnv($envKey, $form_data[$optionKey]);
     }
     return ['is_set' => $is_set];
   }
@@ -125,10 +171,10 @@ class Option extends OptionModel
   {
     $option = self::find($oauthName . '_client_id');
     if ($option) {
-      if($oauthName == 'sso'){
+      if ($oauthName == 'sso') {
         $sso_client_main_url = self::find('sso_client_main_url')->value;
         $sso_client_main_name = self::find('sso_client_main_name')->value;
-        if($sso_client_main_url == null){
+        if ($sso_client_main_url == null) {
           throw new \Exception("SSO客户端主URL未配置");
         }
         return [
@@ -285,7 +331,7 @@ class Option extends OptionModel
         if ($option = self::find($optionKey)) {
           $option->value = $form_data[$optionKey];
           $option->save();
-        }else{
+        } else {
           self::create([
             'name' => $optionKey,
             'value' => $form_data[$optionKey],
@@ -343,10 +389,13 @@ class Option extends OptionModel
 
     $form_data = [];
     if (UserGroupController::IsAdmin($user_token)) {
-      foreach (self::$mailOptions as $optionKey) {
-        if ($option = self::find($optionKey)) {
-          $form_data[$optionKey] = $option->value;
-        }
+      // foreach (self::$mailOptions as $optionKey) {
+      //   if ($option = self::find($optionKey)) {
+      //     $form_data[$optionKey] = $option->value;
+      //   }
+      // }
+      foreach (self::$mailOptions as $optionKey => $envKey) {
+        $form_data[$optionKey] = $_ENV[$envKey];
       }
     }
     return [
@@ -407,16 +456,19 @@ class Option extends OptionModel
 
     $is_set = false;
     if (UserGroupController::IsAdmin($user_token)) {
-      foreach (self::$mailOptions as $optionKey) {
-        if ($option = self::find($optionKey)) {
-          $option->value = $form_data[$optionKey];
-          $option->save();
-        }else{
-          self::create([
-            'name' => $optionKey,
-            'value' => $form_data[$optionKey],
-          ]);
-        }
+      // foreach (self::$mailOptions as $optionKey) {
+      //   if ($option = self::find($optionKey)) {
+      //     $option->value = $form_data[$optionKey];
+      //     $option->save();
+      //   }else{
+      //     self::create([
+      //       'name' => $optionKey,
+      //       'value' => $form_data[$optionKey],
+      //     ]);
+      //   }
+      // }
+      foreach (self::$mailOptions as $optionKey => $envKey) {
+        Config::SetEnv($envKey, $form_data[$optionKey]);
       }
       $is_set = true;
     }

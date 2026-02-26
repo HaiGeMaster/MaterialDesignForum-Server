@@ -23,6 +23,7 @@ use MaterialDesignForum\Plugins\i18n;
 
 class Share
 {
+  
   /**
    * 处理主题页面数据嵌入
    * @param string $lang 语言
