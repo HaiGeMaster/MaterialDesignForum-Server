@@ -66,9 +66,9 @@ class Option extends OptionModel
     // 'OAUTH2_SSO_CLIENT_ID',
     // 'OAUTH2_SSO_CLIENT_SECRET',
 
-    
+
     'github_client_id' => 'OAUTH2_GITHUB_CLIENT_ID',
-    'github_client_secret' => 'OAUTH2_GITHUB_CLIENT_SECRET',  
+    'github_client_secret' => 'OAUTH2_GITHUB_CLIENT_SECRET',
     'google_client_id' => 'OAUTH2_GOOGLE_CLIENT_ID',
     'google_client_secret' => 'OAUTH2_GOOGLE_CLIENT_SECRET',
     'microsoft_client_id' => 'OAUTH2_MICROSOFT_CLIENT_ID',
@@ -102,7 +102,7 @@ class Option extends OptionModel
     // 'MAIL_PORT',
     // 'MAIL_REPLY_TO',
     // 'MAIL_SCHEME',
-    
+
     'smtp_host' => 'MAIL_HOST',
     'smtp_password' => 'MAIL_PASSWORD',
     'smtp_port' => 'MAIL_PORT',
@@ -169,26 +169,53 @@ class Option extends OptionModel
    */
   public static function GetOauthClientId($oauthName)
   {
-    $option = self::find($oauthName . '_client_id');
-    if ($option) {
-      if ($oauthName == 'sso') {
-        $sso_client_main_url = self::find('sso_client_main_url')->value;
-        $sso_client_main_name = self::find('sso_client_main_name')->value;
-        if ($sso_client_main_url == null) {
-          throw new \Exception("SSO客户端主URL未配置");
-        }
+    // $option = self::find($oauthName . '_client_id');
+    // if ($option) {
+    //   if ($oauthName == 'sso') {
+    //     $sso_client_main_url = self::find('sso_client_main_url')->value;
+    //     $sso_client_main_name = self::find('sso_client_main_name')->value;
+    //     if ($sso_client_main_url == null) {
+    //       throw new \Exception("SSO客户端主URL未配置");
+    //     }
+    //     return [
+    //       'is_get' => true,
+    //       'client_id' => $option->value,
+    //       'sso_client_main_url' => $sso_client_main_url,
+    //       'sso_client_main_name' => $sso_client_main_name,
+    //     ];
+    //   }
+    //   return [
+    //     'is_get' => true,
+    //     'client_id' => $option->value,
+    //   ];
+    // }
+
+    //从env获取
+    switch ($oauthName) {
+      case 'sso':
         return [
           'is_get' => true,
-          'client_id' => $option->value,
-          'sso_client_main_url' => $sso_client_main_url,
-          'sso_client_main_name' => $sso_client_main_name,
+          'client_id' => $_ENV['OAUTH2_SSO_CLIENT_ID'],
+          'sso_client_main_url' => $_ENV['OAUTH2_SSO_CLIENT_MAIN_URL'],
+          'sso_client_main_name' => $_ENV['OAUTH2_SSO_CLIENT_MAIN_NAME'],
         ];
-      }
-      return [
-        'is_get' => true,
-        'client_id' => $option->value,
-      ];
+      case 'github':
+        return [
+          'is_get' => true,
+          'client_id' => $_ENV['OAUTH2_GITHUB_CLIENT_ID'],
+        ];
+      case 'microsoft':
+        return [
+          'is_get' => true,
+          'client_id' => $_ENV['OAUTH2_MICROSOFT_CLIENT_ID'],
+        ];
+      case 'google':
+        return [
+          'is_get' => true,
+          'client_id' => $_ENV['OAUTH2_GOOGLE_CLIENT_ID'],
+        ];
     }
+
     return [
       'is_get' => false,
       'client_id' => null,
