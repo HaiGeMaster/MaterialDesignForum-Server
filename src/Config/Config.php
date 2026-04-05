@@ -185,6 +185,6 @@ class Config
   }
   public static function GetDefaultTheme(): string
   {
-    return Option::Get('theme') || self::getConfig()['php_default_theme'];
+    return Option::Get('theme') ?? self::getConfig()['php_default_theme'];
   }
 }

@@ -20,7 +20,7 @@ use MaterialDesignForum\Plugins\i18n;
 
 class Share
 {
-  
+
   /**
    * 处理主题页面数据嵌入
    * @param string $lang 语言
@@ -40,7 +40,9 @@ class Share
     $theme = ''
   ) {
     if ($theme == '') {
-      $theme = self::GetClientThemeName();
+      // $theme = self::GetClientThemeName();
+      //服务器不再从客户端获取主题cookie，而是从数据库中获取默认主题
+      $theme = Config::GetDefaultTheme();
     }
     if ($lang == '') {
       $lang = i18n::i18n()->locale;
@@ -97,14 +99,16 @@ class Share
    * @param string $script 脚本
    * @return string
    */
-  public static function HandleAdminPage($lang, $theme = 'MaterialDesignForum-Vuetify2')
+  public static function HandleAdminPage($lang, $theme = 'MaterialDesignForum-Vuetify4')
   {
     if ($theme == '') {
       //$theme = self::GetClientThemeName();
       // $theme = Config::GetDefaultTheme();
-      $theme = 'MaterialDesignForum-Vuetify2';
+      // $theme = 'MaterialDesignForum-Vuetify2';
+      $theme = 'MaterialDesignForum-Vuetify4';
     }
-    $index_html = file_get_contents(Config::GetWebThemePath() . $theme . '/admin.html');
+    // $index_html = file_get_contents(Config::GetWebThemePath() . $theme . '/admin.html');
+    $index_html = file_get_contents(Config::GetWebThemePath() . $theme . '/index.html');
     $upcoming = i18n::t('Message.App.UpComing', $lang);
     if (i18n::VerificationLanguages($lang)) {
       $index_html = str_replace('{lang}', $lang, $index_html);
@@ -388,7 +392,7 @@ class Share
     return $user_token;
   }
   /**
-   * 获取主题列表
+   * 获取主题信息列表
    * @return array
    */
   public static function GetThemesInfo()
@@ -490,6 +494,64 @@ class Share
     } else {
       return false;
     }
+  }
+  /**
+   * 获取主题配置文件
+   * @param string $theme_name 主题名称
+   * @return array
+   */
+  public static function GetThemeSettingColor($theme_name)
+  {
+    try {
+
+      $themeConfigFile = Config::GetWebThemePath() . $theme_name . '/setting.json';
+      //获取$themeConfigFile里面的内容
+      $themeConfigFile = file_get_contents($themeConfigFile);
+      //转成数组
+      $themeConfigFile = json_decode($themeConfigFile, true);
+      // return $themeConfigFile;
+      return [
+        'is_get' => $themeConfigFile['theme_color'] ? true : false,
+        'theme_color' => $themeConfigFile['theme_color'] ?? null,
+      ];
+    } catch (\Exception $e) {
+      return [
+        'is_get' => false,
+        'theme_color' => null,
+      ];
+    }
+  }
+  /**
+   * 设置主题配置文件
+   * @param string $theme_name 主题名称
+   * @param array $themes 主题配置
+   * @return array
+   */
+  public static function SetThemeSettingColor($theme_name, $theme_color)
+  {
+    // 获取原始文件路径
+    $filePath = Config::GetWebThemePath() . $theme_name . '/setting.json';
+
+    // 读取并解析现有配置文件
+    $fileContent = file_get_contents($filePath);
+    $existingConfig = json_decode($fileContent, true) ?: []; // 确保解析失败时返回空数组
+
+    // 处理传入的 $theme_color（无需重复编码/解码）
+    $theme_color = is_array($theme_color) ? $theme_color : json_decode($theme_color, true);
+
+    // 更新配置
+    $existingConfig['theme_color'] = $theme_color;
+
+    // 将更新后的数组写回文件
+    $is_set = file_put_contents(
+      $filePath,
+      json_encode($existingConfig, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)
+    );
+
+    return [
+      'is_set' => $is_set !== false,
+      'theme_color' => $is_set ? $existingConfig['theme_color'] : null,
+    ];
   }
   /**
    * 判断是否为IE浏览器

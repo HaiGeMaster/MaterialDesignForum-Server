@@ -16,7 +16,7 @@ use Phroute\Phroute\Exception\HttpRouteNotFoundException;
 
 use MaterialDesignForum\Config\Install;
 use MaterialDesignForum\Config\Config;
-
+use MaterialDesignForum\Controllers\Option;
 use MaterialDesignForum\Plugins\Share;
 
 class Api
@@ -114,6 +114,25 @@ class Api
       return Share::HandleArrayToJSON(
         \MaterialDesignForum\Controllers\Option::GetActivationKey(
           $data['user_token'] ?? ''
+        )
+      );
+    });
+    $collector->post('/api/option/get/theme/setting_color', function () {
+      $data = Share::GetRequestData();
+      return Share::HandleArrayToJSON(
+        Option::GetThemeSettingColor(
+          $data['user_token'] ?? '', 
+          $data['theme_name']
+        )
+      );
+    });
+    $collector->post('/api/option/set/theme/setting_color', function () {
+      $data = Share::GetRequestData();
+      return Share::HandleArrayToJSON(
+        Option::SetThemeSettingColor(
+          $data['user_token'] ?? '', 
+          $data['theme_name'],
+          $data['theme_color']
         )
       );
     });

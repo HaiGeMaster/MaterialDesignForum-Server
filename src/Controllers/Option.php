@@ -794,4 +794,31 @@ class Option extends OptionModel
       'is_set' => $is_set,
     ];
   }
+  
+  /**
+   * 获取主题配置文件
+   * @param string $user_token 用户token
+   * @param string $theme_name 主题名称
+   * @return array
+   */
+  public static function GetThemeSettingColor($user_token,$theme_name){
+    return Share::GetThemeSettingColor($theme_name);
+  }
+  /**
+   * 设置主题配置文件
+   * @param string $user_token 用户token 需要管理员权限
+   * @param string $theme_name 主题名称
+   * @param array $themes 主题配置
+   * @return array
+   */
+  public static function SetThemeSettingColor($user_token,$theme_name, $themes)
+  {
+    if (!UserGroupController::IsAdmin($user_token)) {
+      return [
+        'is_set' => false,
+        'themes' => null,
+      ];
+    }
+    return Share::SetThemeSettingColor($theme_name, $themes);
+  }
 }
