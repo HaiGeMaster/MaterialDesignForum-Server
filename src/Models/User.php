@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Author HaiGeMaster
  * @package MaterialDesignForum
@@ -10,9 +11,27 @@
 namespace MaterialDesignForum\Models;
 
 use Illuminate\Database\Eloquent\Model as Eloquent;
+// use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Eloquent
 {
+  // // 软删除（更新 deleted_time 字段）
+  // $user->delete(); 
+
+  // // 查询包含软删除的记录
+  // User::withTrashed()->find(1);
+
+  // // 恢复软删除
+  // $user->restore();
+
+  // // 永久删除
+  // $user->forceDelete();
+
+  // use SoftDeletes;
+
+  // // 指定自定义软删除字段名
+  // const DELETED_AT = 'disable_time'; 
+
   protected $table = 'user';
   public $timestamps = false;
   protected $primaryKey = 'user_id';
@@ -101,7 +120,8 @@ class User extends Eloquent
   ];
   // 搜索字段
   public static $search_field = [
-    'username', 'headline',
+    'username',
+    'headline',
     'bio'
   ];
   /**
@@ -293,7 +313,7 @@ class User extends Eloquent
   public static function SubFollowerCount($user_id, $count = 1): bool
   {
     $user = self::find($user_id);
-    if ($user->follower_count <= 0){
+    if ($user->follower_count <= 0) {
       $user->follower_count = 0;
       return $user->save();
     }
@@ -309,7 +329,7 @@ class User extends Eloquent
   public static function SubFolloweeCount($user_id, $count = 1): bool
   {
     $user = self::find($user_id);
-    if ($user->followee_count <= 0){
+    if ($user->followee_count <= 0) {
       $user->followee_count = 0;
       return $user->save();
     }
@@ -325,7 +345,7 @@ class User extends Eloquent
   public static function SubFollowingTopicCount($user_id, $count = 1): bool
   {
     $user = self::find($user_id);
-    if ($user->following_topic_count <= 0){
+    if ($user->following_topic_count <= 0) {
       $user->following_topic_count = 0;
       return $user->save();
     }
@@ -341,7 +361,7 @@ class User extends Eloquent
   public static function SubFollowingArticleCount($user_id, $count = 1): bool
   {
     $user = self::find($user_id);
-    if ($user->following_article_count <= 0){
+    if ($user->following_article_count <= 0) {
       $user->following_article_count = 0;
       return $user->save();
     }
@@ -357,7 +377,7 @@ class User extends Eloquent
   public static function SubFollowingQuestionCount($user_id, $count = 1): bool
   {
     $user = self::find($user_id);
-    if ($user->following_question_count <= 0){
+    if ($user->following_question_count <= 0) {
       $user->following_question_count = 0;
       return $user->save();
     }
@@ -373,7 +393,7 @@ class User extends Eloquent
   public static function SubTopicCount($user_id, $count = 1): bool
   {
     $user = self::find($user_id);
-    if ($user->topic_count <= 0){
+    if ($user->topic_count <= 0) {
       $user->topic_count = 0;
       return $user->save();
     }
@@ -389,7 +409,7 @@ class User extends Eloquent
   public static function SubArticleCount($user_id, $count = 1): bool
   {
     $user = self::find($user_id);
-    if ($user->article_count <= 0){
+    if ($user->article_count <= 0) {
       $user->article_count = 0;
       return $user->save();
     }
@@ -405,7 +425,7 @@ class User extends Eloquent
   public static function SubQuestionCount($user_id, $count = 1): bool
   {
     $user = self::find($user_id);
-    if ($user->question_count <= 0){
+    if ($user->question_count <= 0) {
       $user->question_count = 0;
       return $user->save();
     }
@@ -421,7 +441,7 @@ class User extends Eloquent
   public static function SubAnswerCount($user_id, $count = 1): bool
   {
     $user = self::find($user_id);
-    if ($user->answer_count <= 0){
+    if ($user->answer_count <= 0) {
       $user->answer_count = 0;
       return $user->save();
     }
@@ -437,7 +457,7 @@ class User extends Eloquent
   public static function SubCommentCount($user_id, $count = 1): bool
   {
     $user = self::find($user_id);
-    if ($user->comment_count <= 0){
+    if ($user->comment_count <= 0) {
       $user->comment_count = 0;
       return $user->save();
     }
@@ -453,7 +473,7 @@ class User extends Eloquent
   public static function SubReplyCount($user_id, $count = 1): bool
   {
     $user = self::find($user_id);
-    if ($user->reply_count <= 0){
+    if ($user->reply_count <= 0) {
       $user->reply_count = 0;
       return $user->save();
     }
@@ -469,7 +489,7 @@ class User extends Eloquent
   public static function SubNotificationCount($user_id, $count = 1): bool
   {
     $user = self::find($user_id);
-    if ($user->notification_unread <= 0){
+    if ($user->notification_unread <= 0) {
       $user->notification_unread = 0;
       return $user->save();
     }

@@ -169,7 +169,7 @@ class UserGroup extends UserGroupModel
     //   return false;
     // }
 
-    if($name == null || $name == ''){
+    if ($name == null || $name == '') {
       return false;
     }
 
@@ -605,6 +605,15 @@ class UserGroup extends UserGroupModel
     // 增加新用户组的人数
     self::AddUserGroupUserCount($user_group_id, $users_count);
 
+    // 更新用户组人数
+    foreach ($old_user_group_ids as $old_user_group_id) 
+    {
+      if ($old_user_group_id != $user_group_id) {
+        self::UpdateUserGroupUserCount($old_user_group_id);
+      }
+    }
+    self::UpdateUserGroupUserCount($user_group_id);
+
     return true;
   }
   /**
@@ -634,8 +643,8 @@ class UserGroup extends UserGroupModel
       //然后将旧的用户组ID的用户组人数减1，最后将新的用户组ID的用户组人数加1
       self::SubUserGroupUserCount($old_user_group_id, $old_users_count);
       self::AddUserGroupUserCount($user_group_id, $old_users_count);
-      // self::UpdateUserGroupUserCount($old_user_group_id);
-      // self::UpdateUserGroupUserCount($user_group_id);
+      self::UpdateUserGroupUserCount($old_user_group_id);
+      self::UpdateUserGroupUserCount($user_group_id);
       return true;
     }
     return false;
@@ -655,11 +664,13 @@ class UserGroup extends UserGroupModel
         // ->where('delete_time', '=', 0)
         ->first();
       if ($is_update) {
-        if($is_update->user_group_user_count - $user_count != 0){
-          $is_update->user_group_user_count = $user_count;
-        }else if($is_update->user_group_user_count - $user_count < 0){
-          $is_update->user_group_user_count = 0;
-        }
+        // if($is_update->user_group_user_count - $user_count != 0){
+        //   $is_update->user_group_user_count = $user_count;
+        // }else if($is_update->user_group_user_count - $user_count < 0){
+        //   $is_update->user_group_user_count = 0;
+        // }
+
+        $is_update->user_group_user_count = ($user_count < 0) ? 0 : $user_count;
         return $is_update->save();
         // return true;
       }

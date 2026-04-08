@@ -1197,6 +1197,9 @@ class User extends UserModel
       $is_set = self::whereIn('user_id', $user_ids)->update([
         'disable_time' => $disable_time,
       ]);
+
+      // 使用伪删除
+      // $is_set = self::whereIn('user_id', $user_ids)->delete();
     }
     return [
       'is_delete' => $is_set,
