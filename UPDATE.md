@@ -3,6 +3,19 @@
 
 ### 版本更新日志
 
+
+#### 2026-03-22 版本更新
+**新增内容**
+ - 为基于`Vuetify4`UI框架精心打造的`Material Design Forum Vuetify4`的全新客户端主题添加了 `Admin 管理员端`
+ - 您可以在登录后-头像-设置-切换主题，如新主题使用出现bug，欢迎提交issue或进群反馈交流 QQ群聊：`891100027`
+
+**修复**
+ - 修复大量来自`Material Design Forum Vuetify4`的bug，包括但不限于：登录异常、主题切换异常、权限管理异常等。
+
+
+<details>
+<summary>点击展开/收起 历史更新</summary>
+
 #### 2026-03-22 版本更新
 **新增内容**
  - 新增了基于`Vuetify4`UI框架精心打造的`Material Design Forum Vuetify4`的全新客户端主题（暂不含管理员端）`
@@ -13,9 +26,6 @@
 
 
 ---
-
-<details>
-<summary>点击展开/收起 历史更新</summary>
 
 #### 2026-02-26 版本更新
 **核心变更：引入 `.env` 配置文件**
