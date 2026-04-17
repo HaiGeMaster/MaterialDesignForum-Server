@@ -4,7 +4,29 @@
 ### 版本更新日志
 
 
-#### 2026-03-22 版本更新
+#### 2026-04-17 版本更新
+
+**新增内容**
+ - 兼容 `tauri` 应用框架
+ - 当检测到新版本时，将会在顶部显示横幅通知您有新版本可用。添加的组件：`src\components\update-banner\index.vue`
+
+**修复**
+ - 前端样式优化改进
+ - 话题、文章、提问列表页tab标签绑定优化。
+ - 修复部分按钮为方圆角问题
+ - Oauth前端显示错误问题
+ - Oauth后端错误问题：
+```php
+// src\Controllers\Oauth.php
+        'sso_client_main_name' => $_ENV['OAUTH2_SSO_CLIENT_MAIN_NAME'],//OptionController::find('sso_client_main_name')->value,
+```
+
+---
+
+<details>
+<summary>点击展开/收起 历史更新</summary>
+
+#### 2026-04-08 版本更新
 **新增内容**
  - 为基于`Vuetify4`UI框架精心打造的`Material Design Forum Vuetify4`的全新客户端主题添加了 `Admin 管理员端`
  - 您可以在登录后-头像-设置-切换主题，如新主题使用出现bug，欢迎提交issue或进群反馈交流 QQ群聊：`891100027`
@@ -13,8 +35,7 @@
  - 修复大量来自`Material Design Forum Vuetify4`的bug，包括但不限于：登录异常、主题切换异常、权限管理异常等。
 
 
-<details>
-<summary>点击展开/收起 历史更新</summary>
+---
 
 #### 2026-03-22 版本更新
 **新增内容**

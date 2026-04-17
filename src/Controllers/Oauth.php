@@ -119,7 +119,7 @@ class Oauth extends OauthModel
         'microsoft' => $microsoft,
         'google' => $google,
         'sso' => $sso,
-        'sso_client_main_name' => OptionController::find('sso_client_main_name')->value,
+        'sso_client_main_name' => $_ENV['OAUTH2_SSO_CLIENT_MAIN_NAME'],//OptionController::find('sso_client_main_name')->value,
       ]
     ];
   }
