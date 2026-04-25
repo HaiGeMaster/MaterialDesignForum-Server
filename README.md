@@ -1,5 +1,5 @@
 
-### Material Design Forum - Server
+# Material Design Forum - Server
 
 
 <img src="https://mdf.xbedrock.com/assets/info_content/md3/device_info_template_auto.png" alt="MDUI2主题预览图" width="100%">
@@ -89,23 +89,15 @@ Material Design Forum通过以下优势成为现代化论坛平台：
 1. 下载最新版本的Material Design Forum部署文件（包含前端代码和后端代码）
 2. 解压文件到服务器目录
 3. 导入数据库文件（位于`assets/demo_table.sql`）
-4. 配置数据库连接（编辑`src\Config\Config.php`文件）
-   ```php
-   //以下是可以修改的配置↓
-    $config['mysql_hostname'] = 'localhost'; //数据库地址
-    $config['mysql_username'] = 'root'; //数据库用户名
-    $config['mysql_password'] = 'root'; //数据库密码
-    $config['mysql_database'] = 'demo'; //'root';//数据库名
-    ```
-5. 访问网站进行安装（通常为`http://localhost/install`）（暂不完善，建议手动安装）
-6. 将请求转到`index.php`
+4. 访问网站进行安装（通常为`http://yourdomain/install`）,之后你可以参考`.env.example`文件配置数据库连接信息到`.env`
+5. 将请求转到`index.php`
     ```nginx
      ##这是nginx配置,其他服务器请自行配置
      location / {
         try_files $uri $uri/ /index.php;
      }
      ```
-7. 默认有两个用户
+6. 默认有两个用户
    - 用户名：Admin
    - 密码：1234
    ---
@@ -120,123 +112,114 @@ Material Design Forum通过以下优势成为现代化论坛平台：
 > 让我们共同打造更美好的线上社区环境！
 
 
----
+# Material Design Forum - Server
 
-# [EN] Material Design Forum - A Modern Web-Based Forum Application  
 
-## Product Overview  
-The Material Design Forum is a web-based forum application designed to provide users with:  
-• An exceptional interactive experience  
-• A visually pleasing environment  
-• An interface design aligned with the core principles of Material Design  
+<img src="https://mdf.xbedrock.com/assets/info_content/md3/device_info_template_auto.png" alt="MDUI2 Theme Preview" width="100%">
 
-## UI Design and Technical Implementation  
 
-### Framework and Theme  
-• Frontend Framework: Vuetify2、MDUI2
-• Client-Side Theme: Vuetify2、MDUI2
-• Design Standards: Strictly follows Material Design guidelines  
+<img src="https://mdf.xbedrock.com/assets/info_content/md2/device_info_template_auto.png" alt="Vuetify2 Theme Preview" width="100%">
 
-### Responsive Layout  
-• Supported Device Types:  
-  • PC (Desktop)  
-  • Pad (Tablet)  
-  • Mobile (Smartphone)  
+# [EN] Material Design Forum - Modern Web-Based Forum Application
 
-• Features:  
-  • Intelligent device type recognition  
-  • Browser window auto-adaptation  
-  • Seamless layout switching  
+## Product Overview
+Material Design Forum is a web-based forum application dedicated to providing users with:
+- Exceptional interactive experience
+- Visual enjoyment
+- Interface design aligned with core Material Design principles
 
-## Core Features  
+## UI Design & Technical Implementation
 
-### User Features  
-• Content Publishing:  
-  • Start a topic  
-  • Ask a question  
-  • Write an article  
+### Framework & Themes
+- **Frontend Frameworks**: Vuetify2, MDUI2
+- **Client-side Themes**: Vuetify2, MDUI2
+- **Design Specification**: Strictly adheres to Material Design guidelines
 
-• Interaction Features:  
-  • Post answers  
-  • Participate in comments  
-  • Reply to posts  
+### Responsive Layout
+- Supported Device Types:
+  - PC (Desktop)
+  - Pad (Tablet devices)
+  - Mobile (Mobile devices)
+- Key Features:
+  - Intelligent device type detection
+  - Browser window adaptive layout
+  - Seamless layout switching
 
-### Administrator Features  
-• Content Management:  
-  • CRUD operations for topics/questions/articles/answers/comments/replies  
+## Core Features
 
-• Backend Tools:  
-  • Real-time data dashboard  
-  • Data management and deletion  
-  • Site data settings  
-  • Email sending configuration  
+### User Features
+- Content Creation:
+  - Start topics
+  - Ask questions
+  - Write articles
+- Interaction Features:
+  - Post answers
+  - Participate in comments
+  - Reply to discussions
 
-• User Group Management:  
-  • Fine-grained permission allocation  
-  • Diverse role management  
+### Administrator Features
+- Content Management:
+  - CRUD operations for topics/questions/articles/answers/comments/replies
+- Backend Tools:
+  - Real-time data dashboard
+  - Data management and deletion
+  - Site data configuration
+  - Email sending settings
+- User Group Management:
+  - Granular permission assignment
+  - Diverse role management
 
-## Design Highlights  
+## Design Highlights
 
-### Visual Experience  
-• Color Scheme: Carefully designed  
-• Icon System: Compliant with Material standards  
-• Animation Transitions: Smooth and natural  
-• Theme Modes:  
-  • Dark Mode  
-  • Light Mode  
+### Visual Experience
+- Color Palette: Carefully curated
+- Icon System: Compliant with Material specifications
+- Motion Transitions: Smooth and natural
+- Theme Modes:
+  - Dark mode
+  - Light mode
 
-### Internationalization Support  
-• Built-in multi-language options  
-• Open API for language pack translation  
-• Support for custom language files  
+### Internationalization Support
+- Built-in multi-language options
+- Open translation interface for language packs
+- Support for custom language files
 
-## Summary  
-The Material Design Forum stands out as a modern forum platform with the following advantages:  
-1. Exquisite design aesthetics  
-2. Powerful feature set  
-3. Flexible customization options  
-4. Comprehensive multi-language support  
+## Summary
+Material Design Forum stands out as a modern forum platform through the following advantages:
+1. Exquisite design aesthetics
+2. Robust feature system
+3. Flexible customization options
+4. Comprehensive multilingual support
 
-## Installation and Configuration Guide  
+## Installation & Configuration Guide
 
-### System Requirements  
-• Server: PHP 7.4 or higher  
-• Database: MySQL 5.7 or higher  
-• Browser: Google Chrome, Mozilla Firefox, Microsoft Edge, etc.  
+### Environment Requirements
+- Server: PHP 7.4 or higher
+- Database: MySQL 5.7 or higher
+- Browsers: Google Chrome, Mozilla Firefox, Microsoft Edge, etc.
 
-### Installation Steps  
-1. Download the latest version of the Material Design Forum deployment package (includes both frontend and backend code)  
-2. Extract the files to your server directory  
-3. Import the database file (located at `assets/demo_table.sql`)  
-4. Configure the database connection (edit the file `src\Config\Config.php`)  
-   ```php
-   // The following configurations are editable ↓
-    $config['mysql_hostname'] = 'localhost'; // Database host
-    $config['mysql_username'] = 'root'; // Database username
-    $config['mysql_password'] = 'root'; // Database password
-    $config['mysql_database'] = 'demo'; // Database name
-    ```
-5. Access the website to begin installation (typically at `http://localhost/install`) *(Note: currently incomplete, manual installation is recommended)*  
-6. Redirect requests to `index.php`  
+### Installation Steps
+1. Download the latest version of Material Design Forum deployment package (including frontend and backend code)
+2. Extract files to your server directory
+3. Import the database file located at `assets/demo_table.sql`
+4. Access your website to start installation (typically `http://yourdomain.com/install`). Then configure database connection details in `.env` file by referring to `.env.example`
+5. Configure request routing to `index.php`
     ```nginx
-     ## This is Nginx configuration; configure accordingly for other servers
+     ## Nginx configuration example (configure accordingly for other servers)
      location / {
         try_files $uri $uri/ /index.php;
      }
      ```
-7. Two default user accounts are provided:  
-   • Username: Admin  
-   • Password: 1234  
+6. Default user accounts:
+   - Username: Admin
+   - Password: 1234
+   ---
+   - Username: User
+   - Password: 1234
 
-   ---  
-   • Username: User  
-   • Password: 1234  
+Ideal for:
+- Material Design enthusiasts
+- Community administrators
+- Global user communities
 
-Suitable For:  
-• Material Design enthusiasts  
-• Community administrators  
-• Global user communities  
-
-> Let’s build a better online community together!
-
----
+> Let's work together to build a better online community environment!
