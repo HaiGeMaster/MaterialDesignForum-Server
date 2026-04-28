@@ -535,7 +535,7 @@ class User extends UserModel
    * @param string $user_id 用户id
    * @param string $user_token token字符串 可选
    * @param string $is_admin 是否是管理员 可选
-   * @return json {is_get:是否获取成功,user:用户信息含is_follow、user_group}
+   * @return array {is_get:是否获取成功,user:用户信息含is_follow、user_group}
    */
   public static function GetUser($user_id, $user_token = '', $is_admin = false)
   {
@@ -582,7 +582,7 @@ class User extends UserModel
    * 根据user_id请求用户简介信息
    * @param string $user_id 用户id
    * @param string $user_token token字符串 可选
-   * @return json {is_get:是否获取成功,user:用户信息含is_follow、user_group}
+   * @return array {is_get:是否获取成功,user:用户信息含is_follow、user_group}
    */
   public static function GetUserInfo($user_id, $user_token = '')
   {
@@ -605,6 +605,9 @@ class User extends UserModel
         'blog' => $user->blog,
         'company' => $user->company,
         'location' => $user->location,
+        // 'last_login_location' => $user->last_login_location,//最后登录位置 给评论展示用？？
+        // 对$user->last_login_location进行处理，按照空格分割，取第一个元素作为最后登录位置
+        'last_login_location' => $user->last_login_location != '' ? explode(' ', $user->last_login_location)[0] : '',
         'bio' => $user->bio,
         'question_count' => $user->question_count,
         'article_count' => $user->article_count,

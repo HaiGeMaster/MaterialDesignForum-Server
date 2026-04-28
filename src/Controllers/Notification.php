@@ -454,7 +454,7 @@ class Notification extends NotificationModel
               $notification->reply = ReplyController::where('reply_id', $notification->reply_id)->first(); //接收者的reply
               $notification->replyable_reply = ReplyController::where('reply_id', $notification->reply_to_reply_id)->first(); //发送者的reply
 
-              $receiver_content = $notification->replyable->content;
+              $receiver_content = $notification->reply->content;
               $sender_content = $notification->replyable_reply->content;
             }
             break;
