@@ -17,8 +17,8 @@ class i18n
 {
   // 属性
   public string $locale;
-  public $fallbackLocale;
-  public $messages;
+  public string $fallbackLocale;
+  public array $messages;
   // 构造方法
   /**
    * @param function $i18n = new i18n('zh_CN','en_US',$localization['messages']) 构造方法

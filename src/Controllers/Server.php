@@ -29,7 +29,12 @@ use Illuminate\Database\Capsule\Manager as DB;
 
 class Server
 {
-  public static function GetDataCount($user_token)
+  /**
+   * 获取统计数据
+   * @param string $user_token 用户Token
+   * @return array is_get:是否获取 data:统计数据
+   */
+  public static function GetDataCount($user_token = '')
   {
     if (
       // !UserGroupController::IsAdmin($user_token)||
@@ -72,11 +77,9 @@ class Server
   }
   /**
    * 获取指定时间段内的统计数据
-   * @param $user_token string
-   * @param $time_type string last_7_days, this_month, last_month, last_30_days, this_year, last_year, last_1_year
-   * @param $model_type string user, user_group, report, topic, question, answer, article, comment, reply
-   * @param $startTimestamp int 开始时间戳
-   * @param $endTimestamp int 结束时间戳
+   * @param string $user_token 用户Token
+   * @param string $time_type last_7_days, this_month, last_month, last_30_days, this_year, last_year, last_1_year
+   * @param string $model_type user, user_group, report, topic, question, answer, article, comment, reply
    * @return array|null
    */
   public static function GetDataBetweenTimestamps($user_token, $time_type, $model_type/*, $startTimestamp, $endTimestamp*/)
@@ -289,8 +292,8 @@ class Server
   }
   /**
    * 获取所有统计数据
-   * @param $user_token string
-   * @param $time_type string last_7_days, this_month, last_month, last_30_days, this_year, last_year, last_1_year
+   * @param string $user_token 用户Token
+   * @param string $time_type last_7_days, this_month, last_month, last_30_days, this_year, last_year, last_1_year
    * @return array|null
    */
   public static function GetDataBetweenTimestampsAll($user_token, $time_type)
@@ -322,10 +325,10 @@ class Server
   }
   /**
    * 获取服务器信息
-   * @param $user_token string
+   * @param string $user_token 用户Token
    * @return array|null
    */
-  public static function GetServerInfo($user_token)
+  public static function GetServerInfo($user_token = '')
   {
 
     if (
@@ -395,7 +398,11 @@ class Server
     }
 
     // 将字节转换为T、G、M、KB
-    function formatSize($bytes)
+    /**
+     * @param int $bytes 字节大小
+     * @return string 格式化后的大小
+     */
+    function formatSize($bytes = 0)
     {
       if ($bytes >= 1099511627776) { // 1 TB = 1,099,511,627,776 bytes
         return number_format($bytes / 1099511627776, 2) . ' TB';

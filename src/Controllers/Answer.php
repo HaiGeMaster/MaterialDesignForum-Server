@@ -42,7 +42,7 @@ class Answer extends AnswerModel
    * @param string $content_markdown 纯文本
    * @param string $content_rendered 渲染后的HTML
    * @param string $user_token 用户Token
-   * @return
+   * @return array is_add:bool 是否添加成功 answer:AnswerModel 回答
    */
   public static function AddAnswer($question_id, $content_markdown, $content_rendered, $user_token)
   {
@@ -57,6 +57,8 @@ class Answer extends AnswerModel
       $user_token != '';
     $user_id = TokenController::GetUserId($user_token);
     $is_add = false;
+    $answer = null;
+
     if (
       $user_id != null
       && $is_valid_content
@@ -205,7 +207,7 @@ class Answer extends AnswerModel
    * @param string $content_markdown 纯文本
    * @param string $content_rendered 渲染后的HTML
    * @param string $user_token 用户Token
-   * @return
+   * @return array is_edit:bool 是否编辑成功 answer:AnswerModel 回答
    */
   public static function EditAnswer($answer_id, $content_markdown, $content_rendered, $user_token)
   {
@@ -252,9 +254,9 @@ class Answer extends AnswerModel
   }
   /**
    * 删除回答
-   * @param int $answer_id 回答ID
+   * @param int[] $answer_ids 回答ID数组
    * @param string $user_token 用户Token
-   * @return
+   * @return array is_delete:是否删除,delete_ids:删除成功的IDID数组
    */
   public static function DeleteAnswers($answer_ids, $user_token)
   {
@@ -331,10 +333,6 @@ class Answer extends AnswerModel
           //   }
           // }
 
-          //减少对应问题的回答数量
-          QuestionController::SubAnswerCount($answer->question_id);
-          //减少用户的回答数量
-          UserController::SubAnswerCount($answer->user_id);
           //删除回答
           $answer->delete_time = Share::ServerTime();
 

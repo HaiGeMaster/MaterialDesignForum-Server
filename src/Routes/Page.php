@@ -27,6 +27,11 @@ use MaterialDesignForum\Views\Admin;
 
 class Page
 {
+  /**
+   * 处理manifest.json
+   * @param bool|null $dark 是否暗黑模式
+   * @return string
+   */
   public static function HandleManifest($dark = null)
   {
     //读取manifest.json

@@ -25,11 +25,11 @@ use Illuminate\Database\Capsule\Manager as Capsule;
 
 class Install
 {
-  public static $path = '././src/Config/Install.json';
-  public static $installIndexFilePath = '././public/themes/MaterialDesignForum-Vuetify2/install.html';
-  public static $defaultConfigFiePath = '././src/Config/Config.default.php.txt';
-  public static $configFiePath = '././src/Config/Config.php';
-  public static $defaultSQLFilePath = '././demo_table.sql';
+  public static string $path = '././src/Config/Install.json';
+  public static string $installIndexFilePath = '././public/themes/MaterialDesignForum-Vuetify2/install.html';
+  public static string $defaultConfigFiePath = '././src/Config/Config.default.php.txt';
+  public static string $configFiePath = '././src/Config/Config.php';
+  public static string $defaultSQLFilePath = '././demo_table.sql';
 
   /**
    * @return bool 是否已经安装
@@ -88,6 +88,11 @@ class Install
     }
     return $json;
   }
+  /**
+   * 安装页面
+   * @param string $lang 语言
+   * @return string 安装页面html
+   */
   public static function InstallView($lang = '')
   {
     if ($lang == '') {
@@ -104,6 +109,12 @@ class Install
     $index_html = str_replace('{script}', '', $index_html);
     return $index_html;
   }
+  /**
+   * 保存安装信息
+   * @param bool $install 是否安装
+   * @param int $step 安装步骤
+   * @return bool 是否保存成功
+   */
   public static function SaveInstallJSON($install = false, $step = 0): bool
   {
     //如果文件不存在则创建
@@ -241,6 +252,13 @@ class Install
   }
   /**
    * 安装2-1：设置系统邮件
+   * @param string $smtp_username 邮箱用户名
+   * @param string $smtp_password 邮箱密码
+   * @param string $smtp_send_name 发件人名称
+   * @param string $smtp_host 邮箱服务器地址
+   * @param string $smtp_port 邮箱服务器端口
+   * @param string $smtp_secure 邮箱服务器安全协议
+   * @return array [mail=>bool]
    */
   public static function SetSqlMail($smtp_username, $smtp_password, $smtp_send_name, $smtp_host, $smtp_port, $smtp_secure)
   {
@@ -267,6 +285,9 @@ class Install
   }
   /**
    * 安装3：设置网站信息
+   * @param string $site_name 网站名称
+   * @param string $default_language 默认语言
+   * @return array [web=>bool]
    */
   public static function SetWebInfo($site_name, $default_language)
   {

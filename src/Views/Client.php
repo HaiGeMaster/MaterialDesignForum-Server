@@ -16,12 +16,12 @@ use MaterialDesignForum\Config\Config;
 class Client
 {
   public static string $lang; //语言 从外部设置
-  public static $title;
-  public static $description;
-  public static $keywords;
-  public static $content = '';
-  public static $script;
-  public static $theme;
+  public static string $title;
+  public static string $description;
+  public static string $keywords;
+  public static string $content = '';
+  public static string $script;
+  public static string $theme;
   public static function Index()
   {
     $user_token = Share::GetClientUserToken();
@@ -86,6 +86,11 @@ class Client
     }
     return self::ReturnView();
   }
+  /**
+   * 处理主题页面
+   * @param string $topic_id 主题ID
+   * @return string
+   */
   public static function Topic($topic_id)
   {
     $user_token = Share::GetClientUserToken();
@@ -138,6 +143,11 @@ class Client
 
     return self::ReturnView();
   }
+  /**
+   * 处理问题页面
+   * @param string $question_id 问题ID
+   * @return string
+   */
   public static function Question($question_id)
   {
     $user_token = Share::GetClientUserToken();
@@ -169,6 +179,12 @@ class Client
 
     return self::ReturnView();
   }
+  /**
+   * 处理问题和答案页面
+   * @param string $question_id 问题ID
+   * @param int $answer_id 答案ID
+   * @return string
+   */
   public static function Question_And_Answers($question_id, $answer_id = 0)
   {
     $user_token = Share::GetClientUserToken();
@@ -236,6 +252,11 @@ class Client
 
     return self::ReturnView();
   }
+  /**
+   * 处理文章页面
+   * @param string $article_id 文章ID
+   * @return string
+   */
   public static function Article($article_id)
   {
     $user_token = Share::GetClientUserToken();
@@ -267,6 +288,11 @@ class Client
 
     return self::ReturnView();
   }
+  /**
+   * 处理用户页面
+   * @param string $user_id 用户ID
+   * @return string
+   */
   public static function User($user_id)
   {
     $data = \MaterialDesignForum\Controllers\User::GetUserInfo($user_id);

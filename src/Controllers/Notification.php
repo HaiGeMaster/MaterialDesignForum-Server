@@ -31,30 +31,30 @@ class Notification extends NotificationModel
   //通知设置类型注释定义
   /**
    * @typedef NotificationType 通知类型
-   * @property string user_follow 自己被关注
-   * @property string topic_follow 话题被关注
-   * @property string topic_delete 话题被删除
-   * @property string article_follow 文章被关注
-   * @property string article_comment 文章被评论
-   * @property string article_like 文章被点赞
-   * @property string article_delete 文章被删除
-   * @property string question_follow 提问被关注
-   * @property string question_comment 提问被评论
-   * @property string question_answer 提问被回答
-   * @property string question_delete 问题被删除
-   * @property string answer_comment 回答被评论
-   * @property string answer_like 回答被点赞
-   * @property string answer_delete 回答被删除
-   * @property string comment_like 评论被点赞
-   * @property string comment_reply 评论被回复
-   * @property string comment_delete 评论被删除
-   * @property string reply_like 回复被点赞
-   * @property string reply_reply 回复被回复
-   * @property string reply_delete 回复被删除
-   * @property string follow_user_update 关注用户更新
-   * @property string follow_topic_update 关注话题更新
-   * @property string follow_question_update 关注提问更新
-   * @property string follow_article_update 关注文章更新
+   * @property string $user_follow 自己被关注
+   * @property string $topic_follow 话题被关注
+   * @property string $topic_delete 话题被删除
+   * @property string $article_follow 文章被关注
+   * @property string $article_comment 文章被评论
+   * @property string $article_like 文章被点赞
+   * @property string $article_delete 文章被删除
+   * @property string $question_follow 提问被关注
+   * @property string $question_comment 提问被评论
+   * @property string $question_answer 提问被回答
+   * @property string $question_delete 问题被删除
+   * @property string $answer_comment 回答被评论
+   * @property string $answer_like 回答被点赞
+   * @property string $answer_delete 回答被删除
+   * @property string $comment_like 评论被点赞
+   * @property string $comment_reply 评论被回复
+   * @property string $comment_delete 评论被删除
+   * @property string $reply_like 回复被点赞
+   * @property string $reply_reply 回复被回复
+   * @property string $reply_delete 回复被删除
+   * @property string $follow_user_update 关注用户更新
+   * @property string $follow_topic_update 关注话题更新
+   * @property string $follow_question_update 关注提问更新
+   * @property string $follow_article_update 关注文章更新
    */
   /**
    * 添加互动通知 此方法不对外开放 仅供内部调用
@@ -70,7 +70,8 @@ class Notification extends NotificationModel
    * @param int $answer_id 被xx的回答ID
    * @param int $comment_id 被xx的评论ID
    * @param int $reply_id 被xx的回复ID
-   * @return array [is_add:是否添加成功 notification:通知对象]
+   * @param int $reply_to_reply_id 被xx的回复回复ID
+   * @return array [is_add=>bool,notification=>NotificationModel]
    */
   public static function AddInteractionNotification(
     $receiver_id = 0,

@@ -6,12 +6,18 @@ use MaterialDesignForum\Controllers\UserGroup as UserGroupController;
 
 class Update
 {
-    private static $remoteUrl;
-    private static $localPackageFile;
-    private static $downloadFolder;
-    private static $websiteRoot;
+    private static string $remoteUrl;
+    private static string $localPackageFile;
+    private static string $downloadFolder;
+    private static string $websiteRoot;
 
     // 修改构造函数为静态方法，初始化静态变量
+    /**
+     * 初始化更新类
+     * @param string $remoteUrl 远程 composer.json 链接
+     * @param string $localPackageFile 本地 composer.json 文件路径
+     * @param string $downloadFolder 下载文件夹路径
+     */
     public static function init(
         // $remoteUrl = 'http://localhost:83/composer.json', 
         $remoteUrl = 'https://mdf.xbedrock.com/composer.json', 
@@ -73,6 +79,8 @@ class Update
     /**
      * 解压压缩包
      * @param string $zipFile 压缩包文件路径
+     * @param string|null $path 解压文件夹路径，默认网站根目录
+     * @return void
      */
     private static function extractZip($zipFile,$path = null)
     {
@@ -194,6 +202,7 @@ class Update
 
     /**
      * 检查是否有更新
+     * @param string|null $user_token 用户令牌
      * @return array
      */
     public static function checkUpdate($user_token = null)

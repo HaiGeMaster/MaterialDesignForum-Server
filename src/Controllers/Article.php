@@ -135,8 +135,9 @@ class Article extends ArticleModel
   }
   /**
    * 获取文章
-   * @param int $question_id 问题ID
-   * @return array is_get:是否获取 article:文章信息
+   * @param int $article_id 文章ID
+   * @param string $user_token 用户Token
+   * @return array [is_get=>bool,article=>object]
    */
   public static function GetArticle($article_id, $user_token = '')
   {
@@ -272,7 +273,7 @@ class Article extends ArticleModel
    * @param string $content_markdown 纯文本
    * @param string $content_rendered 渲染后的HTML
    * @param string $user_token 用户Token
-   * @return
+   * @return array [is_edit=>bool,article=>object]
    */
   public static function EditArticle($article_id, $title, $topics, $content_markdown, $content_rendered, $user_token)
   {
@@ -396,7 +397,6 @@ class Article extends ArticleModel
           // UserGroupController::IsAdmin($user_token)
         ) {
           UserController::SubArticleCount($article->user_id);
-          TopicController::SubArticleCount($article->topics);
           NotificationController::AddInteractionNotification(
             $article->user_id,
             $user_id,
@@ -448,8 +448,6 @@ class Article extends ArticleModel
               TopicController::SubArticleCount($topic->topic_id);
             }
           }
-          //减少用户的文章数量
-          UserController::SubArticleCount($article->user_id);
           //删除文章
           $article->delete_time = Share::ServerTime();
 

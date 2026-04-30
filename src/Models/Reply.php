@@ -50,7 +50,7 @@ class Reply extends Eloquent
     'delete_time'
   ];
   // 搜索字段
-  public static $search_field = ['content'];
+  public static array $search_field = ['content'];
   /**
    * 添加回复的回复数量
    * @param int $reply_id 回复ID

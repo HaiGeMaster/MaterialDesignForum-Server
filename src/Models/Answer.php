@@ -46,7 +46,7 @@ class Answer extends Eloquent
     'delete_time'
   ];
   // 搜索字段
-  public static $search_field = ['content_markdown'];
+  public static array $search_field = ['content_markdown'];
   /**
    * 添加回答的评论数量
    * @param int $answer_id 回答ID

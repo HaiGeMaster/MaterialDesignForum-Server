@@ -18,7 +18,7 @@ use MaterialDesignForum\Plugins\EnvEditor;
 class Config
 {
 
-  public static $dotenv = null;
+  public static ?Dotenv $dotenv = null;
   // public static $sql_is_connect = false;
   public static function getConfig()
   {
@@ -66,7 +66,7 @@ class Config
    * 设置环境变量
    * @param string $key 环境变量键
    * @param string $value 环境变量值
-   * @return void
+   * @return bool 是否设置成功
    */
   public static function SetEnv(string $key, string $value): bool
   {

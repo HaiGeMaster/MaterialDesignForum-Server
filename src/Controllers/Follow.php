@@ -40,7 +40,7 @@ class Follow extends FollowModel
    * @param string $followable_type 关注类型
    * @param int $followable_id 关注ID
    * @param bool $user_is_token 用户是否是token
-   * @return array [is_follow:是否关注 json]
+   * @return bool 是否关注
    */
   public static function IsFollow($user, $followable_type, $followable_id, $user_is_token = false): bool
   {
@@ -227,7 +227,7 @@ class Follow extends FollowModel
    * @param string $user_token 用户token
    * @param int $per_page 每页显示数量
    * @param bool $is_admin 是否是管理员
-   * @return array||null $[data,pagination] data:用户对象列表 pagination:分页信息
+   * @return array [data=>array,pagination=>array]
    */
   public static function GetFollows($modes, $followable_type, $followable_id, $page, $user_token = '', $per_page = 20, $is_admin = false)
   {
@@ -263,8 +263,8 @@ class Follow extends FollowModel
    * @param string $followable_type 关注类型 user，topic，question，articles
    * @param int $page 页数
    * @param int $per_page 每页显示数量
-   * @param bool $user_id_is_token user_id是否是token
-   * @return array||null $[data,pagination] data:用户对象列表 pagination:分页信息
+   * @param string $user_token 用户token
+   * @return array [data=>array,pagination=>array]
    */
   private static function GetFolloweesListObject($user_id, $followable_type, $page = 1, $per_page = 20, $user_token = '', $user_is_admin = false)
   {
@@ -315,12 +315,12 @@ class Follow extends FollowModel
   }
   /**
    * 获取 被关注的对象 的 N个用户对象的列表
-   * @param int $$followable_id 被关注的对象ID
+   * @param int $followable_id 被关注的对象ID
    * @param string $followable_type 关注类型 user，topic，question，articles
    * @param int $page 页数
    * @param int $per_page 每页显示数量
-   * @param bool $user_token 请求者用户token
-   * @return array||null $[data,pagination] data:用户对象列表 pagination:分页信息
+   * @param string $user_token 请求者用户token
+   * @return array [data=>array,pagination=>array]
    */
   private static function GetFollowersListObject($followable_id, $followable_type, $page = 1, $per_page = 20, $user_token = '', $user_is_admin = false)
   {
@@ -345,7 +345,7 @@ class Follow extends FollowModel
    * @param int $user_token 用户token
    * @param int $page 页数
    * @param int $per_page 每页显示数量
-   * @return array||null $[data,pagination] data:用户对象列表 pagination:分页信息
+   * @return array [data=>array,pagination=>array]
    */
   public static function GetFollowMutualAttentionList($user_token, $page = 1, $per_page = 20)
   {

@@ -12,11 +12,14 @@ namespace MaterialDesignForum\Plugins;
 
 class EnvEditor
 {
-    protected $path;
-    protected $exampleEnvPath;
-    protected $content = [];
-    
-    public function __construct($path = '.env')
+    protected string $path;
+    protected string $exampleEnvPath;
+    protected array $content = [];
+    /**
+     * 构造函数
+     * @param string $path .env文件路径
+     */
+    public function __construct(string $path = '.env')
     {
         $this->path = $path;
         $this->exampleEnvPath = $path . '.example';
@@ -58,13 +61,21 @@ class EnvEditor
         //     }
         // }
     }
-    
-    public function set($key, $value)
+    /**
+     * 设置环境变量
+     * @param string $key 环境变量键
+     * @param string $value 环境变量值
+     * @return EnvEditor
+     */
+    public function set(string $key, string $value)
     {
         $this->content[$key] = $value;
         return $this;
     }
-    
+    /**
+     * 保存环境变量
+     * @return bool 是否成功
+     */
     public function save(): bool
     {
         $lines = [];

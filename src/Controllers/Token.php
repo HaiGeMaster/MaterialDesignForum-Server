@@ -142,7 +142,7 @@ class Token extends TokenModel
   /**
    * 验证token是否是用户自己的 仅适用于用户
    * @param string $token token字符串
-   * @param int $user_id 要与其对比验证的用户ID
+   * @param int $target_user_id 要与其对比验证的用户ID
    * @return bool $token->user_id == $target_user_id
    */
   public static function IsUserSelf($token, $target_user_id = null): bool

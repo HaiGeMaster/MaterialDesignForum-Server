@@ -22,7 +22,7 @@ class Inbox extends InboxModel
   //角色类型：系统system，用户user_id
   //sender_type 发送类型: user_to_user、user_to_chat_group、system_to_user、system_to_user_group
   //接收类型: user_id、user_group_id、chat_group_id
-  public static $sender_type = [
+  public static array $sender_type = [
     'user_to_user',
     'user_to_chat_group',
     'system_to_user',
@@ -116,7 +116,7 @@ class Inbox extends InboxModel
    * @param int $receiver_id 接收者ID
    * @param string $content_markdown 纯文本
    * @param string $content_rendered 渲染后的HTML
-   * @return
+   * @return array [is_add=>bool,inbox=>InboxModel]
    */
   public static function Client_AddInbox($sender_token, $sender_type, $receiver_id, $content_markdown, $content_rendered)
   {
@@ -143,7 +143,7 @@ class Inbox extends InboxModel
    * @param int $receiver_id 接收者ID user_id、chat_group_id
    * @param string $content_markdown 纯文本
    * @param string $content_rendered 渲染后的HTML
-   * @return
+   * @return array [is_add=>bool,inbox=>InboxModel]
    */
   public static function Server_AddInbox($sender_id, $sender_type, $receiver_id, $content_markdown, $content_rendered)
   {

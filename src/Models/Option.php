@@ -46,6 +46,12 @@ class Option extends Eloquent
       return null;
     }
   }
+  /**
+   * 设置配置项
+   * @param string $name 配置项名称
+   * @param string $value 配置项值
+   * @return bool 是否设置成功
+   */
   public static function Set($name, $value)
   {
     $option = self::find($name);

@@ -27,7 +27,9 @@ class Share
    * @param string $title 标题
    * @param string $description 描述
    * @param string $keywords 关键词
+   * @param string $content 内容
    * @param string $script 脚本
+   * @param string $theme 主题名称
    * @return string
    */
   public static function HandleThemePage(
@@ -92,11 +94,7 @@ class Share
    * share.php
    * 读入index.html
    * @param string $lang 语言
-   * @param string $title 标题
-   * @param string $description 描述
-   * @param string $keywords 关键词
-   * @param string $content 内容
-   * @param string $script 脚本
+   * @param string $theme 主题名称
    * @return string
    */
   public static function HandleAdminPage($lang, $theme = 'MaterialDesignForum-Vuetify4')
@@ -143,9 +141,10 @@ class Share
   /**
    * 处理Array数据为JSON
    * @param array $data 数据
-   * @return JSON||null
+   * @return string|null
+   * @throws \Exception 如果JSON编码失败则抛出异常
    */
-  public static function HandleArrayToJSON($data)
+  public static function HandleArrayToJSON($data): string|null
   {
     try {
       //return json_encode($data);
@@ -162,9 +161,11 @@ class Share
   /**
    * 处理JSON数据为数组
    * @param string $data 数据
+   * @param bool $assoc 是否关联关联数组
+   * @throws \Exception 如果JSON解码失败则抛出异常
    * @return array
    */
-  public static function HandleJSONToArray($data, $assoc = false)
+  public static function HandleJSONToArray($data, $assoc = false): array
   {
     if (Config::Dev() || $assoc) {
       return json_decode($data, true);
@@ -174,7 +175,7 @@ class Share
   }
   /**
    * 处理数据和分页
-   * @param $data 查询的分页数据数据
+   * @param object $data 查询的分页数据数据
    * @return array ['is_get' => bool, 'data' => array, 'pagination' => array]
    */
   public static function HandleDataAndPagination($data = null)
@@ -218,8 +219,8 @@ class Share
   }
   /**
    * 处理合并数据和分页 适用于不同表的数据和分页
-   * @param $data 查询的数据->items()
-   * @param $pagination 分页数据
+   * @param array $data 查询的数据->items()
+   * @param object $pagination 分页数据
    * @return array ['is_get' => bool, 'data' => array, 'pagination' => array]
    */
   public static function HandleMergeDataAndPagination($data, $pagination)
@@ -289,7 +290,7 @@ class Share
   }
   /**
    * 从原始请求中获取JSON数据 仅限POST且Content-Type为application/x-www-form-urlencoded
-   * @return array||null
+   * @return array|null
    */
   public static function GetRequestJSONData()
   {
@@ -304,7 +305,12 @@ class Share
 
     //json_encode($postData, JSON_PRETTY_PRINT)) //转换为正常的json
   }
-  public static function GetLanguage($lang)
+  /**
+   * 获取语言文件
+   * @param string $lang 语言符号
+   * @return string
+   */
+  public static function GetLanguage($lang): string
   {
     $dataFolder = '././public/locale/json/' . $lang . '.json';
     if (file_exists($dataFolder)) {
@@ -436,6 +442,11 @@ class Share
     //     "path": "././public/themes/MaterialDesignVuetify2"
     // }]
   }
+  /**
+   * 获取主题信息
+   * @param string $theme_name 主题名称
+   * @return array|null
+   */
   public static function GetThemeInfo($theme_name)
   {
     $themeFilePath = Config::GetWebThemePath() . $theme_name . '/theme.json';
@@ -485,6 +496,8 @@ class Share
   }
   /**
    * 获取主题是否支持ie浏览器 最低ie6起步
+   * @param string $theme_name 主题名称
+   * @return bool 是否支持
    */
   public static function GetThemeIsSupportIE($theme_name)
   {
@@ -524,7 +537,7 @@ class Share
   /**
    * 设置主题配置文件
    * @param string $theme_name 主题名称
-   * @param array $themes 主题配置
+   * @param array|string $theme_color 主题配置文件
    * @return array
    */
   public static function SetThemeSettingColor($theme_name, $theme_color)

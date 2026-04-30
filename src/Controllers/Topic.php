@@ -64,11 +64,13 @@ class Topic extends TopicModel
   }
   /**
    * 增加话题
-   * @param int $user_token 用户token
-   * @param int $topic_id 话题ID
+   * @param string $name 话题名称
+   * @param string $description 话题描述
+   * @param string $cover 话题封面
+   * @param string $user_token 用户token
    * @return array is_add:是否增加成功 topic:话题 json
    */
-  public static function AddTopic($name, $description, $cover, $user_token)
+  public static function AddTopic($name, $description, $cover, $user_token = '')
   {
     $is_valid_content =
       $name != null &&

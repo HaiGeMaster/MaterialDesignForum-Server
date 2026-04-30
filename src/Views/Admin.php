@@ -13,7 +13,7 @@ use MaterialDesignForum\Plugins\Share;
 
 class Admin
 {
-  public static $lang; //语言 从外部设置
+  public static string $lang; //语言 从外部设置
   public static function Index()
   {
     return self::ReturnView();

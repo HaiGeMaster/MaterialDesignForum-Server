@@ -39,12 +39,24 @@ class ChatGroup extends Eloquent
     'update_time',
     'delete_time'
   ];
+  /**
+   * 增加聊天组用户数量
+   * @param int $chat_group_id 聊天组ID
+   * @param int $count 数量
+   * @return void
+   */
   public static function AddChatGroupUserCount($chat_group_id, $count = 1)
   {
     $chat_group = ChatGroup::find($chat_group_id);
     $chat_group->chat_group_user_count += $count;
     $chat_group->save();
   }
+  /**
+   * 减少聊天组用户数量
+   * @param int $chat_group_id 聊天组ID
+   * @param int $count 数量
+   * @return void
+   */
   public static function SubChatGroupUserCount($chat_group_id, $count = 1)
   {
     $chat_group = ChatGroup::find($chat_group_id);

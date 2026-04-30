@@ -218,7 +218,7 @@ class UserGroup extends Eloquent
     'ability_vote' => 'boolean',//16
   ];
   // 搜索字段
-  public static $search_field = [
+  public static array $search_field = [
     'user_group_id',
     'user_group_name',
     'user_group_description'
@@ -226,6 +226,7 @@ class UserGroup extends Eloquent
   /**
    * 增加用户组人数
    * @param int $user_group_id 用户组ID
+   * @param int $count 增加数量
    * @return bool 是否成功
    */
   public static function AddUserGroupUserCount($user_group_id, $count = 1): bool
@@ -241,6 +242,7 @@ class UserGroup extends Eloquent
   /**
    * 减少用户组人数
    * @param int $user_group_id 用户组ID
+   * @param int $count 减少数量
    * @return bool 是否成功
    */
   public static function SubUserGroupUserCount($user_group_id, $count = 1): bool

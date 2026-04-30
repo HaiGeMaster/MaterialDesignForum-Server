@@ -1,6 +1,6 @@
 {
   "app_name": "MaterialDesignForum",
-  "version": "26.4.27",
+  "version": "26.4.28",
   "zip_link": "https://www.123865.com/s/VFB9-QEnsd",
   "prefer-stable": true,
   "minimum-stability": "stable",
@@ -10,6 +10,7 @@
     }
   ],
   "require": {
+    "php": ">=8.2",
     "phroute/phroute": "^2.2",
     "phpmailer/phpmailer": "^6.8",
     "illuminate/database": "^8.83",

@@ -15,7 +15,7 @@ use MaterialDesignForum\Controllers\Option as OptionController;
 
 class Oauth
 {
-  private static $sso_client_main_url = '';
+  private static string $sso_client_main_url = '';
   /**
    * 执行完整的GitHub OAuth认证流程
    * @param string $oauthName OAuth名称(如 "github","google","microsoft"等)
@@ -24,7 +24,7 @@ class Oauth
    * @param string $requestCode 前端传递过来的授权code
    * @param string $redirectUri 回调URI(可选，如果不提供则使用GitHub应用设置的默认URI)
    * @return array 包含用户信息和access_token的关联数组,其中mdf_user_token为当前用户的token
-   * @throws Exception 如果流程中任何步骤失败则抛出异常
+   * @throws \Exception 如果流程中任何步骤失败则抛出异常
    */
   public static function ExecuteOAuthFlow(
     string $oauthName,
@@ -170,7 +170,8 @@ class Oauth
           $tokenResponse = self::GetGoogleAccessToken($clientID, $clientSecret, $requestCode);
           $accessToken = $tokenResponse['access_token'];
 
-          echo $tokenResponse;
+          echo json_encode($tokenResponse);
+          // echo $tokenResponse;
           exit;
           // 2. 获取用户基本信息
           $userInfo = self::GetGoogleUserInfo($accessToken);
@@ -296,7 +297,7 @@ class Oauth
    * @param string $clientSecret GitHub 应用的 Client Secret
    * @param string $requestCode 前端传递过来的授权 code
    * @return array GitHub 返回的 JSON 响应(已解析为关联数组)
-   * @throws Exception 如果请求失败或解析出错则抛出异常
+   * @throws \Exception 如果请求失败或解析出错则抛出异常
    */
   public static function GetGitHubAccessToken(string $clientID, string $clientSecret, string $requestCode): array
   {
@@ -362,7 +363,7 @@ class Oauth
    *
    * @param string $accessToken GitHub OAuth Access Token
    * @return array 用户信息数组
-   * @throws Exception 如果请求失败则抛出异常
+   * @throws \Exception 如果请求失败则抛出异常
    */
   public static function GetGitHubUserInfo(string $accessToken): array
   {
@@ -374,7 +375,7 @@ class Oauth
    *
    * @param string $accessToken GitHub OAuth Access Token
    * @return array 用户邮箱数组
-   * @throws Exception 如果请求失败则抛出异常
+   * @throws \Exception 如果请求失败则抛出异常
    */
   public static function GetGitHubUserEmails(string $accessToken): array
   {
@@ -493,7 +494,7 @@ class Oauth
    * @param string $requestCode 前端传递过来的授权 code
   //  * @param string $redirectUri 回调URI
    * @return array Microsoft 返回的 JSON 响应(已解析为关联数组)
-   * @throws Exception 如果请求失败或解析出错则抛出异常
+   * @throws \Exception 如果请求失败或解析出错则抛出异常
    */
   public static function GetMicrosoftAccessToken(
     string $clientID,
@@ -580,7 +581,7 @@ class Oauth
    *
    * @param string $accessToken Microsoft OAuth Access Token
    * @return array 用户信息数组
-   * @throws Exception 如果请求失败则抛出异常
+   * @throws \Exception 如果请求失败则抛出异常
    */
   public static function GetMicrosoftUserInfo(string $accessToken): array
   {
@@ -673,7 +674,7 @@ class Oauth
    * @param string $clientSecret Google 应用的 Client Secret
    * @param string $requestCode 前端传递过来的授权 code
    * @return array Google 返回的 JSON 响应(已解析为关联数组)
-   * @throws Exception 如果请求失败或解析出错则抛出异常
+   * @throws \Exception 如果请求失败或解析出错则抛出异常
    */
   public static function GetGoogleAccessToken(string $clientID, string $clientSecret, string $requestCode): array
   {
@@ -760,7 +761,7 @@ class Oauth
    *
    * @param string $accessToken Google OAuth Access Token
    * @return array 用户信息数组
-   * @throws Exception 如果请求失败则抛出异常
+   * @throws \Exception 如果请求失败则抛出异常
    */
   public static function GetGoogleUserInfo(string $accessToken): array
   {
@@ -924,7 +925,7 @@ class Oauth
    *
    * @param string $accessToken SSO OAuth Access Token
    * @return array 用户信息数组 至少返回[access_token,token_type,scope,user{}]
-   * @throws Exception 如果请求失败则抛出异常
+   * @throws \Exception 如果请求失败则抛出异常
    */
   public static function GetSSOUserInfo(string $accessToken): array
   {

@@ -41,9 +41,11 @@ class Reply extends ReplyModel
    * 添加回复
    * @param int $replyable_id 回复目标的ID
    * @param string $replyable_type 回复目标类型：comment、reply、评论、回复
+   * @param int $replyable_comment_id 回复的评论ID
    * @param string $content 原始正文内容
    * @param string $user_token 用户Token
-   * @return
+   * @param int $replyable_user_id 回复目标用户ID
+   * @return array [is_add=>bool,reply_id=>int|null] 是否添加成功，回复ID或null
    */
   public static function AddReply(
     $replyable_id,
@@ -340,7 +342,7 @@ class Reply extends ReplyModel
    * @param int $reply_id 回复ID
    * @param string $content 原始正文内容
    * @param string $user_token 用户Token
-   * @return
+   * @return array [is_edit=>bool,reply=>Reply|null] 是否编辑成功，回复信息或null
    */
   public static function EditReply($reply_id,  $content,  $user_token)
   {
@@ -376,9 +378,9 @@ class Reply extends ReplyModel
   }
   /**
    * 删除回复
-   * @param int $reply_ids 回复ID数组
+   * @param int[] $reply_ids 回复ID数组
    * @param string $user_token 用户Token
-   * @return
+   * @return array is_delete:bool 是否删除成功 delete_ids:删除成功的IDID数组
    */
   public static function DeleteReplys($reply_ids,  $user_token)
   {
@@ -451,14 +453,12 @@ class Reply extends ReplyModel
           // }
 
           //减少对应评论或回复的数量
-          if ($reply->replyable_type == 'comment') {
-            CommentController::SubReplyCount($reply->replyable_id);
-          } else if ($reply->replyable_type == 'reply') {
-            CommentController::SubReplyCount($reply->replyable_comment_id);
-            self::SubReplyCount($reply->replyable_id);
-          }
-          //减少用户回复数量
-          UserController::SubReplyCount($reply->user_id);
+          // if ($reply->replyable_type == 'comment') {
+          //   CommentController::SubReplyCount($reply->replyable_id);
+          // } else if ($reply->replyable_type == 'reply') {
+          //   CommentController::SubReplyCount($reply->replyable_comment_id);
+          //   self::SubReplyCount($reply->replyable_id);
+          // }
           //删除回复
           $reply->delete_time = Share::ServerTime();
 
@@ -490,9 +490,9 @@ class Reply extends ReplyModel
    * 获取回复的最终目标对象是question还是article的id和type
    * @param int $reply_id 回复ID
    * @param string $user_token 用户Token
-   * @return
+   * @return array [is_get=>bool,replyable_id=>int|null,replyable_type=>string|null] 是否获取成功，回复目标对象ID或null，回复目标对象类型或null
    */
-  public static function GetReplyable($reply_id,  $user_token)
+  public static function GetReplyable($reply_id,  $user_token = '')
   {
     $reply = self::where('reply_id', '=', $reply_id)
       ->where('delete_time', '=', 0)

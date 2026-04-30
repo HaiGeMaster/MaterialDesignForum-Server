@@ -277,7 +277,7 @@ class Comment extends CommentModel
    * @param int $comment_id 评论ID
    * @param string $content 原始正文内容
    * @param string $user_token 用户Token
-   * @return
+   * @return array [is_edit=>bool,comment=>object]
    */
   public static function EditComment(
     $comment_id,
@@ -341,9 +341,9 @@ class Comment extends CommentModel
   }
   /**
    * 删除评论
-   * @param int $comment_ids 评论ID数组
+   * @param int[] $comment_ids 评论ID数组
    * @param string $user_token 用户Token
-   * @return
+   * @return array is_delete:bool 是否删除成功 delete_ids:删除成功的IDID数组
    */
   public static function DeleteComments(
     $comment_ids,
@@ -419,19 +419,17 @@ class Comment extends CommentModel
           // }
 
           //减少对应问题或文章的评论数量
-          if ($comment->commentable_type == 'answer') {
-            //如果是回答评论，则减少对应问题的评论数量
-            QuestionController::SubCommentCount($comment->commentable_id);
-          } else {
-            //如果是文章或问题评论，则减少对应文章或问题的评论数量
-            if ($comment->commentable_type == 'article') {
-              ArticleController::SubCommentCount($comment->commentable_id);
-            } else if ($comment->commentable_type == 'question') {
-              QuestionController::SubCommentCount($comment->commentable_id);
-            }
-          }
-          //减少用户评论数量
-          UserController::SubCommentCount($comment->user_id);
+          // if ($comment->commentable_type == 'answer') {
+          //   //如果是回答评论，则减少对应问题的评论数量
+          //   QuestionController::SubCommentCount($comment->commentable_id);
+          // } else {
+          //   //如果是文章或问题评论，则减少对应文章或问题的评论数量
+          //   if ($comment->commentable_type == 'article') {
+          //     ArticleController::SubCommentCount($comment->commentable_id);
+          //   } else if ($comment->commentable_type == 'question') {
+          //     QuestionController::SubCommentCount($comment->commentable_id);
+          //   }
+          // }
           //删除评论
           $comment->delete_time = Share::ServerTime();
 

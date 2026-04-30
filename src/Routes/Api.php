@@ -140,7 +140,7 @@ class Api
       $data = Share::GetRequestData();
       return Share::HandleArrayToJSON(
         \MaterialDesignForum\Controllers\Option::GetInfoData(
-          $data['user_token'] ?? ''
+          // $data['user_token'] ?? ''
         )
       );
     });
@@ -197,7 +197,7 @@ class Api
       $data = Share::GetRequestData();
       return Share::HandleArrayToJSON(
         \MaterialDesignForum\Controllers\Option::GetAllOptions(
-          $data['user_token'] ?? ''
+          // $data['user_token'] ?? ''
         )
       );
     });

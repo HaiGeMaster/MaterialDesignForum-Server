@@ -48,7 +48,7 @@ class Article extends Eloquent
     'delete_time'
   ];
   // 搜索字段
-  public static $search_field = ['title','content_markdown'];
+  public static array $search_field = ['title','content_markdown'];
   /**
    * 添加文章的评论数量
    * @param int $article_id 文章ID

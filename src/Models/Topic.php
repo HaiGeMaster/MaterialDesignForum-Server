@@ -48,10 +48,11 @@ class Topic extends Eloquent
     'delete_time',
   ];
   // 搜索字段
-  public static $search_field = ['name', 'description'];
+  public static array $search_field = ['name', 'description'];
   /**
    * 增加文章数量
    * @param int $topic_id 话题ID
+   * @param int $count 增加数量
    * @return bool 是否成功
    */
   public static function AddArticleCount($topic_id, $count = 1): bool
@@ -67,6 +68,7 @@ class Topic extends Eloquent
   /**
    * 增加问题数量
    * @param int $topic_id 话题ID
+   * @param int $count 增加数量
    * @return bool 是否成功
    */
   public static function AddQuestionCount($topic_id, $count = 1): bool
@@ -82,6 +84,7 @@ class Topic extends Eloquent
   /**
    * 增加关注者数量
    * @param int $topic_id 话题ID
+   * @param int $count 增加数量
    * @return bool 是否成功
    */
   public static function AddFollowerCount($topic_id, $count = 1): bool
@@ -100,6 +103,7 @@ class Topic extends Eloquent
   /**
    * 减少文章数量
    * @param int $topic_id 话题ID
+   * @param int $count 减少数量
    * @return bool 是否成功
    */
   public static function SubArticleCount($topic_id, $count = 1): bool
@@ -119,6 +123,7 @@ class Topic extends Eloquent
   /**
    * 减少问题数量
    * @param int $topic_id 话题ID
+   * @param int $count 减少数量
    * @return bool 是否成功
    */
   public static function SubQuestionCount($topic_id, $count = 1): bool
@@ -138,6 +143,7 @@ class Topic extends Eloquent
   /**
    * 减少关注者数量
    * @param int $topic_id 话题ID
+   * @param int $count 减少数量
    * @return bool 是否成功
    */
   public static function SubFollowerCount($topic_id, $count = 1): bool

@@ -52,7 +52,7 @@ class Question extends Eloquent
     'delete_time'
   ];
   // 搜索字段
-  public static $search_field = ['title','content_markdown'];
+  public static array $search_field = ['title','content_markdown'];
   /**
    * 添加评论数
    * @param int $question_id 问题ID

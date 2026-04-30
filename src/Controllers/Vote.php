@@ -29,7 +29,7 @@ class Vote extends VoteModel
    * @param int $votable_id 投票对象ID
    * @param string $votable_type 投票对象类型 question、answer、article、comment、reply
    * @param int $type 投票类型 up down
-   * @return
+   * @return array is_add_vote:是否增加投票 is_sub_vote:是否减少投票 vote:投票模型json
    */
   public static function Vote($user_token, $votable_id, $votable_type, $type)
   {

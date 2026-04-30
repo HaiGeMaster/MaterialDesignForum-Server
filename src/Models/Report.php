@@ -36,5 +36,5 @@ class Report extends Eloquent
     'create_time'
   ];
   // 搜索字段
-  public static $search_field = ['reason'];
+  public static array $search_field = ['reason'];
 }

@@ -119,7 +119,7 @@ class User extends Eloquent
     'disable_time' // 禁用时间
   ];
   // 搜索字段
-  public static $search_field = [
+  public static array $search_field = [
     'username',
     'headline',
     'bio'
@@ -543,15 +543,31 @@ class User extends Eloquent
   //   $user->inbox_private_message -= $count;
   //   return $user->save();
   // }
+  /**
+   * 处理密码
+   * @param string $password 密码
+   * @return string 处理后的密码
+   */
   public static function HandlePassword($password)
   {
     //return password_hash($password, PASSWORD_DEFAULT);
     return md5($password);
   }
+  /**
+   * 验证密码
+   * @param string $password 密码
+   * @param string $hash 处理后的密码
+   * @return bool 是否验证通过
+   */
   public static function PasswordHash($password, $hash)
   {
     return password_verify($password, $hash);
   }
+  /**
+   * 处理用户头像字符串
+   * @param string $avatar 用户头像字符串
+   * @return array 用户头像数组
+   */
   public static function AvatarStringToArray($avatar)
   {
     return json_decode($avatar, true);

@@ -18,9 +18,9 @@ use MaterialDesignForum\Config\Config;
 
 class MailCaptcha
 {
-  public $code;
-  public $md5code;
-  public $session_name;
+  public string $code;
+  public string $md5code;
+  public string $session_name;
   /**
    * @param string $SessionName 会话名称
    * @return void
@@ -36,7 +36,7 @@ class MailCaptcha
     }
   }
   /**
-   * @param void 创建验证码
+   * @return array ['code','md5code']
    */
   public function CreateMailCode(): array
   {
@@ -62,7 +62,8 @@ class MailCaptcha
     return $this->code;
   }
   /**
-   * @param bool 验证验证码
+   * @param string $code 验证码
+   * @return bool 验证结果
    */
   public function CheckCode($code): bool
   {
@@ -99,7 +100,7 @@ class MailCaptcha
   //   }
   // }
   /**
-   * @param string||array $to 收件人
+   * @param string|array $to 收件人邮箱或邮箱数组
    * @param string $subject 主题
    * @param string $content 内容
    * @return bool 发送邮件

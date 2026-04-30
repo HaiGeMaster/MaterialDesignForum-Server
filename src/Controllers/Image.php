@@ -19,7 +19,7 @@ use MaterialDesignForum\Plugins\Share;
 class Image extends ImageModel
 {
   //以前都是 'path' => 'publi c/stati c/upload/xxx
-  public static $pathData = [
+  public static array $pathData = [
     'user_avatar' => [
       'path' => 'user/avatars',
       'needDeleteOld' => true,
@@ -360,6 +360,12 @@ class Image extends ImageModel
     ];
     return $pathArr;
   }
+  /**
+   * 获取上传的图片
+   * @param string $path 图片路径
+   * @param string $size 图片大小
+   * @return void 图片
+   */
   public static function GetUploadImage($path, $size = 'original')
   {
     $images_path = './.' . base64_decode($path);

@@ -44,7 +44,7 @@ class Question extends QuestionModel
    * @param string $content_markdown 纯文本
    * @param string $content_rendered 渲染后的HTML
    * @param string $user_token 用户Token
-   * @return
+   * @return array [is_add=>bool,question_id=>int|null] 是否添加成功，问题ID或null
    */
   public static function AddQuestion($title, $topics, $content_markdown, $content_rendered, $user_token)
   {
@@ -138,6 +138,7 @@ class Question extends QuestionModel
   /**
    * 获取提问
    * @param int $question_id 问题ID
+   * @param string $user_token 用户Token
    * @return array is_get:是否获取 question:问题信息
    */
   public static function GetQuestion($question_id, $user_token = '')
@@ -370,9 +371,9 @@ class Question extends QuestionModel
   }
   /**
    * 删除提问
-   * @param int $question_id 问题ID
+   * @param int[] $question_ids 问题ID数组
    * @param string $user_token 用户Token
-   * @return array is_delete:是否删除
+   * @return array is_delete:是否删除,delete_ids:删除成功的IDID数组
    */
   public static function DeleteQuestions($question_ids, $user_token)
   {
@@ -408,7 +409,6 @@ class Question extends QuestionModel
            // UserGroupController::IsAdmin($user_token)
         ) {
           UserController::SubQuestionCount($question->user_id);
-          // TopicController::SubQuestionCount($question->topics);
           NotificationController::AddInteractionNotification(
             $question->user_id,
             $user_id,
@@ -499,8 +499,6 @@ class Question extends QuestionModel
               TopicController::SubQuestionCount($topic->topic_id);
             }
           }
-          //减少用户的提问数量
-          UserController::SubQuestionCount($question->user_id);
           //删除提问
           $question->delete_time = Share::ServerTime();
 

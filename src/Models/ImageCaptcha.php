@@ -11,12 +11,12 @@ namespace MaterialDesignForum\Models;
 
 class ImageCaptcha
 {
-  public $code;
-  public $md5code;
+  public string $code;
+  public string $md5code;
   public $img;
-  public $black;
-  public $green;
-  public $white;
+  public int $black;
+  public int $green;
+  public string $white;
   public function __construct()
   {
     if (!isset($_SESSION) || $_SESSION['ImageCaptchaCode'] == '') {
@@ -61,6 +61,11 @@ class ImageCaptcha
     imagepng($this->img);
     imagedestroy($this->img);
   }
+  /**
+   * 验证验证码
+   * @param string $code 验证码
+   * @return bool
+   */
   public function CheckCode($code): bool
   {
     if ($code == $_SESSION['ImageCaptchaCode']) {

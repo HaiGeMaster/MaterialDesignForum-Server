@@ -87,7 +87,12 @@ class TopicAble extends TopicAbleModel
     // }
     return $topic_ids;
   }
-  public static function DeleteTopicAbles($topic)
+  /**
+   * 删除话题关联
+   * @param TopicAbleModel $topic 话题关联模型
+   * @return bool 是否删除成功
+   */
+  public static function DeleteTopicAbles($topic): bool
   {
     $topicables = self::where('topic_id', '=', $topic->topic_id)->get();
     foreach ($topicables as $topicable) {

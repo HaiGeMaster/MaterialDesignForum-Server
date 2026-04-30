@@ -40,7 +40,7 @@ class User extends UserModel
    * @param string $oauthUserMail 第三方平台用户邮箱 用来查找数据库中是否有对应的用户
    * @param string $oauthSourceResponse 第三方平台返回的用户信息
    * @param string $user_token 对应的用户token。可以为空
-   * @return OauthModel|null 返回添加或更新后的Oauth模型实例或null
+   * @return array 返回添加或更新后的Oauth模型实例或null
    */
   public static function OauthLoginOrRegister($oauthName, $oauthUserId, $oauthUserName, $oauthUserMail, $oauthSourceResponse, $user_token): array
   {
@@ -126,7 +126,8 @@ class User extends UserModel
    * @param string $password 密码
    * @param string $email_captcha 邮箱验证码
    * @param string $username 用户名
-   * @return json {is_register:是否注册成功}
+   * @param string $language 语言
+   * @return array {is_register:是否注册成功}
    */
   public static function AddUser($email, $password, $email_captcha, $username = "", $language = "")
   {
@@ -207,7 +208,7 @@ class User extends UserModel
    * @param string $bio 个人介绍
    * @param string $user_token token 修改者用户token字符串
    * @param string $edit_target_user_id 要编辑的用户id
-   * @return json {is_edit:是否更新成功,user:新的用户信息}
+   * @return array {is_edit:是否更新成功,user:新的用户信息}
    */
   public static function EditInfo($email, $username, $user_group_id, $headline, $blog, $company, $location, $bio, $user_token, $edit_target_user_id)
   {
@@ -260,10 +261,20 @@ class User extends UserModel
       'user' => self::GetUser($edit_target_user_id, $user_token)['user'],
     ];
   }
+  /**
+   * 创建默认头像
+   * @param string $name 用户名
+   * @param string $user_id 用户id
+   * @return string 默认头像url
+   */
   public static function CreateDefaultAvatar($name, $user_id = 'cache')
   {
     return ImageController::CreateUserDefaultAvatar($name, $user_id);
   }
+  /**
+   * 创建默认封面
+   * @return string 默认封面url
+   */
   public static function CreateDefaultCover()
   {
     return ImageController::CreateUserDefaultCover();
@@ -338,7 +349,7 @@ class User extends UserModel
    * 请求发送邮件验证码
    * @param string $email 邮箱
    * @param string $lang 语言 如zh_CN 必须来自客户端界面支持的语言 可选的 i18n将会自动检测并设置。
-   * @return json {send_mail:发送的邮箱,is_send:是否发送成功,email_code:邮箱验证码,locale:语言}
+   * @return array {send_mail:发送的邮箱,is_send:是否发送成功,email_code:邮箱验证码,locale:语言}
    */
   public static function GetEmailCaptcha($email, $lang = "")
   {
@@ -374,7 +385,8 @@ class User extends UserModel
   }
   /**
    * 请求图片验证码
-   * @return img 图片验证码
+   * @param int $time 时间戳
+   * @return array {img:图片验证码,code:验证码,locale:语言}
    */
   public static function GetImageCaptcha($time = 0)
   {
@@ -390,10 +402,10 @@ class User extends UserModel
   }
   /**
    * 请求登录验证
-   * @param string $email 邮箱
+   * @param string $username_or_email 用户名或邮箱
    * @param string $password 密码
    * @param string $image_capthca 验证码
-   * @return json {is_login:是否登录成功,token:token字符串}
+   * @return array {is_login:是否登录成功,token:token字符串}
    */
   public static function Login($username_or_email, $password, $image_capthca = "")
   {
@@ -472,7 +484,7 @@ class User extends UserModel
    * @param string $email 邮箱
    * @param string $email_captcha 邮箱验证码
    * @param string $password 密码
-   * @return json {is_reset:是否重置成功}
+   * @return array {is_reset:是否重置成功}
    */
   public static function Reset($email, $password, $email_captcha)
   {
@@ -502,7 +514,7 @@ class User extends UserModel
   /**
    * 请求用户信息
    * @param string $token token字符串
-   * @return json {is_login:是否登录成功,user:用户信息}
+   * @return array {is_login:是否登录成功,user:用户信息}
    */
   public static function Auto_Login($token)
   {
@@ -606,7 +618,7 @@ class User extends UserModel
         'company' => $user->company,
         'location' => $user->location,
         // 'last_login_location' => $user->last_login_location,//最后登录位置 给评论展示用？？
-        // 对$user->last_login_location进行处理，按照空格分割，取第一个元素作为最后登录位置
+        // 对$user->last_login_location进行处理，按照空格分割，取第一个元素作为最后登录位置，最大可能得保护用户隐私位置
         'last_login_location' => $user->last_login_location != '' ? explode(' ', $user->last_login_location)[0] : '',
         'bio' => $user->bio,
         'question_count' => $user->question_count,
@@ -637,7 +649,7 @@ class User extends UserModel
    * @param string $search_keywords 搜索关键词
    * @param array $search_field 搜索字段
    * @param string $is_admin 是否是管理员
-   * @return json {分页用户信息}
+   * @return array {分页用户信息}
    */
   public static function GetUsers(
     $order,
@@ -799,7 +811,7 @@ class User extends UserModel
   }
   /**
    * 重置所有人的头像 仅限开发者使用
-   * @return json {is_reset:是否重置成功}
+   * @return array {is_reset:是否重置成功}
    */
   public static function DEV_AllUserAvatarReset()
   {
@@ -821,7 +833,7 @@ class User extends UserModel
   }
   /**
    * 重置所有人的封面 仅限开发者使用
-   * @return json {is_reset:是否重置成功}
+   * @return array {is_reset:是否重置成功}
    */
   public static function DEV_AllUserCoverReset()
   {
@@ -852,7 +864,7 @@ class User extends UserModel
    * 重置用户头像
    * @param string $user_id 用户id
    * @param string $user_token token字符串
-   * @return json {is_reset:是否重置成功}
+   * @return array {is_reset:是否重置成功}
    */
   public static function ResetAvatar($user_id, $user_token)
   {
@@ -894,7 +906,7 @@ class User extends UserModel
    * 重置用户封面
    * @param string $user_id 用户id
    * @param string $user_token token字符串
-   * @return json {is_reset:是否重置成功}
+   * @return array {is_reset:是否重置成功}
    */
   public static function ResetCover($user_id, $user_token)
   {
@@ -936,7 +948,7 @@ class User extends UserModel
    * 上传头像
    * @param string $user_token token字符串
    * @param string $avatar 头像base64
-   * @return json {is_upload:是否上传成功,user:用户信息}
+   * @return array {is_upload:是否上传成功,user:用户信息}
    */
   public static function UploadAvatar($user_token, $avatar)
   {
@@ -968,7 +980,7 @@ class User extends UserModel
    * 上传封面
    * @param string $user_token token字符串
    * @param string $cover 封面base64
-   * @return json {is_upload:是否上传成功,user:用户信息}
+   * @return array {is_upload:是否上传成功,user:用户信息}
    */
   public static function UploadCover($user_token, $cover)
   {
@@ -1003,7 +1015,7 @@ class User extends UserModel
    * @param string $page 页码
    * @param string $user_token token字符串
    * @param string $per_page 每页显示的数量
-   * @return json {分页提问信息}
+   * @return array {分页提问信息}
    */
   public static function GetUserQuestions(
     $user_id,
@@ -1035,7 +1047,7 @@ class User extends UserModel
    * @param string $page 页码
    * @param string $user_token token字符串
    * @param string $per_page 每页显示的数量
-   * @return json {分页回答信息}
+   * @return array {分页回答信息}
    */
   public static function GetUserArticles(
     $user_id,
@@ -1067,7 +1079,7 @@ class User extends UserModel
    * @param string $page 页码
    * @param string $user_token token字符串
    * @param string $per_page 每页显示的数量
-   * @return json {分页回答信息}
+   * @return array {分页回答信息}
    */
   public static function GetUserAnswers(
     $user_id,
@@ -1111,7 +1123,7 @@ class User extends UserModel
    * @param string $user_token token字符串
    * @param string $type 类型 question、article、answer
    * @param string $file 图片base64
-   * @return json {is_upload:是否上传成功,upload_url:上传的图片url}
+   * @return array {is_upload:是否上传成功,upload_url:上传的图片url}
    */
   public static function UploadImage($user_token, $type, $file)
   {
@@ -1140,7 +1152,7 @@ class User extends UserModel
    * 设置用户语言
    * @param string $user_token token字符串
    * @param string $lang 语言
-   * @return json {is_set:是否设置成功,user:用户信息}
+   * @return array {is_set:是否设置成功,user:用户信息}
    */
   public static function SetUserLanguage($user_token, $lang)
   {

@@ -20,7 +20,7 @@ use  MaterialDesignForum\Config\Config;
 class Option extends OptionModel
 {
   // 敏感选项，不允许直接获取
-  private $sensitive_options = [
+  private static array $sensitive_options = [
     'site_activation_key',
     'smtp_host',
     'smtp_password',
@@ -40,7 +40,7 @@ class Option extends OptionModel
     'sso_client_main_url',
   ];
   // Oauth选项
-  private static $oauthOptions = [
+  private static array $oauthOptions = [
     // 'github_client_id',
     // 'github_client_secret',
     // 'google_client_id',
@@ -76,7 +76,7 @@ class Option extends OptionModel
     'sso_client_main_name' => 'OAUTH2_SSO_CLIENT_MAIN_NAME',
   ];
 
-  private static $infoOptions = [
+  private static array $infoOptions = [
     'site_name',
     'site_description',
     'site_keywords',
@@ -84,7 +84,7 @@ class Option extends OptionModel
     'site_gongan_beian',
     'default_language',
   ];
-  private static $mailOptions = [
+  private static array $mailOptions = [
     // 'smtp_host',
     // 'smtp_password',
     // 'smtp_port',
@@ -131,6 +131,12 @@ class Option extends OptionModel
 
     return ['is_get' => !empty($form_data), 'form_data' => $form_data];
   }
+  /**
+   * 设置Oauth所有的选项
+   * @param array $form_data 表单数据
+   * @param string $user_token 用户token
+   * @return array [is_set=>bool]
+   */
   public static function SetOauthOptions($form_data, $user_token)
   {
     if (!UserGroupController::IsAdmin($user_token)) {

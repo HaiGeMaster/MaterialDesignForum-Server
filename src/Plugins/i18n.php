@@ -17,8 +17,8 @@ use MaterialDesignForum\Config\Config;
 
 class i18n
 {
-  public static $i18n = null;
-  public static $null_language = null;
+  public static ?i18nModel $i18n = null;
+  public static string $null_language = '';
 
   private static function Init()
   {
@@ -50,9 +50,10 @@ class i18n
   }
   /**
    * 验证语言 仅限于构造实例self::i18n后使用
-   * @return string
+   * @param string $lang 语言符号
+   * @return bool 是否存在
    */
-  public static function VerificationLanguages($lang)
+  public static function VerificationLanguages(string $lang): bool
   {
     if (self::i18n()->hasLocale($lang)) {
       return true;
