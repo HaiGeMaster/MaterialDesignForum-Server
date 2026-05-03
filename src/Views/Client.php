@@ -21,7 +21,7 @@ class Client
   public static string $keywords;
   public static string $content = '';
   public static string $script;
-  public static string $theme;
+  public static string $theme = '';
   public static function Index()
   {
     $user_token = Share::GetClientUserToken();
