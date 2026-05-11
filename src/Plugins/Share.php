@@ -69,13 +69,13 @@ class Share
     // }
     $index_html = file_get_contents(Config::GetWebThemePath() . $theme . '/index.html');
     $upcoming = i18n::t('Message.App.UpComing', $lang);
-    $upcoming = '<div class="loading-text">' . $upcoming . '</div>';
+    // $upcoming = '<div class="loading-text">' . $upcoming . '</div>';
     if (i18n::VerificationLanguages($lang)) {
       $index_html = str_replace('{lang}', $lang, $index_html);
       $index_html = str_replace('{title}', $title, $index_html);
       $index_html = str_replace('{description}', $description, $index_html);
       $index_html = str_replace('{keywords}', $keywords, $index_html);
-      $index_html = str_replace('<div id="upcoming"></div>', $upcoming, $index_html);
+      // $index_html = str_replace('<div id="upcoming"></div>', $upcoming, $index_html);
       $index_html = str_replace('<div id="content"></div>', $content, $index_html);
       $index_html = str_replace('<script id="seo"></script>', '<script id="seo">' . $script . '</script>', $index_html);
     } else {
@@ -83,7 +83,7 @@ class Share
       $index_html = str_replace('{title}', Option::Get('site_name'), $index_html);
       $index_html = str_replace('{description}', Option::Get('site_description'), $index_html);
       $index_html = str_replace('{keywords}', Option::Get('site_keywords'), $index_html);
-      $index_html = str_replace('<div id="upcoming"></div>', $upcoming, $index_html);
+      // $index_html = str_replace('<div id="upcoming"></div>', $upcoming, $index_html);
       $index_html = str_replace('<div id="content"></div>',  Option::Get('site_name') . ' - ' . Option::Get('site_keywords') . ' - ' . Option::Get('site_description'), $index_html);
       $index_html = str_replace('<script id="seo"></script>', '<script id="seo">' . $script . '</script>', $index_html);
     }
@@ -116,7 +116,7 @@ class Share
     $index_html = str_replace('{title}', i18n::t('Message.Components.Avatar.ManagementPanel'), $index_html);
     $index_html = str_replace('{description}', i18n::t('Message.Components.Avatar.ManagementPanel'), $index_html);
     $index_html = str_replace('{keywords}', i18n::t('Message.Components.Avatar.ManagementPanel'), $index_html);
-    $index_html = str_replace('{upcoming}', $upcoming, $index_html);
+    // $index_html = str_replace('{upcoming}', $upcoming, $index_html);
     // $index_html = str_replace('{content}', '<div style="display:none">' . i18n::t('Message.Components.Avatar.ManagementPanel') . '</div>', $index_html);
     $index_html = str_replace('{script}', '<script id="seo"></script>', $index_html);
     return $index_html;
