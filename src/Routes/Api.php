@@ -67,6 +67,18 @@ class Api
     ////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////
 
+    $collector->post('/api/user/signin/add', function () {
+      $data = Share::GetRequestData();
+      return Share::HandleArrayToJSON(
+        \MaterialDesignForum\Controllers\Extension\UserSignIn::AddUserSignIn($data['user_token'] ?? null)
+      );
+    });
+    $collector->post('/api/user/signin/get', function () {
+      $data = Share::GetRequestData();
+      return Share::HandleArrayToJSON(
+        \MaterialDesignForum\Controllers\Extension\UserSignIn::GetUserSignInData($data['user_token'] ?? null)
+      );
+    });
     $collector->post('/api/core/update/check', function () {
       $data = Share::GetRequestData();
       return Share::HandleArrayToJSON(
